@@ -15,12 +15,25 @@ Goals:
 
 Layout of the repository:
 
-- server portion of the code 
-    - this will contain the Java Backend, Python, and SQL code that we will need to use 
+- Server directory: server portion of the code 
+    - Server.java: this is the java file that contains all of the Server code that we will need 
+    
 
-- client portion of the code 
-    - this will contain the Javascript, the Frameworks such as React and Angular, CSS, and HTML
-    - It also contains each of the individual webpages for    our website 
+- Client directory: client portion of the code 
+    - index.js: this is where we will be running all of the code that we will use for the functionality of the webpages
+    - Webpages: this is the place where we will have the layout of each of the pages
+        - Class Webpage: this is the place where we will have all of the code for the layout of the class webpage 
+            - Class.css: this contains all of the styles for the class webpage 
+            - Class.html: this contains the layout of the class webpage 
+        - MainPage Webpage: this is the place where we will have all of the code for the layout of the MainPage webpage 
+            - MainPage.css: this contains all of the styles for the MainPage webpage 
+            - MaiPage.html: this contains the layout of the MainPage webpage 
+        - SearchEngine Webpage: this is the place where we will have all of the code for the layout of the SearchEngine webpage 
+            - SearchEngine.css: this contains all of the styles for the SearchEngine webpage 
+            - SearchEngine.html: this contains the layout of the SearchEngine webpage 
+        - Submission Webpage: this is the place where we will have all of the code for the layout of the Submission webpage 
+            - SubmissionPage.css: this contains all of the styles for the Submission webpage 
+            - SubmissionPage.html: this contains the layout of the Submission webpage 
 
 
 
