@@ -20,7 +20,7 @@ Layout of the repository:
 
 - client portion of the code 
     - this will contain the Javascript, the Frameworks such as React and Angular, CSS, and HTML
-    - It also contains each of the individual webpages for our website 
+    - It also contains each of the individual webpages for    our website 
 
 
 
