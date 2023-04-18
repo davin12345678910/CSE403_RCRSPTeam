@@ -16,24 +16,24 @@ Goals:
 Layout of the repository:
 
 - Server directory: server portion of the code 
-    - Server.java: this is the java file that contains all of the Server code that we will need 
+    - Server.java: this is the java file that contains all of the Server code that we will need
     
 
 - Client directory: client portion of the code 
-    - index.js: this is where we will be running all of the code that we will use for the functionality of the webpages
+    - index.js: This is file which boostraps the whole application and because it's a react application all the components will be loaded inside this file
     - Webpages: this is the place where we will have the layout of each of the pages
         - Class Webpage: this is the place where we will have all of the code for the layout of the class webpage 
             - Class.css: this contains all of the styles for the class webpage 
-            - Class.html: this contains the layout of the class webpage 
+            - Class.js: this contains the layout of the class webpage 
         - MainPage Webpage: this is the place where we will have all of the code for the layout of the MainPage webpage 
             - MainPage.css: this contains all of the styles for the MainPage webpage 
-            - MaiPage.html: this contains the layout of the MainPage webpage 
+            - MaiPage.js: this contains the layout of the MainPage webpage 
         - SearchEngine Webpage: this is the place where we will have all of the code for the layout of the SearchEngine webpage 
             - SearchEngine.css: this contains all of the styles for the SearchEngine webpage 
-            - SearchEngine.html: this contains the layout of the SearchEngine webpage 
+            - SearchEngine.js: this contains the layout of the SearchEngine webpage 
         - Submission Webpage: this is the place where we will have all of the code for the layout of the Submission webpage 
             - SubmissionPage.css: this contains all of the styles for the Submission webpage 
-            - SubmissionPage.html: this contains the layout of the Submission webpage 
+            - SubmissionPage.js: this contains the layout of the Submission webpage 
 
 
 
