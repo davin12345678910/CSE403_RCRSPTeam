@@ -7,25 +7,25 @@ We are making an app that is building on top of the current registration system 
 
 
 ## Goals: 
-### 1. Make a tool that is more accessibile for users 
-### 2. Make a tool that has a more streamlined add in code process 
-### 3. Make a tool that expands the capabilities of the current system to improve the UI
-### 4. Make a tool that is more transparent with users when they are registering 
-### 5. Make a tool that includes all of the ratings and previous grades of a class 
+1. Make a tool that is more accessibile for users 
+2. Make a tool that has a more streamlined add in code process 
+3. Make a tool that expands the capabilities of the current system to improve the UI
+4. Make a tool that is more transparent with users when they are registering 
+5. Make a tool that includes all of the ratings and previous grades of a class 
 
 
 ## Layout of the repository:
 ###    - Server directory: server portion of the code 
-###    - Server.java: this is the java file that contains all of the Server code that we will need
+        - `Server.java`: this is the java file that contains all of the Server code that we will need
     
-## - Client directory: client portion of the code 
-###    - index.js: This is file which boostraps the whole application and because it's a react application all the components will be loaded inside this file
+###    - Client directory: client portion of the code 
+          - `index.js`: This is file which boostraps the whole application and because it's a react application all the components will be loaded inside this file
 ###    - Webpages: this is the place where we will have the layout of each of the pages
-####        - Class Webpage: this is the place where we will have all of the code for the layout of the class webpage
-####        - MainPage Webpage: this is the place where we will have all of the code for the layout of the MainPage webpage 
-####        - SearchEngine Webpage: this is the place where we will have all of the code for the layout of the SearchEngine webpage 
-####        - Submission Webpage: this is the place where we will have all of the code for the layout of the Submission webpage 
-###        Note: for each of these Webpages you want to have a css file where you will have all of the code for the formatting and the 
+          - `Class Webpage`: this is the place where we will have all of the code for the layout of the class webpage
+          - `MainPage Webpage`: this is the place where we will have all of the code for the layout of the MainPage webpage 
+          - `SearchEngine Webpage`: this is the place where we will have all of the code for the layout of the SearchEngine webpage 
+          - `Submission Webpage`: this is the place where we will have all of the code for the layout of the Submission webpage 
+      Note: for each of these Webpages you want to have a css file where you will have all of the code for the formatting and the 
         style of the webpage. And we will have a javascript file where we will have all of the functionality as well as the code 
         that will build up the html of the webpage 
 
