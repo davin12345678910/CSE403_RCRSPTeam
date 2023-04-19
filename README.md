@@ -7,11 +7,11 @@ We are making an app that is building on top of the current registration system 
 
 
 ## Goals: 
-1. Make a tool that is more accessibile for users 
-2. Make a tool that has a more streamlined add in code process 
-3. Make a tool that expands the capabilities of the current system to improve the UI
-4. Make a tool that is more transparent with users when they are registering 
-5. Make a tool that includes all of the ratings and previous grades of a class 
+1. Make a tool that is more accessibile for users: The current system doesn't provide all the information needed for registration in one place
+2. Make a tool that has a more streamlined add in code process: The add code is time consuming and also it might be challenging for a person who is not familiar
+3. Make a tool that expands the capabilities of the current system to improve the UI: The UI can be more user friendly and easy to use
+4. Make a tool that is more transparent with users when they are registering: There are some complexities in the current system that our app is going to resolve
+5. Make a tool that includes all of the ratings and previous grades of a class: The grade statistics can help user to decide which courses they want to register
 
 
 ## Layout of the repository:
