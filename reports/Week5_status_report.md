@@ -1,0 +1,39 @@
+# Week 5 status report for Sahil
+
+## Team report:
+### Status update:
+So far our team is currently working on the brainstorming of the front end and the back end of our application. We are determining the best services to use for our back end and the best way to structure our API which we will be making. In terms of the front end, we are determining the best wesbite formats as well as determining the best accessibility features for our website so that all stuents can use our application.
+
+One thing that we have yet to have agreed on is a weekly meeting time, though we have set up a when2meet to resolve this.
+
+### Agenda for tuesday's meeting
+1. The front end team and the back end team will discuss their design decisions, and as needed, we will be adjusting the design plans we had on each team in order to have a smooth connection between the front end and the backend
+2. We will be scheduleing times for pair programming
+3. We will check in with @sahil on our progress
+4. Further concerns and comments
+
+
+## Contributions of team memebers:
+
+### Davin Win Kyi:
+I worked on the majority of the document in terms of the beginning answers, and made revisions as needed. I also am working on the front end design for the team as well.
+
+### Azaan Kalfe
+
+
+### Ahmed Helow
+
+
+### Chairnet Muche
+
+
+### Foad Shariat
+
+
+### Sol Zomaro
+
+
+
+## Plans for next week:
+1. we hope to discuss the progress we have made in getting the outlines for the webpages that we will be using for our website
+2. For the backend we hope to have a server that has endpoints that are mostly complete and might add more during our next meeting as needed
