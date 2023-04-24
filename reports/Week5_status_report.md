@@ -28,6 +28,7 @@ I helped with the ER digaram with end points, the coding guideline the risk asse
 
 
 ### Foad Shariat
+I helped with the front-end elements needed for the project. I also helped with the design details in the document
 
 
 ### Sol Zomaro
