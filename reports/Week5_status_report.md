@@ -22,6 +22,7 @@ I worked on the majority of the document in terms of the beginning answers, and 
 I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule.
 
 ### Ahmed Helow
+I helped with designing the ER diagram for our database model. As well as deciding on what framework we are going to use ti implement our backend server and API. 
 
 
 ### Chairnet Muche
