@@ -33,7 +33,8 @@ I helped with the front-end elements needed for the project. I also helped with 
 I have seeded the react app with the basic components and have started working on the front-end design.
 
 
-### Sol Zomaro
+### Sol Zamora
+I contributed to the back-end development and overall design of the system. I also worked on deciding the coding guidelines for each segment of the project/each language we're using. Further, I helped designing and conceptualizing the interactions within ER diagrams.
 
 
 
