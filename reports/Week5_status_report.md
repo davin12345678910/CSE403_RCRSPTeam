@@ -25,7 +25,7 @@ I helped with the ER digaram with end points, the coding guideline the risk asse
 
 
 ### Chairnet Muche
-
+I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated the LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project.
 
 ### Foad Shariat
 I helped with the front-end elements needed for the project. I also helped with the design details in the document.
