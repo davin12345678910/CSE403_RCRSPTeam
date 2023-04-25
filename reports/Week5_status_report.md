@@ -29,7 +29,8 @@ I helped with designing the ER diagram for our database model. As well as decidi
 
 
 ### Foad Shariat
-I helped with the front-end elements needed for the project. I also helped with the design details in the document
+I helped with the front-end elements needed for the project. I also helped with the design details in the document.
+I have seeded the react app with the basic components and have started working on the front-end design.
 
 
 ### Sol Zomaro
