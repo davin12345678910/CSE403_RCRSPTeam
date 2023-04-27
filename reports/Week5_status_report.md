@@ -18,7 +18,7 @@ One thing that we have yet to have agreed on is a weekly meeting time, though we
 ### Davin Win Kyi:
 I worked on the majority of the document in terms of the beginning answers, and made revisions as needed. I also am working on the front end design for the team as well.
 
-### Azaan Kalfe
+### Azaan Khalfe
 I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule.
 
 ### Ahmed Helow
