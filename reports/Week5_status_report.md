@@ -19,7 +19,7 @@ One thing that we have yet to have agreed on is a weekly meeting time, though we
 I worked on the majority of the document in terms of the beginning answers, and made revisions as needed. I also am working on the front end design for the team as well.
 
 ### Azaan Khalfe
-I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule.
+I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule. What worked is group meetings are productive when they happen, but there must be some goals set so there is not much off-topic discussion. I learned how important designing the system is and how much background research is needed to think about designing, after spending time designing hopefully implementing will be a lot easier. It is a little hard to come up with the whole system while not coding the actual system. I am stuck trying to flush out the whole backend system and try to implement it. And how much detail does the backend need?  
 
 ### Ahmed Helow
 I helped with designing the ER diagram for our database model. As well as deciding on what framework we are going to use to implement our backend server and API. 
