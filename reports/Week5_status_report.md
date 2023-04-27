@@ -26,11 +26,10 @@ I helped with designing the ER diagram for our database model. As well as decidi
 
 
 ### Chairnet Muche
-I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated the LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project.
+I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project. I helped with the front-end design, and I learned how important all components are and how to connect all the components. I have had trouble trying to connect the front end to the back end and how to complete the application. I need more time to implement the front end.
 
 ### Foad Shariat
-I helped with the front-end elements needed for the project. I also helped with the design details in the document.
-I have seeded the react app with the basic components and have started working on the front-end design.
+I helped with the front-end elements needed for the project. I also helped with the design details in the document. I have seeded the react app with the basic components and have started working on the front-end design. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end, where I had trouble picking the library to use. I am stuck on seeing if we need more libraries to improve the front end.
 
 
 ### Sol Zamora
