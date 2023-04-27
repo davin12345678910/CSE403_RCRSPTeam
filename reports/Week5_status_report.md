@@ -23,10 +23,10 @@ I worked on the majority of the document in terms of the beginning answers, and 
 what I learned:
 how to structure the software components of a project
 
-What i had trouble on:
+What I had trouble on:
 figuring out how to structure the relationships between software componenets in a project
 
-What i am stuck on:
+What I am stuck on:
 currently I wouldn't say i am stuck, but i am still deciding the design for the front end webpages
 
 ### Azaan Khalfe
@@ -42,13 +42,13 @@ I am stuck trying to flush out the whole backend system and try to implement it.
 
 ### Ahmed Helow
 
-What i did:
+What I did:
 I helped with designing the ER diagram for our database model. As well as deciding on what framework we are going to use to implement our backend server and API.
 
 what I learned:
 I learned about azure and how i can make tables in azure
 
-what i had trouble on:
+what I had trouble on:
 I had trouble understanding how the server and API relate to each other
 
 what I am stuck on:
@@ -58,26 +58,26 @@ I am currently trying to figure out the best way to write test for the back end
 ### Chairnet Muche
 I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project. I helped with the front-end design.
 
-what i learned:
+what I learned:
 I learned about how the interfaces between software components work. I learned how important all components are and how to connect all the components.
 
-what i had trouble on:
+what I had trouble on:
 I had trouble understanding how components worked in react. I have had trouble trying to connect the front end to the back end and how to complete the application.
 
-what i am stuck on:
+what I am stuck on:
 I am stuck on the the way to style the webpages for our website. I need more time to implement the front end.
 
 ### Foad Shariat
 I helped with the front-end elements needed for the project. I also helped with the design details in the document. I have seeded the react app with the basic components and have started working on the front-end design. 
 
-what i learned:
+what I learned:
 I learned about the MVC and tried to see if we could use soft of the software components in MVC as one of our
 software compoenents. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end.
 
-what i had trouble on:
+what I had trouble on:
 i had trouble finding the needed endpoints for our API since there are so many things that we need, where I had trouble picking the library to use
 
-what i am stuck on
+what I am stuck on:
 I am still struggling to find the best design for the webpages, I am stuck on seeing if we need more libraries to improve the front end.
 
 
