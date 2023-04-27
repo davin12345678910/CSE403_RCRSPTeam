@@ -30,7 +30,15 @@ What i am stuck on:
 currently I wouldn't say i am stuck, but i am still deciding the design for the front end webpages
 
 ### Azaan Khalfe
-I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule. What worked is group meetings are productive when they happen, but there must be some goals set so there is not much off-topic discussion. I learned how important designing the system is and how much background research is needed to think about designing, after spending time designing hopefully implementing will be a lot easier. It is a little hard to come up with the whole system while not coding the actual system. I am stuck trying to flush out the whole backend system and try to implement it. And how much detail does the backend need?
+What I did:
+I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule. What worked is group meetings are productive when they happen, but there must be some goals set so there is not much off-topic discussion.
+
+What I learned:
+I learned how important designing the system is and how much background research is needed to think about designing, after spending time designing hopefully implementing will be a lot easier.
+What I had trouble on:
+t is a little hard to come up with the whole system while not coding the actual system.
+What I am stuck on:
+I am stuck trying to flush out the whole backend system and try to implement it. And how much detail does the backend need?
 
 ### Ahmed Helow
 
@@ -48,30 +56,30 @@ I am currently trying to figure out the best way to write test for the back end
 
 
 ### Chairnet Muche
-I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project. I helped with the front-end design, and I learned how important all components are and how to connect all the components. I have had trouble trying to connect the front end to the back end and how to complete the application. I need more time to implement the front end.
+I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project. I helped with the front-end design.
 
 what i learned:
-I learned about how the interfaces between software components work
+I learned about how the interfaces between software components work. I learned how important all components are and how to connect all the components.
 
 what i had trouble on:
-I had trouble understanding how components worked in react
+I had trouble understanding how components worked in react. I have had trouble trying to connect the front end to the back end and how to complete the application.
 
 what i am stuck on:
-I am stuck on the the way to style the webpages for our website
+I am stuck on the the way to style the webpages for our website. I need more time to implement the front end.
 
 ### Foad Shariat
-I helped with the front-end elements needed for the project. I also helped with the design details in the document. I have seeded the react app with the basic components and have started working on the front-end design. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end, where I had trouble picking the library to use. I am stuck on seeing if we need more libraries to improve the front end.
+I helped with the front-end elements needed for the project. I also helped with the design details in the document. I have seeded the react app with the basic components and have started working on the front-end design. 
 
 what i learned:
 I learned about the MVC and tried to see if we could use soft of the software components in MVC as one of our
-software compoenents
+software compoenents. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end.
 
 what i had trouble on:
-i had trouble finding the needed endpoints for our
-API since there are so many things that we need
+i had trouble finding the needed endpoints for our API since there are so many things that we need, where I had trouble picking the library to use
 
 what i am stuck on
-I am still struggling to find the best design for the webpages
+I am still struggling to find the best design for the webpages, I am stuck on seeing if we need more libraries to improve the front end.
+
 
 
 
