@@ -2,14 +2,17 @@
 import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log('Email:', email, 'Password:', password);
+        navigate('/register');
     };
 
     const isFormValid = () => {
