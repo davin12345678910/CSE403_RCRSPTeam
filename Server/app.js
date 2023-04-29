@@ -75,13 +75,13 @@ async function createTables() {
 //createTables();
 
 
-
+// tests to see if adding to the table works
 async function testAdd() {
   var database = await getDBConnection();
   let qry = 'INSERT INTO classes ("class_id", "credits", "rating", "average_gpa", "professor", "assistant_professor", "class_times") VALUES ("123", 5, 3.5, 3.5, "nigiri", "pokimaine", "11:20-5:30");';
   //await database.run(qry);
 
-  let qry2 = 'SELECT* FROM classes;';
+  let qry2 = 'SELECT* FROM classes WHERE class_id = 123;';
   let classes = await database.all(qry2);
   console.log(classes);
 }
