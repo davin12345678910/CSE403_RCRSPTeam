@@ -76,22 +76,27 @@ async function createTables() {
 
 
 // tests to see if adding to the table works
-async function testAdd() {
+async function testAdd(adding) {
   var database = await getDBConnection();
+  let qry_test = adding;
+
   let qry = 'INSERT INTO classes ("class_id", "credits", "rating", "average_gpa", "professor", "assistant_professor", "class_times") VALUES ("123", 5, 3.5, 3.5, "nigiri", "pokimaine", "11:20-5:30");';
   //await database.run(qry);
 
   let qry2 = 'SELECT* FROM classes WHERE class_id = 123;';
   let classes = await database.all(qry2);
+  
   console.log(classes);
+  return classes;
+  database.close();
 }
-
+module.exports = testAdd
 testAdd();
 
 
 
 app.get('/posts', function (req, res) {
-  res.type("text").send("pussy");
+  res.type("text").send("cats");
 });
 
 
