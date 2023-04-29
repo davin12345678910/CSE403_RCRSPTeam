@@ -2,17 +2,18 @@
 import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const HandleSubmit = (event) => {
         const navigate=useNavigate();
         event.preventDefault();
         console.log('Email:', email, 'Password:', password);
-        navigate("/beginning");
+        navigate('/register');
     };
 
     const isFormValid = () => {

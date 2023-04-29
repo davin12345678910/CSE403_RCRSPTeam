@@ -2,14 +2,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import LoginPage from './LoginPage';
-import BeginningPage from './BeginningPage';
+import RegistrationPage from './RegistrationPage';
 
 const App = () => {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
-                <Route path="/beginning" element={<BeginningPage />} />
+                <Route path="/register" element={<RegistrationPage />} /> {/* Add this line */}
             </Routes>
         </BrowserRouter>
     );
