@@ -2,14 +2,17 @@
 import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event) => {
+    const HandleSubmit = (event) => {
+        const navigate=useNavigate();
         event.preventDefault();
         console.log('Email:', email, 'Password:', password);
+        navigate("/beginning");
     };
 
     const isFormValid = () => {
@@ -21,7 +24,7 @@ const LoginPage = () => {
             <div className={styles.loginCard}>
                 <img className={styles.logo} src={registrationIcon} alt="Logo" />
                 <h1 className={styles.title}>Registration System</h1>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={HandleSubmit}>
                     <input
                         className={styles.input}
                         type="email"

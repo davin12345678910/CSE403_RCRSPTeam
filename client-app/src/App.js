@@ -1,16 +1,17 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import LoginPage from './LoginPage';
+import BeginningPage from './BeginningPage';
 
 const App = () => {
     return (
-        <Router>
+        <BrowserRouter>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
-                {/* Add more routes for other pages here */}
+                <Route path="/beginning" element={<BeginningPage />} />
             </Routes>
-        </Router>
+        </BrowserRouter>
     );
 };
 
