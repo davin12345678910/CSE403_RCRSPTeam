@@ -13,7 +13,7 @@ describe("POST /users", () => {
       const addResponse = await request(app).post("/getClasses").send()
       var classes = addResponse.body.class
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {       
         setTimeout(() => {
           var found = false
           classes.forEach(element => {
