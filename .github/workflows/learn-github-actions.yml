@@ -4,15 +4,15 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: npm install
       - name: Install supertest
-        run: npm install supertest
         working-directory: Server
+        run: npm install supertest
       - name: Run tests
-        env:
-          NODE_OPTIONS: --experimental-vm-modules
-        run: timeout 1s npx jest
+        run: npx jest --verbose
 
