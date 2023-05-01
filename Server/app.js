@@ -2,7 +2,6 @@
 
 // These are the imports that we will require
 import express from 'express'
-import { cloneElement } from 'react';
 import sqlite3 from 'sqlite3'
 
 const verboseSqlite = sqlite3.verbose();
