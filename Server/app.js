@@ -49,7 +49,7 @@ async function makeTables() {
 //makeTables();
 
 app.use(express.json())
-app.post('/getClasses', async (req, res) => {
+app.get('/getClasses', async (req, res) => {
   getClasses(res);
 })
 

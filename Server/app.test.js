@@ -10,7 +10,7 @@ describe("POST /users", () => {
     })
 
     test("Should contain 345", async () => {
-      const addResponse = await request(app).post("/getClasses").send()
+      const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
 
       //return new Promise((resolve, reject) => {
@@ -24,6 +24,6 @@ describe("POST /users", () => {
       expect(found).toBe(true)
         //})
       //})
-    }, 10000)
+    })
   })
 })
