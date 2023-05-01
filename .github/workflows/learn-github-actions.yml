@@ -12,6 +12,7 @@ jobs:
         run: npm install
       - name: Install supertest
         run: npm install supertest
+        working-directory: Server
       - name: Run tests
         working-directory: Server
         run: npx jest
