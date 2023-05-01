@@ -7,7 +7,7 @@ describe("POST /users", () => {
     test("should respond with a 200 status code", async () => {
       const response = await request(app).post("/users").send()
       expect(response.statusCode).toBe(200)
-    }, 10000) // set timeout to 10 seconds
+    })
 
     test("Should contain 345", async () => {
       const addResponse = await request(app).post("/getClasses").send()
@@ -23,8 +23,8 @@ describe("POST /users", () => {
           })
           expect(found).toBe(true)
           resolve()
-        }, 7000) // set timeout to 7 seconds
+        })
       })
-    }, 10000) // set timeout to 10 seconds
+    })
   })
 })
