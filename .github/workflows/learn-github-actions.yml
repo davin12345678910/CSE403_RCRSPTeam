@@ -14,5 +14,5 @@ jobs:
         working-directory: Server
         run: npm install supertest
       - name: Run tests
-        run: npx jest
+        run: npx jest --verbose
 
