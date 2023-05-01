@@ -68,6 +68,7 @@ async function getClasses(res) {
     //console.log(classes)
     res.send({"class" : classes})
   })
+  database.close()
 }
 
 // testAdd();
