@@ -1,17 +1,8 @@
-name: Simple Workflow
-
-# Controls when the workflow will run
+name: learn-github-actions
+run-name: ${{ github.actor }} is learning GitHub Actions
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    paths: .\Server\app.test.js
 jobs:
   build:
     runs-on: ubuntu-latest
