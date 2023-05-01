@@ -14,6 +14,5 @@ jobs:
         run: npm install supertest
         working-directory: Server
       - name: Run tests
-        working-directory: Server
-        run: npx jest
+        run: npx jest timeout 1s
 
