@@ -9,26 +9,9 @@ jobs:
     env:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: npm install
-      - name: Run tests
-        working-directory: Server
-        run: npm test
-
-
-
-#name: learn-github-actions
-#run-name: ${{ github.actor }} is learning GitHub Actions
-#on: [push]
-
-#jobs:
-#  check-bats-version:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-node@v3
-#      - using: node12
-#      - main: app.test.js
-#        with:
-#          node-version: '14'
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: npm install
+      - run: npm test
