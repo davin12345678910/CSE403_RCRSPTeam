@@ -8,8 +8,6 @@ jobs:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: npm install
       - name: Install supertest
         working-directory: Server
         run: npm install supertest
