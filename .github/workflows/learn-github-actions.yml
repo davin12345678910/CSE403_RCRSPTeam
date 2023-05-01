@@ -2,4 +2,7 @@ name: learn-github-actions
 run-name: ${{ github.actor }} is learning GitHub Actions
 on: [push]
 jobs:
-  - NODE_OPTIONS=--experimental-vm-modules npx jest
+  steps: 
+  - uses: .\Server\app.test.js
+  - run: npm install
+  - run: NODE_OPTIONS=--experimental-vm-modules npx jest
