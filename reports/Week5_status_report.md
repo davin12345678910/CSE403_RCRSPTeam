@@ -10,7 +10,7 @@ One thing that we have yet to have agreed on is a weekly meeting time, though we
 1. The front end team and the back end team will discuss their design decisions, and as needed, we will be adjusting the design plans we had on each team in order to have a smooth connection between the front end and the backend
 2. We will be scheduleing times for pair programming
 3. We will check in with @sahil on our progress
-4. Further concerns and comments
+4. Further concerns and comments  
 
 
 ## Contributions of team memebers:
