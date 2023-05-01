@@ -1,6 +1,17 @@
 name: learn-github-actions
 run-name: ${{ github.actor }} is learning GitHub Actions
 on: [push]
-runs: 
-  using: node12
-  main: app.test.js
+  paths: .\Server\app.test.js
+jobs:
+  check-bats-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+
+      - name: Install dependencies
+      run: npm install
+
+      - name: Run tests
+      run: NODE_OPTIONS=--experimental-vm-modules npx jest
