@@ -10,9 +10,21 @@ describe("POST /users", () => {
       expect(response.statusCode).toBe(200)
     })
 
-    test("should respond should be happy", async () => {
-      const response = await request(app).post("/users").send()
-      expect(response.body.name).toBe("happy")
+    test("Should contain 345", async () => {
+      const addResponse = await request(app).post("/getClasses").send()
+      var classes = addResponse.body.class
+
+      setTimeout(() => {
+
+      }, 7000000);
+
+      var found = false
+      classes.forEach(element => {
+        if (element.class_id == '345') {
+          found = true
+        }
+      })
+      expect(found).toBe(true)
     })
   })
 })
