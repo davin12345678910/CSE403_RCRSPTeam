@@ -8,7 +8,6 @@ jobs:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
-      - name: Change to parent directory
       - name: Install supertest
         run: npm install supertest
       - name: Run tests
