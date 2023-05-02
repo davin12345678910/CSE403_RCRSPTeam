@@ -8,8 +8,10 @@ jobs:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
+      - name: Change to parent directory
+        run: cd ..
       - name: Install supertest
-        working-directory: ./server
+        working-directory: server
         run: npm install supertest
       - name: Run tests
         run: npx jest --verbose
