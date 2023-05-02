@@ -8,6 +8,10 @@ jobs:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
+      - name: Install Babel dependencies
+        run: npm install --save-dev @babel/core @babel/cli @babel/preset-env @babel/preset-react
+      - name: Transpile JSX code
+        run: npx babel src --out-dir lib --presets=@babel/preset-react,@babel/preset-env
       - name: Install supertest
         run: npm install supertest
       - name: Run tests
