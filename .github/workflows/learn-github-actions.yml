@@ -11,6 +11,6 @@ jobs:
       - name: Install supertest
         run: npm install supertest
       - name: Run tests
-        run: cd .. && cd server && npx jest --verbose
+        run: cd server && npx jest --verbose
 
 
