@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install supertest
-        working-directory: Server
+        working-directory: server
         run: npm install supertest
       - name: Run tests
         run: npx jest --verbose
