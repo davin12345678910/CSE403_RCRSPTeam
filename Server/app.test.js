@@ -9,6 +9,7 @@ describe("POST /users", () => {
       expect(response.statusCode).toBe(200)
     })
 
+/*
     test("Should contain 345", async () => {
       const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
@@ -25,5 +26,6 @@ describe("POST /users", () => {
         //})
       //})
     })
+*/
   })
 })

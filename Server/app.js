@@ -73,6 +73,7 @@ async function getClasses(res) {
 // testAdd();
 
 
+// this is a basic test
 app.post('/users', async (req, res) => {
   res.send({name : "happy"})
 })
