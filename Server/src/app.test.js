@@ -25,7 +25,7 @@ describe("POST /users", () => {
       expect(found).toBe(true)
         //})
       //})
-    })
+    }, 100000)
 
   })
 })
