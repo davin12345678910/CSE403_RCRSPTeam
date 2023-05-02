@@ -4,8 +4,8 @@
 import express from 'express'
 import sqlite3 from 'sqlite3'
 
+// we need these
 const verboseSqlite = sqlite3.verbose();
-
 const app = express()
 
 
@@ -49,7 +49,7 @@ async function makeTables() {
 //makeTables();
 
 app.use(express.json())
-app.post('/getClasses', async (req, res) => {
+app.get('/getClasses', async (req, res) => {
   getClasses(res);
 })
 
@@ -73,6 +73,7 @@ async function getClasses(res) {
 // testAdd();
 
 
+// this is a basic test
 app.post('/users', async (req, res) => {
   res.send({name : "happy"})
 })
