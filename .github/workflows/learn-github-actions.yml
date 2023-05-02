@@ -12,5 +12,5 @@ jobs:
         working-directory: Server
         run: npm install supertest
       - name: Run tests
-        run: NODE_OPTIONS=--experimental-vm-modules npx jest
+        run: npm test
 
