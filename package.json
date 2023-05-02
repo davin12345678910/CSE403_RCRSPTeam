@@ -1,30 +1,23 @@
 {
-  "name": "cse403_rcrspteam",
+  "type": "module",
+  "name": "server",
   "version": "1.0.0",
-  "description": "We are a team of computer science students working on a Resilient Course Registration System for CSE 403",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/davin12345678910/CSE403_RCRSPTeam.git"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/davin12345678910/CSE403_RCRSPTeam/issues"
-  },
-  "homepage": "https://github.com/davin12345678910/CSE403_RCRSPTeam#readme",
   "dependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^9.1.2",
-    "babel-preset-env": "^1.7.0",
+    "clone": "^2.1.2",
     "express": "^4.18.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "web-cli": "^1.0.0-prealpha",
-    "webpack": "^5.81.0",
-    "webpack-dev-server": "^4.13.3"
-  }
+    "request": "^2.88.2",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
+  },
+  "description": ""
 }
