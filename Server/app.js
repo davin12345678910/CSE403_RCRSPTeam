@@ -4,8 +4,8 @@
 import express from 'express'
 import sqlite3 from 'sqlite3'
 
+// we need these
 const verboseSqlite = sqlite3.verbose();
-
 const app = express()
 
 
