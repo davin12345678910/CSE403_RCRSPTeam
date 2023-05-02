@@ -10,8 +10,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Change to parent directory
       - name: Install supertest
-        run: cd .. && cd server && npm install supertest
+        run: npm install supertest
       - name: Run tests
-        run: npx jest --verbose
+        run: cd .. && cd server && npx jest --verbose
 
 
