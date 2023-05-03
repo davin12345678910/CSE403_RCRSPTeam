@@ -65,19 +65,19 @@ I am stuck trying to flush out the whole backend system and try to implement it.
 ### Ahmed Helow
 
 What I did:
-I helped with designing the ER diagram for our database model. As well as deciding on what framework we are going to use to implement our backend server and API.
+I helped with designing our backend as well as implementing the base code for it. I also helped with writing some test cases and setting up github actions for our CI testing, in which it run the tests every time someone of the group pushes to the repository.  
 
 
 what I learned:
-I learned about azure and how i can make tables in azure
+I learned about CI testing for the first and how useful it is in working environments, as well as creating sql tables in node.js and using them in our testing.
 
 
 what I had trouble on:
-I had trouble understanding how the server and API relate to each other
+I had trouble setting up github actions and CI testing. Tests were passing locally but not on github actions, but we ended up figuring it out.
 
 
 what I am stuck on:
-I am currently trying to figure out the best way to write test for the back end
+I am currently trying to figure out the best ways and methods to write tests for our backend. 
 
 
 
