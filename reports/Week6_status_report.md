@@ -91,15 +91,15 @@ what I had trouble on: I had trouble with how to run the back-end side of our pr
 what I am stuck on: I am still stuck on the way to style the web pages for our website. I need more time to implement the front end in that we need to come up with a great background style for different tabs when the students click on them. For example, we need to come up with coloring of the page when the student clicks on the registration page.
 
 ### Foad Shariat
-
+What I did:
 I helped with the front-end elements needed for the project. I also helped with the design details in the document. I have seeded the react app with the basic components and have started working on the front-end design.
 
 what I learned:
 I learned about the MVC and tried to see if we could use soft of the software components in MVC as one of our
-software compoenents. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end.
+software components. I learned how much React can improve the front-end elements, how other components must be included within the design, and can fully improve the overall front-end.
 
 what I had trouble on:
-i had trouble finding the needed endpoints for our API since there are so many things that we need, where I had trouble picking the library to use
+I had trouble finding the needed endpoints for our API since there are so many things that we need, where I had trouble picking the library to use
 
 what I am stuck on:
 I am still struggling to find the best design for the webpages, I am stuck on seeing if we need more libraries to improve the front end.
