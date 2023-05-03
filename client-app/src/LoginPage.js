@@ -10,7 +10,6 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const HandleSubmit = (event) => {
-        const navigate=useNavigate();
         event.preventDefault();
         console.log('Email:', email, 'Password:', password);
         navigate('/register');
