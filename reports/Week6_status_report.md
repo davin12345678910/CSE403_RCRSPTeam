@@ -82,16 +82,12 @@ I am currently trying to figure out the best way to write test for the back end
 
 
 ### Chairnet Muche
-I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I initiated LoginPage.js to demonstrate its functionality when students input their UW email and password. Currently, I am focused on developing the front-end component of the project. I helped with the front-end design.
+What I did: I contributed to the front-end aspect of the document and performed revisions and writing on other sections as needed. I added some components to RegistrationPage to demonstrate its functionality when students input their UW email and password, it should open up a new tap for a registration page.  Currently, I am focused on developing the front-end component of the project and adding new components by adding new pages for different purposes.
 
-what I learned:
-I learned about how the interfaces between software components work. I learned how important all components are and how to connect all the components.
+what I learned: I learned how the layout of our project works, and how to create a new tab for different components.
+what I had trouble on: I had trouble with how to run the back-end side of our project in that had to download the need files in order to run it and pass all of the tests. 
 
-what I had trouble on:
-I had trouble understanding how components worked in react. I have had trouble trying to connect the front end to the back end and how to complete the application.
-
-what I am stuck on:
-I am stuck on the the way to style the webpages for our website. I need more time to implement the front end.
+what I am stuck on: I am still stuck on the way to style the web pages for our website. I need more time to implement the front end in that we need to come up with a great background style for different tabs when the students click on them. For example, we need to come up with coloring of the page when the student clicks on the registration page.
 
 ### Foad Shariat
 
