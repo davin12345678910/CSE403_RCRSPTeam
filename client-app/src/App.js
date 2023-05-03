@@ -9,7 +9,7 @@ const App = () => {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
-                <Route path="/register" element={<RegistrationPage />} /> {/* Add this line */}
+                <Route path="/register" element={<RegistrationPage />} />
             </Routes>
         </BrowserRouter>
     );
