@@ -65,7 +65,7 @@ I am stuck trying to flush out the whole backend system and try to implement it.
 ### Ahmed Helow
 
 What I did:
-I helped with designing our backend as well as implementing the base code for it. I also helped with writing some test cases and setting up github actions for our CI testing, in which it run the tests every time someone of the group pushes to the repository.  
+I helped with designing our backend as well as implementing the base code for it. I also helped with writing some test cases and setting up github actions for our CI testing, in which it run the tests every time someone of the group pushes to the repository.
 
 
 what I learned:
@@ -77,7 +77,7 @@ I had trouble setting up github actions and CI testing. Tests were passing local
 
 
 what I am stuck on:
-I am currently trying to figure out the best ways and methods to write tests for our backend. 
+I am currently trying to figure out the best ways and methods to write tests for our backend.
 
 
 
@@ -86,7 +86,7 @@ What I did: I contributed to the front-end aspect of the document and performed 
 
 what I learned: I learned how the layout of our project works, and how to create a new tab for different components.
 
-what I had trouble on: I had trouble with how to run the back-end side of our project in that had to download the need files in order to run it and pass all of the tests. 
+what I had trouble on: I had trouble with how to run the back-end side of our project in that had to download the need files in order to run it and pass all of the tests.
 
 what I am stuck on: I am still stuck on the way to style the web pages for our website. I need more time to implement the front end in that we need to come up with a great background style for different tabs when the students click on them. For example, we need to come up with coloring of the page when the student clicks on the registration page.
 
@@ -106,7 +106,17 @@ I am still struggling to find the best design for the webpages, I am stuck on se
 
 
 ### Sol Zamora
-I contributed to the back-end development and overall design of the system. I also worked on deciding the coding guidelines for each segment of the project/each language we're using. Further, I helped designing and conceptualizing the interactions within ER diagrams.
+What I did:
+
+
+what I learned:
+
+
+what I had trouble on:
+
+
+what I am stuck on:
+
 
 
 ## Plans for next week:
