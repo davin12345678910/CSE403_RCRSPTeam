@@ -47,19 +47,19 @@ since it is one of the most reliable and has a lot of resources about it online.
 
 ### Azaan Khalfe
 What I did:
-I helped with the ER digaram with end points, the coding guideline the risk assessment and with the project schedule. What worked is group meetings are productive when they happen, but there must be some goals set so there is not much off-topic discussion.
+I helped with the CI test automation, where I helped create some basic SQL tests and other tests for the endpoints. We used jest and supertest for the testing framework in node.js.
 
 
 What I learned:
-I learned how important designing the system is and how much background research is needed to think about designing, after spending time designing hopefully implementing will be a lot easier.
+I learned that even if the tests work locally, setting up a CI infrastructure is difficult. I learned how to write tests in node.js with jest and how GitHub actions use a YAML file to test the code online, where we can choose when the code is tested. 
 
 
 What I had trouble on:
-t is a little hard to come up with the whole system while not coding the actual system.
+I had trouble debugging the YAML file since the tests were running locally, but I didn’t really understand the purpose of the YAML file, so I researched about it. Also, the GitHub actions were taking 2 hours to run, so we had to improve and debug it so it did not take this long.
 
 
 What I am stuck on:
-I am stuck trying to flush out the whole backend system and try to implement it. And how much detail does the backend need?
+I am stuck on fully flushing out the backend and having the code be connected through the backend and frontend. So I will meet with my group and focus on this so we have it function before the Alpha release. 
 
 
 ### Ahmed Helow
