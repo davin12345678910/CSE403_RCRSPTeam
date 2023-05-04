@@ -75,6 +75,21 @@ app.post('/addClasses', async (req, res) => {
   });
 })
 
+app.post('removeClasses', async (req, res) => {
+  let db = await getDBConnection()
+  let class_id = req.body.class_id;
+
+  let removeClass = 'DELETE FROM classes WHERE class_id=?'
+  db.run(removeClass, [class_id], function (err) {
+    if (err) {
+      console.error('Error removing class:', err);
+      res.status(500).json({ message: 'Error removing class ' + class_id, error: err });
+    } else {
+      res.status(201).json({ message: 'Class removed successfully', class_id: class_id });
+    }
+  });
+})
+
 
 
 async function getClasses(res) {
