@@ -30,5 +30,11 @@ We are making an app that is building on top of the current registration system 
         that will build up the html of the webpage 
 
 
+## How to build and test the system 
 
+Clearly labeled instructions for how to build and test the system. (Strive for a high degree of automation.)
+
+Clearly labeled instructions for how to run the system.
+
+Based on the provided instructions, the course staff must be able to build and test the system without issues.
 
