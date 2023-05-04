@@ -107,16 +107,16 @@ I am still struggling to find the best design for the webpages, I am stuck on se
 
 ### Sol Zamora
 What I did:
-
+I helped designed the backend infrastructure, writing tests for it, and debugging the failing tests. I also helped setting up the github actions for our CI testing, which was producing an unexpected delay. Lastly, I also helped writing the documentation for testing environment.
 
 what I learned:
-
+I learned that JavaScript can be used to build a reliable backend. At first, I was planning on writing the serverside code in Java since it's the language I'm most familiar with and is commonly used for backend services. However, this would result in problems later down the line when trying to transfer data from the frontend to the backend, which would've been written in different languages. Fortunately, Davin suggested that we instead code the backend in JavaScript and save ourselves the hassle, which has worked out great!
 
 what I had trouble on:
-
+I had trouble installing some of the dependencies required to execute the code on my machine. Several of my teammates use a different machine than I, and this resulted in different dependencies being required to run the test suite.
 
 what I am stuck on:
-
+I am stuck on writing deeper and more involved tests for the test suite. I am still new to JavaScript, so I'm trying to learn the syntax for development and testing as we go.
 
 
 ## Plans for next week:
