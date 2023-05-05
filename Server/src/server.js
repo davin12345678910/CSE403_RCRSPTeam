@@ -11,9 +11,10 @@ app.use(express.json());
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
+  console.log(req.body);
+  const { email, password } = req.body;
   const timestamp = new Date().toLocaleString();
-  const logEntry = `${timestamp}: ${username} logged in\n`;
+  const logEntry = `${timestamp}: ${email} logged in\n`;
 
   logStream.write(logEntry);
 
