@@ -90,7 +90,12 @@ app.post('removeClasses', async (req, res) => {
   });
 })
 
-
+// TODO: We don't have a table that stores which student is registered for which class.
+// Do we want to CREATE TABLE registered(net_id TEXT REFERENCES students(net_id), class_id TEXT REFERENCES classes(class_id))
+// or do we want to add this data to the already existing STUDENTS table (would have to add several columns, some of which could be null)?
+app.post('registerClass', async(req, res) => {
+  let db = await getDBConnection()
+})
 
 async function getClasses(res) {
   var database = await getDBConnection();
