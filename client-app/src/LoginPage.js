@@ -1,4 +1,3 @@
-// src/LoginPage.js
 import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
