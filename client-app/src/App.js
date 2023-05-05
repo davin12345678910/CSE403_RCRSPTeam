@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-rou
 import LoginPage from './LoginPage';
 import RegistrationPage from './RegistrationPage';
 import ClassSchedule from './ClassSchedule';
+import VisualSchedule from './VisualSchedule';
 
 const App = () => {
     return (
@@ -12,6 +13,7 @@ const App = () => {
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/register" element={<RegistrationPage />} />
                 <Route path="/schedule" element={<ClassSchedule />} />
+                <Route path="/visual" element={<VisualSchedule />} />
             </Routes>
         </BrowserRouter>
     );
