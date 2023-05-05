@@ -8,7 +8,7 @@ app.use(cors());
 
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
-app.post("/login", (req, res) => {
+app.post("/log", (req, res) => {
   console.log(req.body);
   const { email, password } = req.body;
   const timestamp = new Date().toLocaleString();

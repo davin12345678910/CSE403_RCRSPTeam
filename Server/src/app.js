@@ -23,26 +23,26 @@ async function makeTables() {
   var database = await getDBConnection();
 
   // here we will be inputting the tables we need into the database
-
   // 1. Students
-  let queryStudents = 'CREATE TABLE students(net_id TEXT PRIMARY KEY, student_name TEXT, major TEXT, email TEXT);';
-  //database.run(queryStudents);
+  let queryStudents = 'CREATE TABLE students(net_id TEXT PRIMARY KEY, student_name TEXT, major TEXT, email TEXT, hash_pass TEXT, salt TEXT);';
 
   // 2. Professor
   let queryProfessors = 'CREATE TABLE professors(net_id TEXT PRIMARY KEY, professor_name TEXT, department TEXT, tenure INTEGER, email TEXT, rating INT);';
-  //database.run(queryProfessors);
 
   // 3. Advisers
   let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY, adviser_name TEXT, department TEXT, email TEXT);';
-  //database.run(queryAdvisers);
 
   // 4. Classes
   let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT);';
-  //database.run(queryClasses);
 
   // 5. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
-  //database.run(querySections);
+  
+  database.run(queryStudents);
+  database.run(queryProfessors);
+  database.run(queryAdvisers);
+  database.run(queryClasses);
+  database.run(querySections);
 
   database.close();
 }
@@ -122,6 +122,25 @@ async function getClasses(res) {
 // this is a basic test
 app.post('/users', async (req, res) => {
   res.send({name : "happy"})
+})
+
+app.post('/login', async (req, res) => {
+  db = await getDBConnection();
+  let query = 'SELECT email, hash_pass, salt FROM students WHERE student.email == email';
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+  try {
+    db.all(query, [], (err, result) => {
+      if (err) return console.error(err.message);    
+      hash_pass = result[1] 
+    });
+  } catch (error) {
+    res.send({"login" : "error"})
+  }
+
+  db.close()
 })
 
 export default app
