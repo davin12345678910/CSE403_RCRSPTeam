@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
 import { useNavigate } from 'react-router-dom';
-//import fs from 'fs';
+import { fetchData } from './apiService';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -11,20 +11,25 @@ const LoginPage = () => {
 
     const HandleSubmit = async (event) => {
         event.preventDefault();
-        
+
         console.log('Email:', email, 'Password:', password);
-        
-        const response = await fetch("/login", {
+
+        const endpoint = "/login";
+        const options = {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email: email, password: password })
-          });
-        
-          const data = await response.json();
-          console.log(data);
-        navigate('/register');
+            body: JSON.stringify({ email: email, password: password }),
+        };
+
+        try {
+            const data = await fetchData(endpoint, options);
+            console.log(data);
+            navigate('/register');
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     const isFormValid = () => {
