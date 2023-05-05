@@ -6,6 +6,7 @@ import RegistrationPage from './RegistrationPage';
 import ClassSchedule from './ClassSchedule';
 import VisualSchedule from './VisualSchedule';
 import GradeInquiry from './GradeInquiry';
+import UnofficialTranscript from './UnofficialTranscript';
 
 const App = () => {
     return (
@@ -16,6 +17,7 @@ const App = () => {
                 <Route path="/schedule" element={<ClassSchedule />} />
                 <Route path="/visual" element={<VisualSchedule />} />
                 <Route path="/grade" element={<GradeInquiry />} />
+                <Route path ="/transcript" element={<UnofficialTranscript />} />
             </Routes>
         </BrowserRouter>
     );
