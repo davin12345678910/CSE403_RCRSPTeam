@@ -21,6 +21,6 @@ app.post("/login", (req, res) => {
   res.status(200).json({ message: "Login successful" });
 });
 
-app.listen(3000, () => {
-  console.log("Server started on port 3000");
+app.listen(3001, () => {
+  console.log("Server started on port 3001");
 });
