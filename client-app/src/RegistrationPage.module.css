@@ -1,5 +1,6 @@
 .RegistrationPage {
     display: flex;
+    flex-direction: column;
 }
 
 .Overlay {
