@@ -1,17 +1,29 @@
-// src/LoginPage.js
 import React, { useState } from 'react';
 import registrationIcon from './assets/icon.png';
 import styles from './LoginPage.module.css';
 import { useNavigate } from 'react-router-dom';
+//import fs from 'fs';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const HandleSubmit = (event) => {
+    const HandleSubmit = async (event) => {
         event.preventDefault();
+        
         console.log('Email:', email, 'Password:', password);
+        
+        const response = await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email, password: password })
+          });
+        
+          const data = await response.json();
+          console.log(data);
         navigate('/register');
     };
 

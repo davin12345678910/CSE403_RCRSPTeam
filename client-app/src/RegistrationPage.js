@@ -1,9 +1,21 @@
+import React, { useState } from 'react';
+import Modal from "react-modal";
+import styles from './RegistrationPage.module.css';
+
 const RegistrationPage = () => {
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    function openModal() {
+        setModalIsOpen(true);
+    }
+
+    function closeModal() {
+        setModalIsOpen(false);
+    }
     return (
-        <div>
+        <div className={styles.RegistrationPage}>
             <h1>Registration - Autumn 2023</h1>
             <div>
-                <select name="quarte" id="quarter">
+                <select name="quarter" id="quarter">
                     <option value="autumn">Autumn 2023</option>
                     <option value="winter">Winter 2024</option>
                     <option value="spring">Spring 2024</option>
@@ -11,29 +23,22 @@ const RegistrationPage = () => {
                 </select>
                 <button>Change Quarter</button>
 
-               
                 <p>Prepared for: NAME</p>
                 <p>Prepared on: DATE</p>
                 <p>Major: Computer Science</p>
-              
 
-               
-        
-                {/* <select name="major" id="major">
-                    <option value="cs">Computer Science</option>
-                    <option value="ee">Electrical Engineering</option>
-                    <option value="me">Mechanical Engineering</option>
-                    <option value="ce">Civil Engineering</option>
-                </select>
-                <button>Change Major</button>
-
-                <select name="year" id="year">
-                    <option value="freshman">Freshman</option>
-                    <option value="sophomore">Sophomore</option>
-                    <option value="junior">Junior</option>
-                    <option value="senior">Senior</option>
-                </select>
-                */}
+                <button onClick={openModal}>Open Modal</button>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onRequestClose={closeModal}
+                    contentLabel="Example Modal"
+                    className={styles.Modal}
+                    overlayClassName={styles.Overlay}
+                >
+                    <h2>Search and Add Course</h2>
+                    <p>xxxxxxxxxxxxxx</p>
+                    <button onClick={closeModal}>Close</button>
+                </Modal>
                 
     
             </div>
