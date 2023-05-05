@@ -1,12 +1,10 @@
 import app from './app.js'
 import fs from 'fs'
 import express from 'express';
-
-// const express = require("express");
-// const fs = require("fs");
-
+import cors from 'cors';
 
 app.use(express.json());
+app.use(cors());
 
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
