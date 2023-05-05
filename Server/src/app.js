@@ -125,7 +125,7 @@ app.post('/users', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  db = await getDBConnection();
+  const db = await getDBConnection();
   let query = 'SELECT email, hash_pass, salt FROM students WHERE student.email == email';
 
   const email = req.body.email;
@@ -134,7 +134,7 @@ app.post('/login', async (req, res) => {
   try {
     db.all(query, [], (err, result) => {
       if (err) return console.error(err.message);    
-      hash_pass = result[1] 
+      const hash_pass = result[1] 
     });
   } catch (error) {
     res.send({"login" : "error"})
