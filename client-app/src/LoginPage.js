@@ -36,10 +36,19 @@ const LoginPage = () => {
         return email.trim() !== '' && password.trim() !== '';
     };
 
+    let input = <input
+        className={styles.input}
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        pattern="(?i)[a-zA-Z0-9._%+-]+@uw\.edu"
+        required
+    />;
     return (
         <div className={styles.container}>
             <div className={styles.loginCard}>
-                <img className={styles.logo} src={registrationIcon} alt="Logo" />
+                <img className={styles.logo} src={registrationIcon} alt="Logo"/>
                 <h1 className={styles.title}>Registration System</h1>
                 <form onSubmit={HandleSubmit}>
                     <input
@@ -48,8 +57,13 @@ const LoginPage = () => {
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        pattern="(?i)[a-zA-Z0-9._%+-]+@uw\.edu"
+                        pattern="[a-zA-Z0-9._%+-]+@uw\.edu|[a-zA-Z0-9._%+-]+@UW\.EDU"
                         required
+                        onBlur={(e) => e.target.reportValidity()}
+                        onInvalid={(e) => {
+                            e.target.setCustomValidity("Please enter a valid uw.edu email address.");
+                        }}
+                        onInput={(e) => e.target.setCustomValidity("")}
                     />
                     <input
                         className={styles.input}
