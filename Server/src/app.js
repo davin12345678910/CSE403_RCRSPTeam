@@ -35,7 +35,7 @@ async function makeTables() {
   let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY, adviser_name TEXT, department TEXT, email TEXT);';
 
   // 4. Classes
-  let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT);';
+  let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT);';
 
   // 5. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
@@ -49,11 +49,36 @@ async function makeTables() {
   database.close();
 }
 
-//makeTables();
+// makeTables();
 
 app.use(express.json())
+// this is a basic test for status checking
+app.post('/users', async (req, res) => {
+  res.send({name : "happy"})
+})
+
+
+
 app.get('/getClasses', async (req, res) => {
-  getClasses(res);
+  var database = await getDBConnection();
+
+  let qry2 = "SELECT* FROM classes;";
+
+  try {
+    database.all(qry2, [], (err,rows) => {
+      if(err) return console.error(err.message);
+      var classes = []
+      rows.forEach((row) => {
+        classes.push(row)
+      });
+      //console.log(classes)
+      res.send({"class" : classes})
+    })
+
+  } catch (error) {
+    res.send({"class": "error"})
+  }
+  database.close()
 })
 
 app.post('/addClasses', async (req, res) => {
@@ -65,9 +90,10 @@ app.post('/addClasses', async (req, res) => {
   let professor = req.body.professor;
   let assistant_professor = req.body.assistant_professor;
   let class_times = req.body.class_times;
+  let quarter = req.body.quarter;
 
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times) VALUES (?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times], function (err) {
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ message: 'Error inserting class', error: err });
@@ -100,32 +126,8 @@ app.post('registerClass', async(req, res) => {
   let db = await getDBConnection()
 })
 
-async function getClasses(res) {
-  var database = await getDBConnection();
 
-  let qry2 = "SELECT* FROM classes;";
 
-  try {
-    database.all(qry2, [], (err,rows) => {
-      if(err) return console.error(err.message);
-      var classes = []
-      rows.forEach((row) => {
-        classes.push(row)
-      });
-      //console.log(classes)
-      res.send({"class" : classes})
-    })
-
-  } catch (error) {
-    res.send({"class": "error"})
-  }
-  database.close()
-}
-
-// this is a basic test
-app.post('/users', async (req, res) => {
-  res.send({name : "happy"})
-})
 
 app.post('/login', async (req, res) => {
   const db = await getDBConnection();

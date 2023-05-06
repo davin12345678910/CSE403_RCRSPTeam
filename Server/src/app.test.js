@@ -10,13 +10,12 @@ describe("POST /users", () => {
       expect(response.statusCode).toBe(200)
     })
 
-
+    // We are always going to have 345 in the database, so we are going to check
+    // if 345 is still in the database
     test("Should contain 345", async () => {
       const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
 
-      //return new Promise((resolve, reject) => {
-        //setTimeout(() => {
       var found = false
       classes.forEach(element => {
         if (element.class_id == '345') {
@@ -34,7 +33,8 @@ describe("POST /users", () => {
         average_gpa: '3',
         professor: 'x',
         assistant_professor: 'y',
-        class_times: 'mon-fri'
+        class_times: 'mon-fri',
+        quarter: 'spring'
       };
       const addResponse = await request(app).post("/addClasses").send(req);
       const getResponse = await request(app).get("/getClasses").send();
