@@ -15,6 +15,7 @@ import FinancialAidStatus from './FinancialAidStatus';
 import DirectDepositTransfer from './DirectDepositTransfer';
 import ShortTermLoan from './ShortTermLoan';
 import TuitionStatement from './TuitionStatement';
+import CreditCardPayment from './CreditCardPayment';
 const App = () => {
     return (
         <BrowserRouter>
@@ -33,6 +34,7 @@ const App = () => {
                 <Route path ="/direct" element={<DirectDepositTransfer />} />
                 <Route path ="/short" element={<ShortTermLoan />} />
                 <Route path ="/tuition" element={<TuitionStatement />} />
+                <Route path ="/credit" element={<CreditCardPayment />} />
                 
             </Routes>
         </BrowserRouter>
