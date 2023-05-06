@@ -36,3 +36,10 @@
     transform: rotate(360deg);
   }
 }
+
+.uw-logo {
+  width: 4rem;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
