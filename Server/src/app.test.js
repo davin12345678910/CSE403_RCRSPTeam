@@ -58,17 +58,8 @@ describe("POST /users", () => {
 
     test("Test getClass", async () => {
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
-      var classes = addResponse.body.class
-
-      console.log("This is class: " + classes)
-
-      var found = false
-      classes.forEach(element => {
-        if (element.class_id == '345') {
-          found = true
-        }
-      })
-      expect(found).toBe(true)
+      var professor = addResponse.body.class.professor
+      expect(professor).toBe('x')
     }, 100000)
   })
 

@@ -82,26 +82,17 @@ app.get('/getClasses', async (req, res) => {
 })
 
 
-app.get('/getClass/:class_id', async (req, res) => {
-  const { class_id } = req.params;
-  const database = await getDBConnection();
-
-  const qry2 = "SELECT * FROM classes WHERE class_id=?";
-
-  database.get(qry2, [class_id], (err,row) => {
-    if(err) {
-        console.error(err.message);
-        res.status(500).send("Internal server error");
+app.post('/getClass', async (req,res) => {
+  let db = await getDBConnection();
+  let qry = 'SELECT* FROM classes WHERE class_id=?;';
+  db.get(qry, [req.body.class_id], (err, row) => {
+    if (err) {
+      console.log(err)
     } else {
-      if (row) {
-        res.send(row);
-      } else {
-        res.status(404).send("Class not found");
-      }
+      res.send({'class' : row});
     }
-    database.close();
-  });
-});
+  })
+})
 
 
 
