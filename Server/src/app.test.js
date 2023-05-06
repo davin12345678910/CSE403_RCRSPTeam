@@ -1,5 +1,6 @@
 import request from 'supertest'
 import app from './app.js'
+import { response } from 'express'
 
 
 describe("POST /users", () => {
@@ -52,6 +53,22 @@ describe("POST /users", () => {
 
       //console.log("This is the status: " + removeResponse.status);
       //console.log(removeResponse.error);
+    }, 100000)
+
+
+    test("Test getClass", async () => {
+      const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
+      var classes = addResponse.body.class
+
+      console.log("This is class: " + classes)
+
+      var found = false
+      classes.forEach(element => {
+        if (element.class_id == '345') {
+          found = true
+        }
+      })
+      expect(found).toBe(true)
     }, 100000)
   })
 
