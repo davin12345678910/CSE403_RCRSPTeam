@@ -14,6 +14,7 @@ import InsuranceorOptionalCharges from './InsuranceorOptionalCharges';
 import FinancialAidStatus from './FinancialAidStatus';
 import DirectDepositTransfer from './DirectDepositTransfer';
 import ShortTermLoan from './ShortTermLoan';
+import TuitionStatement from './TuitionStatement';
 const App = () => {
     return (
         <BrowserRouter>
@@ -31,6 +32,7 @@ const App = () => {
                 <Route path ="/financial" element={<FinancialAidStatus />} />
                 <Route path ="/direct" element={<DirectDepositTransfer />} />
                 <Route path ="/short" element={<ShortTermLoan />} />
+                <Route path ="/tuition" element={<TuitionStatement />} />
                 
             </Routes>
         </BrowserRouter>
