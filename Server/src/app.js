@@ -133,67 +133,134 @@ app.post('/updateClass', async (req, res) => {
   let quarter = req.body.quarter;
 
   let qry = 'SELECT* FROM classes WHERE class_id=?;';
+
   db.get(qry, [req.body.class_id], (err, row) => {
     if (err) {
       console.log(err)
+      res.json({'class' : 'error'})
     } else {
-      var update_class_id = class_id;
-      var update_credits = credits;
-      var update_rating = rating;
-      let update_average_gpa = average_gpa;
-      let update_professor = professor;
-      let update_assistant_professor = assistant_professor;
-      let update_class_times = class_times;
-      let update_quarter = quarter;
+      var update_class_id = row.class_id;
+      var update_credits = row.credits;
+      var update_rating = row.rating;
+      let update_average_gpa = row.average_gpa;
+      let update_professor = row.professor;
+      let update_assistant_professor = row.assistant_professor;
+      let update_class_times = row.class_times;
+      let update_quarter = row.quarter;
 
 
       // update
-      var getClass = foundClass[0]
-      if (getClass.class_id != null) {
-        update_class_id = get.class_id
+      if (class_id != undefined) {
+        update_class_id = class_id
       }
 
-      if (getClass.credits != null) {
-        update_credits = get.credits
+      if (credits != undefined) {
+        update_credits = credits
       }
 
-      if (getClass.rating != null) {
-        update_rating = get.rating
+      if (rating != undefined) {
+        update_rating = rating
       }
 
-      if (getClass.average_gpa != null) {
-        update_average_gpa = get.average_gpa
+      if (average_gpa != undefined) {
+        update_average_gpa = average_gpa
       }
 
-      if (getClass.professor != null) {
-        update_professor = get.professor
+      if (professor != undefined) {
+        update_professor = professor
       }
 
-      if (getClass.assistant_professor != null) {
-        update_assistant_professor = get.assistant_professor
+      if (assistant_professor != undefined) {
+        update_assistant_professor = assistant_professor
       }
 
-      if (getClass.class_times != null) {
-        update_class_times = get.class_times
+      if (class_times != undefined) {
+        update_class_times = class_times
       }
 
-      if (getClass.quarter != null) {
-        update_quarter = get.quarter
+      if (quarter != undefined) {
+        update_quarter = quarter
       }
 
+      // now we will update
       let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
-      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter], function (err) {
+      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, class_id], function (err) {
         if (err) {
           console.error('Error inserting class:', err);
-          res.status(500).json({ message: 'Error inserting class', error: err });
+          res.status(500).json({'class': err });
         } else {
-          res.status(201).json({ message: 'Class updated successfully'});
+          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter]});
         }
       });
     }
   })
 
-  db.close();
+
+  /*
+  await db.get(qry, [req.body.class_id], (err, row) => {
+    if (err) {
+      console.log(err)
+    } else {
+      var update_class_id = row.class_id;
+      var update_credits = row.credits;
+      var update_rating = row.rating;
+      let update_average_gpa = row.average_gpa;
+      let update_professor = row.professor;
+      let update_assistant_professor = row.assistant_professor;
+      let update_class_times = row.class_times;
+      let update_quarter = row.quarter;
+
+
+      // update
+      if (class_id != null) {
+        update_class_id = class_id
+      }
+
+      if (credits != null) {
+        update_credits = credits
+      }
+
+      if (rating != null) {
+        update_rating = rating
+      }
+
+      if (average_gpa != null) {
+        update_average_gpa = average_gpa
+      }
+
+      if (professor != null) {
+        update_professor = professor
+      }
+
+      if (assistant_professor != null) {
+        update_assistant_professor = assistant_professor
+      }
+
+      if (class_times != null) {
+        update_class_times = class_times
+      }
+
+      if (quarter != null) {
+        update_quarter = quarter
+      }
+    }
+  })
+  */
+
+  //db.close();
+  // res.status(201).json({'professor' : update_professor});
+
+/*
+  let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
+  await db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter], function (err) {
+    if (err) {
+      console.error('Error inserting class:', err);
+      res.status(500).json({ message: 'Error inserting class', error: err });
+    } else {
+      res.status(201).json({ message: 'Class updated successfully'});
+    }
+  });
+*/
 })
 
 app.post('/removeClasses', async (req, res) => {

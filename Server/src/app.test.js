@@ -58,6 +58,17 @@ describe("POST /users", () => {
       var professor = addResponse.body.class.professor
       expect(professor).toBe('x')
     }, 100000)
+
+
+    test("Test updateClass", async () => {
+      const updateResponse = await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
+      console.log(updateResponse.body.class);
+      const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
+      var professor = addResponse.body.class.professor
+      console.log(professor)
+
+      await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
+    }, 100000)
   })
 
   describe("Unit Testing", () => {
