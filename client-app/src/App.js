@@ -16,12 +16,14 @@ import ShortTermLoan from './ShortTermLoan';
 import TuitionStatement from './TuitionStatement';
 import CreditCardPayment from './CreditCardPayment';
 import logo from './assets/wlogo.png';
+import uwText from './assets/textuw.png';
 import styles from './App.css';
 
 const App = () => {
     return (
         <div>
             <img className="uw-logo" src={logo}></img>
+            <img className="uw-text" src={uwText}></img>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<LoginPage />} />
