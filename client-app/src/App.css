@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.uw-logo {
+  width: 4rem;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+.uw-text {
+  width: 13rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+}
