@@ -12,7 +12,7 @@ import DegreeAudit from './DegreeAudit';
 import AddressandConsent from './AddressandConsent';
 import InsuranceorOptionalCharges from './InsuranceorOptionalCharges';
 import FinancialAidStatus from './FinancialAidStatus';
-
+import DirectDepositTransfer from './DirectDepositTransfer';
 const App = () => {
     return (
         <BrowserRouter>
@@ -28,6 +28,7 @@ const App = () => {
                 <Route path ="/address" element={<AddressandConsent />} />
                 <Route path ="/insurance" element={<InsuranceorOptionalCharges />} />
                 <Route path ="/financial" element={<FinancialAidStatus />} />
+                <Route path ="/direct" element={<DirectDepositTransfer />} />
             </Routes>
         </BrowserRouter>
     );
