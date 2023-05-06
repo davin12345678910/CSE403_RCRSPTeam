@@ -24,8 +24,6 @@ describe("POST /users", () => {
         }
       })
       expect(found).toBe(true)
-        //})
-      //})
     }, 100000)
 
     test("Add classes contains 8910", async () => {
@@ -48,8 +46,12 @@ describe("POST /users", () => {
         }
       })
       expect(found).toBe(true)
-        //})
-      //})
+
+      // remove the class once we are done testing
+      var removeResponse = await request(app).post("/removeClasses").send({'class_id' : req.class_id});
+
+      //console.log("This is the status: " + removeResponse.status);
+      //console.log(removeResponse.error);
     }, 100000)
   })
 

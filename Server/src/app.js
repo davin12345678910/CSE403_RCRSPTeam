@@ -18,7 +18,9 @@ function getDBConnection() {
   return db;
 }
 
-
+/*
+We only need this function when we need to first initialize the database with the tables we need
+*/
 async function makeTables() {
   var database = await getDBConnection();
 
@@ -37,7 +39,7 @@ async function makeTables() {
 
   // 5. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
-  
+
   database.run(queryStudents);
   database.run(queryProfessors);
   database.run(queryAdvisers);
@@ -75,15 +77,16 @@ app.post('/addClasses', async (req, res) => {
   });
 })
 
-app.post('removeClasses', async (req, res) => {
+app.post('/removeClasses', async (req, res) => {
   let db = await getDBConnection()
   let class_id = req.body.class_id;
 
-  let removeClass = 'DELETE FROM classes WHERE class_id=?'
+  let removeClass = 'DELETE FROM classes WHERE class_id =?;';
+
   db.run(removeClass, [class_id], function (err) {
     if (err) {
       console.error('Error removing class:', err);
-      res.status(500).json({ message: 'Error removing class ' + class_id, error: err });
+      res.status(500).json({ message: 'Error removing class ' + class_id, error: err});
     } else {
       res.status(201).json({ message: 'Class removed successfully', class_id: class_id });
     }
@@ -133,8 +136,8 @@ app.post('/login', async (req, res) => {
 
   try {
     db.all(query, [], (err, result) => {
-      if (err) return console.error(err.message);    
-      const hash_pass = result[1] 
+      if (err) return console.error(err.message);
+      const hash_pass = result[1]
     });
   } catch (error) {
     res.send({"login" : "error"})
