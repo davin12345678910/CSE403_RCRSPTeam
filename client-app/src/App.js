@@ -9,6 +9,7 @@ import GradeInquiry from './GradeInquiry';
 import UnofficialTranscript from './UnofficialTranscript';
 import OfficalTranscript from './OfficialTranscript';
 import DegreeAudit from './DegreeAudit';
+import AddressandConsent from './AddressandConsent';
 
 const App = () => {
     return (
@@ -22,6 +23,7 @@ const App = () => {
                 <Route path ="/transcript" element={<UnofficialTranscript />} />
                 <Route path ="/official" element={<OfficalTranscript />} />
                 <Route path ="/audit" element={<DegreeAudit />} />
+                <Route path ="/address" element={<AddressandConsent />} />
             </Routes>
         </BrowserRouter>
     );
