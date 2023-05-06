@@ -11,6 +11,7 @@ import OfficalTranscript from './OfficialTranscript';
 import DegreeAudit from './DegreeAudit';
 import AddressandConsent from './AddressandConsent';
 import InsuranceorOptionalCharges from './InsuranceorOptionalCharges';
+import FinancialAidStatus from './FinancialAidStatus';
 
 const App = () => {
     return (
@@ -26,6 +27,7 @@ const App = () => {
                 <Route path ="/audit" element={<DegreeAudit />} />
                 <Route path ="/address" element={<AddressandConsent />} />
                 <Route path ="/insurance" element={<InsuranceorOptionalCharges />} />
+                <Route path ="/financial" element={<FinancialAidStatus />} />
             </Routes>
         </BrowserRouter>
     );
