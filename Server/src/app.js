@@ -132,84 +132,67 @@ app.post('/updateClass', async (req, res) => {
   let class_times = req.body.class_times;
   let quarter = req.body.quarter;
 
-  let qry2 = "SELECT* FROM classes WHERE class_id=?;";
-
-  await database.all(qry2, [class_id], (err,rows) => {
-    if(err) return console.error(err.message);
-    var foundClass = []
-    rows.forEach((row) => {
-      classes.push(row)
-    });
-
-    res.send('pussy');
-
-    /*
-    var update_class_id = class_id;
-    var update_credits = credits;
-    var update_rating = rating;
-    let update_average_gpa = average_gpa;
-    let update_professor = professor;
-    let update_assistant_professor = assistant_professor;
-    let update_class_times = class_times;
-    let update_quarter = quarter;
+  let qry = 'SELECT* FROM classes WHERE class_id=?;';
+  db.get(qry, [req.body.class_id], (err, row) => {
+    if (err) {
+      console.log(err)
+    } else {
+      var update_class_id = class_id;
+      var update_credits = credits;
+      var update_rating = rating;
+      let update_average_gpa = average_gpa;
+      let update_professor = professor;
+      let update_assistant_professor = assistant_professor;
+      let update_class_times = class_times;
+      let update_quarter = quarter;
 
 
-    // update
-    var getClass = foundClass[0]
-    if (getClass.class_id != null) {
-      update_class_id = get.class_id
-    }
-
-    if (getClass.credits != null) {
-      update_credits = get.credits
-    }
-
-    if (getClass.rating != null) {
-      update_rating = get.rating
-    }
-
-    if (getClass.average_gpa != null) {
-      update_average_gpa = get.average_gpa
-    }
-
-    if (getClass.professor != null) {
-      update_professor = get.professor
-    }
-
-    if (getClass.assistant_professor != null) {
-      update_assistant_professor = get.assistant_professor
-    }
-
-    if (getClass.class_times != null) {
-      update_class_times = get.class_times
-    }
-
-    if (getClass.quarter != null) {
-      update_quarter = get.quarter
-    }
-
-    let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
-    db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter], function (err) {
-      if (err) {
-        console.error('Error inserting class:', err);
-        res.status(500).json({ message: 'Error inserting class', error: err });
-      } else {
-        res.status(201).json({ message: 'Class added successfully', class_id: class_id });
+      // update
+      var getClass = foundClass[0]
+      if (getClass.class_id != null) {
+        update_class_id = get.class_id
       }
-    });
-    */
 
+      if (getClass.credits != null) {
+        update_credits = get.credits
+      }
+
+      if (getClass.rating != null) {
+        update_rating = get.rating
+      }
+
+      if (getClass.average_gpa != null) {
+        update_average_gpa = get.average_gpa
+      }
+
+      if (getClass.professor != null) {
+        update_professor = get.professor
+      }
+
+      if (getClass.assistant_professor != null) {
+        update_assistant_professor = get.assistant_professor
+      }
+
+      if (getClass.class_times != null) {
+        update_class_times = get.class_times
+      }
+
+      if (getClass.quarter != null) {
+        update_quarter = get.quarter
+      }
+
+      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
+      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter], function (err) {
+        if (err) {
+          console.error('Error inserting class:', err);
+          res.status(500).json({ message: 'Error inserting class', error: err });
+        } else {
+          res.status(201).json({ message: 'Class updated successfully'});
+        }
+      });
+    }
   })
 
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter], function (err) {
-    if (err) {
-      console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting class', error: err });
-    } else {
-      res.status(201).json({ message: 'Class added successfully', class_id: class_id });
-    }
-  });
   db.close();
 })
 
@@ -229,6 +212,16 @@ app.post('/removeClasses', async (req, res) => {
   });
   db.close();
 })
+
+
+
+
+
+
+
+
+
+
 
 // TODO: We don't have a table that stores which student is registered for which class.
 // Do we want to CREATE TABLE registered(net_id TEXT REFERENCES students(net_id), class_id TEXT REFERENCES classes(class_id))
