@@ -40,6 +40,8 @@ async function makeTables() {
   // 5. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
 
+  // 6. Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
+
   database.run(queryStudents);
   database.run(queryProfessors);
   database.run(queryAdvisers);
@@ -161,7 +163,7 @@ app.post('/addProfessor', async (req, res) => {
   let tenure = req.body.tenure;
   let email = req.body.email;
   let rating = req.body.rating;
-  
+
   let addProfessor = 'INSERT INTO professors(net_id, professor_name, department, tenure, email, rating) VALUES (?, ?, ?, ?, ?, ?);';
   db.run(addProfessor, [net_id, professor_name, department, tenure, email, rating], function (err) {
     if (err) {
@@ -249,73 +251,6 @@ app.post('/updateClass', async (req, res) => {
       });
     }
   })
-
-
-  /*
-  await db.get(qry, [req.body.class_id], (err, row) => {
-    if (err) {
-      console.log(err)
-    } else {
-      var update_class_id = row.class_id;
-      var update_credits = row.credits;
-      var update_rating = row.rating;
-      let update_average_gpa = row.average_gpa;
-      let update_professor = row.professor;
-      let update_assistant_professor = row.assistant_professor;
-      let update_class_times = row.class_times;
-      let update_quarter = row.quarter;
-
-
-      // update
-      if (class_id != null) {
-        update_class_id = class_id
-      }
-
-      if (credits != null) {
-        update_credits = credits
-      }
-
-      if (rating != null) {
-        update_rating = rating
-      }
-
-      if (average_gpa != null) {
-        update_average_gpa = average_gpa
-      }
-
-      if (professor != null) {
-        update_professor = professor
-      }
-
-      if (assistant_professor != null) {
-        update_assistant_professor = assistant_professor
-      }
-
-      if (class_times != null) {
-        update_class_times = class_times
-      }
-
-      if (quarter != null) {
-        update_quarter = quarter
-      }
-    }
-  })
-  */
-
-  //db.close();
-  // res.status(201).json({'professor' : update_professor});
-
-/*
-  let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
-  await db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter], function (err) {
-    if (err) {
-      console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting class', error: err });
-    } else {
-      res.status(201).json({ message: 'Class updated successfully'});
-    }
-  });
-*/
 })
 
 app.post('/removeClasses', async (req, res) => {
