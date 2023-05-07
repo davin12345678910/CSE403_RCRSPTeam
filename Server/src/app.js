@@ -196,7 +196,19 @@ app.post('/getAdviser', async (req,res) => {
     if (err) {
       console.log(err)
     } else {
-      res.send({'Adviser' : row});
+      res.send({'Advisor' : row});
+    }
+  })
+})
+
+app.post('/getSection', async (req,res) => {
+  let db = await getDBConnection();
+  let qry = 'SELECT* FROM sections WHERE section_id=?;';
+  db.get(qry, [req.body.net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+    } else {
+      res.send({'Section' : row});
     }
   })
 })
@@ -289,6 +301,26 @@ app.post('/addAdviser', async (req, res) => {
   db.close();
 })
 
+app.post('/addSection', async (req, res) => {
+  let db = await getDBConnection()
+  let section_id = req.body.section_id;
+  let ta = req.body.ta;
+  let co_ta = req.body.co_ta;
+  let section_times = req.body.section_times;
+  let class_id = req.body.class_id
+
+  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
+  db.run(addSection, [section_id, ta, co_ta, section_times, class_id ], function (err) {
+    if (err) {
+      console.error('Error inserting Section:', err);
+      res.status(500).json({ message: 'Error inserting Section', error: err });
+    } else {
+      res.status(201).json({ message: 'Section added successfully', section_id: ta });
+    }
+  });
+  db.close();
+})
+
 
 // This is the update endpoint for classes
 app.post('/updateClass', async (req, res) => {
@@ -366,30 +398,29 @@ app.post('/updateClass', async (req, res) => {
   })
 })
 
-
-// This is the update endpoint for classes
-app.post('/updateStudent', async (req, res) => {
+// This is the update endpoint for professor
+app.post('/updateProfessor', async (req, res) => {
   let db = await getDBConnection()
   let net_id = req.body.net_id;
-  let student_name = req.body.student_name;
-  let major = req.body.major;
+  let professor_name = req.body.professor_name;
+  let department = req.body.department;
+  let tenure = req.body.tenure;
   let email = req.body.email;
-  let hash_pass = req.body.hash_pass;
-  let salt = req.body.salt;
+  let rating = req.body.rating;
 
-  let qry = 'SELECT* FROM students WHERE net_id=?;';
+  let qry = 'SELECT* FROM professors WHERE net_id = ?;';
 
-  db.get(qry, [net_id], (err, row) => {
+  db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
-      res.json({'students' : 'error'})
+      res.json({'Proffesor' : 'error'})
     } else {
       var update_net_id = row.net_id;
-      var update_student_name = row.student_name;
-      var update_major = row.major;
-      var update_email = row.email;
-      var update_hash_pass = row.hash_pass;
-      var update_salt = row.salt;
+      var update_professor_name = row.professor_name;
+      var update_department = row.department;
+      let update_tenure = row.tenure;
+      let update_email = row.email;
+      let update_rating = row.assistant_professor;
 
 
       // update
@@ -397,34 +428,143 @@ app.post('/updateStudent', async (req, res) => {
         update_net_id = net_id
       }
 
-      if (student_name != undefined) {
-        update_student_name = student_name
+      if (professor_name != undefined) {
+        update_professor_name = professor_name
       }
 
-      if (major != undefined) {
-        update_major = major
+      if (department != undefined) {
+        update_department = department
+      }
+
+      if (tenure != undefined) {
+        update_tenure = tenure
       }
 
       if (email != undefined) {
         update_email = email
       }
 
-      if (hash_pass != undefined) {
-        update_hash_pass = hash_pass
-      }
-
-      if (salt != undefined) {
-        update_salt = salt
+      if (rating != undefined) {
+        update_rating = rating
       }
 
       // now we will update
-      let updateClass = 'UPDATE students SET net_id=?, student_name=?, major=?, email=?, hash_pass=?, salt=? WHERE net_id=?;';
-      db.run(updateClass, [update_net_id, update_student_name, update_major, update_email, update_hash_pass, update_salt], function (err) {
+      let updateClass = 'UPDATE professors SET net_id=?, professor_name=?, department=?, tenure=?, email=?, rating=? WHERE net_id=?;';
+      db.run(updateClass, [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating, net_id], function (err) {
         if (err) {
-          console.error('Error inserting student:', err);
-          res.status(500).json({'student': err });
+          console.error('Error inserting professor:', err);
+          res.status(500).json({'professor': err });
         } else {
-          res.status(201).json({'student' : "successful"});
+          res.status(201).json({'professor' : [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating]});
+        }
+      });
+    }
+  })
+})
+
+app.post('/updateAdvisor', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.net_id;
+  let advisor_name = req.body.advisor_name;
+  let department = req.body.department;
+  let email = req.body.email;
+
+  let qry = 'SELECT* FROM advisors WHERE net_id = ?;';
+
+  db.get(qry, [req.body.net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+      res.json({'Advisor' : 'error'})
+    } else {
+      var update_net_id = row.net_id;
+      var update_advisor_name = row.advisor_name;
+      var update_department = row.department;
+      let update_email = row.email;
+
+
+      // update
+      if (net_id != undefined) {
+        update_net_id = net_id
+      }
+
+      if (advisor_name != undefined) {
+        update_advisor_name = advisor_name
+      }
+
+      if (department != undefined) {
+        update_department = department
+      }
+
+
+      if (email != undefined) {
+        update_email = email
+      }
+
+      // now we will update
+      let updateAdvisor = 'UPDATE advisors SET net_id=?, advisor_name=?, department=?, email=? WHERE net_id=?;';
+      db.run(updateAdvisor, [update_net_id, update_advisor_name, update_department, update_email, net_id], function (err) {
+        if (err) {
+          console.error('Error inserting advisor:', err);
+          res.status(500).json({'advisor': err });
+        } else {
+          res.status(201).json({'advisor' : [update_net_id, update_advisor_name, update_department, update_email]});
+        }
+      });
+    }
+  })
+})
+
+app.post('/updateSection', async (req, res) => {
+  let db = await getDBConnection()
+  let section_id = req.body.section_id;
+  let ta = req.body.ta;
+  let co_ta = req.body.co_ta;
+  let section_times = req.body.section_times;
+  let class_id = req.body.class_id;
+
+  let qry = 'SELECT* FROM sections WHERE section_id = ?;';
+
+  db.get(qry, [req.body.section_id], (err, row) => {
+    if (err) {
+      console.log(err)
+      res.json({'Section' : 'error'})
+    } else {
+      var update_section_id = row.section_id;
+      var update_ta = row.ta;
+      var update_co_ta = row.co_ta;
+      let update_section_times = row.section_times;
+      let update_class_id = row.class_id;
+
+
+      // update
+      if (section_id != undefined) {
+        update_section_id = section_id
+      }
+
+      if (ta != undefined) {
+        update_ta = ta
+      }
+
+      if (co_ta != undefined) {
+        update_co_ta = co_ta
+      }
+
+      if (section_times != undefined) {
+        update_section_times = section_times
+      }
+
+      if (class_id != undefined) {
+        update_class_id = class_id
+      }
+
+      // now we will update
+      let updateSection = 'UPDATE sections SET section_id=?, ta=?, co_ta=?, section_times=?, class_id=? WHERE section_id=?;';
+      db.run(updateSection, [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id, section_id], function (err) {
+        if (err) {
+          console.error('Error inserting section:', err);
+          res.status(500).json({'section': err });
+        } else {
+          res.status(201).json({'section' : [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id]});
         }
       });
     }
@@ -501,12 +641,22 @@ app.post('/removeAdviser', async (req, res) => {
   db.close();
 })
 
+app.post('/removeSection', async (req, res) => {
+  let db = await getDBConnection()
+  let section_id = req.body.section_id;
 
+  let removeSection= 'DELETE FROM sections WHERE section_id =?;';
 
-
-
-
-
+  db.run(removeSection, [section_id], function (err) {
+    if (err) {
+      console.error('Error removing section:', err);
+      res.status(500).json({ message: 'Error removing section ' + section_id, error: err});
+    } else {
+      res.status(201).json({ message: 'Section removed successfully', section_id : section_id });
+    }
+  });
+  db.close();
+})
 
 
 
