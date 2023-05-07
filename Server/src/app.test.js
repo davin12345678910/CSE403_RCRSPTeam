@@ -11,9 +11,15 @@ describe("POST /users", () => {
       expect(response.statusCode).toBe(200)
     })
 
+    test("Test getClass", async () => {
+      const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
+      var professor = addResponse.body.class.professor
+      expect(professor).toBe('x')
+    }, 100000)
+
     // We are always going to have 345 in the database, so we are going to check
     // if 345 is still in the database
-    test("Should contain 345", async () => {
+    test("Test updateClasses", async () => {
       const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
 
@@ -26,7 +32,7 @@ describe("POST /users", () => {
       expect(found).toBe(true)
     }, 100000)
 
-    test("Add classes contains 8910", async () => {
+    test("Test addClasses", async () => {
       const req = {
         class_id: '8910',
         credits: '4',
@@ -52,14 +58,6 @@ describe("POST /users", () => {
       var removeResponse = await request(app).post("/removeClasses").send({'class_id' : req.class_id});
     }, 100000)
 
-
-    test("Test getClass", async () => {
-      const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
-      var professor = addResponse.body.class.professor
-      expect(professor).toBe('x')
-    }, 100000)
-
-
     test("Test updateClass", async () => {
       const updateResponse = await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
       console.log(updateResponse.body.class);
@@ -68,6 +66,27 @@ describe("POST /users", () => {
       console.log(professor)
 
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
+    }, 100000)
+
+
+
+    // These are the tests for the student endpoints
+    test("Test getStudent", async () => {
+      const req = {
+        net_id: 'pokemon678',
+        student_name: 'pickachu',
+        major: 'electrical engineering',
+        email: 'pika@uw.edu',
+        hash_pass: '123',
+        salt: 'poo'
+      };
+      const addResponse = await request(app).post("/addStudent").send(req);
+      console.log(addResponse.body.message)
+      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
+      var net_id = getStudent.body.Student.net_id
+      console.log("This is the student net_id: " + net_id)
+      expect(net_id).toBe('pokemon678')
+      await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, 100000)
   })
 

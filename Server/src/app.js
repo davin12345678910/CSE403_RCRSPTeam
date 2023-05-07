@@ -177,12 +177,13 @@ app.post('/getProfessor', async (req,res) => {
 
 app.post('/getStudent', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM professors WHERE net_id=?;';
+  let qry = 'SELECT* FROM students WHERE net_id=?;';
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
+      res.send({'Student' : 'error'});
     } else {
-      res.send({'Professor' : row});
+      res.send({'Student' : row});
     }
   })
 })
@@ -190,12 +191,12 @@ app.post('/getStudent', async (req,res) => {
 
 app.post('/getAdviser', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM professors WHERE net_id=?;';
+  let qry = 'SELECT* FROM advisers WHERE net_id=?;';
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
     } else {
-      res.send({'Professor' : row});
+      res.send({'Adviser' : row});
     }
   })
 })
