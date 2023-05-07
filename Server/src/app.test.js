@@ -63,7 +63,7 @@ describe("POST /users", () => {
       };
       const addResponse = await request(app).post("/addProfessor").send(req);
       const getResponse = await request(app).get("/getProfessor").send();
-      var professors = getResponse.body.professor
+      var professors = getResponse.body.Professor
       var found = false
       professors.forEach(element => {
         if (element.net_id == '8910') {
@@ -97,7 +97,7 @@ describe("POST /users", () => {
       const updateResponse = await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'cat'});
       console.log(updateResponse.body.professor);
       const addResponse = await request(app).post("/getProfessor").send({'net_id' : '123'});
-      var professor = addResponse.body.professor.professor_name
+      var professor = addResponse.body.Professor.professor_name
       console.log(professor)
   
       await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x'});
