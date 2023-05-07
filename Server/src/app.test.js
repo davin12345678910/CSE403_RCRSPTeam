@@ -19,7 +19,7 @@ describe("POST /users", () => {
 
     // We are always going to have 345 in the database, so we are going to check
     // if 345 is still in the database
-    test("Test updateClasses", async () => {
+    test("Test getClasses", async () => {
       const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
 
@@ -65,15 +65,24 @@ describe("POST /users", () => {
       var professor = addResponse.body.class.professor
       console.log(professor)
 
+      expect(professor).toBe('cat')
+
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
     }, 100000)
 
 
-
     // These are the tests for the student endpoints
     test("Test getStudent", async () => {
+      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
+      var net_id = getStudent.body.Student.net_id
+      console.log("This is the student net_id: " + net_id)
+      expect(net_id).toBe('pokemon678')
+    }, 100000)
+
+
+    test("Test addStudent", async () => {
       const req = {
-        net_id: 'pokemon678',
+        net_id: 'pokemon789',
         student_name: 'pickachu',
         major: 'electrical engineering',
         email: 'pika@uw.edu',
@@ -82,12 +91,28 @@ describe("POST /users", () => {
       };
       const addResponse = await request(app).post("/addStudent").send(req);
       console.log(addResponse.body.message)
-      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
+      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon789'});
       var net_id = getStudent.body.Student.net_id
       console.log("This is the student net_id: " + net_id)
-      expect(net_id).toBe('pokemon678')
+      expect(net_id).toBe('pokemon789')
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, 100000)
+
+    test("Test updateStudent", async () => {
+      const updateResponse = await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
+      console.log("This is the student:  " + updateResponse.body.Student);
+
+      const addResponse = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
+      var major = addResponse.body.Student.major
+      console.log(major)
+
+      expect(major).toBe('computer engineering')
+
+      await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'electrical engineering'});
+    }, 100000)
+
+
+
   })
 
   describe("Unit Testing", () => {

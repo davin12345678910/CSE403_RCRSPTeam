@@ -462,6 +462,79 @@ app.post('/updateProfessor', async (req, res) => {
   })
 })
 
+
+
+// This is the update endpoint for classes
+app.post('/updateStudent', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.net_id;
+  let student_name = req.body.student_name;
+  let major = req.body.major;
+  let email = req.body.email;
+  let hash_pass = req.body.hash_pass;
+  let salt = req.body.salt;
+
+  let qry = 'SELECT* FROM students WHERE net_id=?;';
+
+  db.get(qry, [net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+      res.json({'Student' : 'error'})
+    } else {
+
+      let update_net_id = row.net_id;
+      let update_student_name = row.student_name;
+      let update_major = row.major;
+      let update_email = row.email;
+      let update_hash_pass = row.hash_pass;
+      let update_salt = row.salt;
+
+
+      // update
+      if (net_id != undefined) {
+        update_net_id = net_id
+      }
+
+      if (student_name != undefined) {
+        update_student_name = student_name
+      }
+
+      if (major != undefined) {
+        update_major = major
+      }
+
+      if (email != undefined) {
+        update_email = email
+      }
+
+      if (hash_pass != undefined) {
+        update_hash_pass = hash_pass
+      }
+
+      if (salt != undefined) {
+        update_salt = salt
+      }
+
+
+      // now we will update
+      let updateStudent = 'UPDATE students SET net_id=?, major=?, email=?, hash_pass=?, salt=? WHERE net_id=?;';
+      db.run(updateStudent, [update_net_id, update_major, update_email, update_hash_pass, update_salt, update_net_id], function (err) {
+        if (err) {
+          console.error('Error updating Student:', err);
+          res.status(500).json({'Student': err });
+        } else {
+          res.status(201).json({'Student' : [update_net_id, update_major, update_email, update_hash_pass, update_salt, update_net_id]});
+        }
+      });
+
+    }
+  })
+})
+
+
+
+
+
 app.post('/updateAdvisor', async (req, res) => {
   let db = await getDBConnection()
   let net_id = req.body.net_id;
