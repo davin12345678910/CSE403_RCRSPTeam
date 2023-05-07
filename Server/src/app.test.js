@@ -52,6 +52,29 @@ describe("POST /users", () => {
       var removeResponse = await request(app).post("/removeClasses").send({'class_id' : req.class_id});
     }, 100000)
 
+    test("Add professor contains 8910", async () => {
+      const req = {
+        net_id: '8910',
+        professor_name: 'x',
+        department: 'y',
+        tenure: '10',
+        email: 'z',
+        rating: '10'
+      };
+      const addResponse = await request(app).post("/addProfessor").send(req);
+      const getResponse = await request(app).get("/getProfessor").send();
+      var professors = getResponse.body.professor
+      var found = false
+      professors.forEach(element => {
+        if (element.net_id == '8910') {
+          found = true
+        }
+      })
+      expect(found).toBe(true)
+
+      var removeResponse = await request(app).post("/removeProfessor").send({'net_id' : req.net_id});
+    }, 100000)
+
 
     test("Test getClass", async () => {
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
@@ -68,6 +91,16 @@ describe("POST /users", () => {
       console.log(professor)
 
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
+    }, 100000)
+
+    test("Test updateProfessor", async () => {
+      const updateResponse = await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'cat'});
+      console.log(updateResponse.body.professor);
+      const addResponse = await request(app).post("/getProfessor").send({'net_id' : '123'});
+      var professor = addResponse.body.professor.professor_name
+      console.log(professor)
+  
+      await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x'});
     }, 100000)
   })
 
