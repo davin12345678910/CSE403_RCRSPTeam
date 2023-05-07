@@ -365,6 +365,70 @@ app.post('/updateClass', async (req, res) => {
   })
 })
 
+// This is the update endpoint for professor
+app.post('/updateProfessor', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.net_id;
+  let professor_name = req.body.professor_name;
+  let department = req.body.department;
+  let tenure = req.body.tenure;
+  let email = req.body.email;
+  let rating = req.body.rating;
+
+  let qry = 'SELECT* FROM professors WHERE net_id = ?;';
+
+  db.get(qry, [req.body.net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+      res.json({'Proffesor' : 'error'})
+    } else {
+      var update_net_id = row.net_id;
+      var update_professor_name = row.professor_name;
+      var update_department = row.department;
+      let update_tenure = row.tenure;
+      let update_email = row.email;
+      let update_rating = row.assistant_professor;
+
+
+      // update
+      if (net_id != undefined) {
+        update_net_id = net_id
+      }
+
+      if (professor_name != undefined) {
+        update_professor_name = professor_name
+      }
+
+      if (department != undefined) {
+        update_department = department
+      }
+
+      if (tenure != undefined) {
+        update_tenure = tenure
+      }
+
+      if (email != undefined) {
+        update_email = email
+      }
+
+      if (rating != undefined) {
+        update_rating = rating
+      }
+
+      // now we will update
+      let updateClass = 'UPDATE professors SET net_id=?, professor_name=?, department=?, tenure=?, email=?, rating=? WHERE net_id=?;';
+      db.run(updateClass, [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating, net_id], function (err) {
+        if (err) {
+          console.error('Error inserting professor:', err);
+          res.status(500).json({'professor': err });
+        } else {
+          res.status(201).json({'professor' : [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating]});
+        }
+      });
+    }
+  })
+})
+
 app.post('/removeClasses', async (req, res) => {
   let db = await getDBConnection()
   let class_id = req.body.class_id;
