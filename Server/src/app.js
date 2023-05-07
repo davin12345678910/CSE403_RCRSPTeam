@@ -335,6 +335,23 @@ app.post('/removeClasses', async (req, res) => {
   db.close();
 })
 
+app.post('/removeProfessor', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.net_id;
+
+  let removeClass = 'DELETE FROM professors WHERE net_id =?;';
+
+  db.run(removeClass, [net_id], function (err) {
+    if (err) {
+      console.error('Error removing class:', err);
+      res.status(500).json({ message: 'Error removing class ' + net_id, error: err});
+    } else {
+      res.status(201).json({ message: 'Class removed successfully', net_id : net_id });
+    }
+  });
+  db.close();
+})
+
 
 
 
