@@ -106,7 +106,7 @@ app.get('/getProfessors', async (req, res) => {
 
 app.post('/getClass', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM professors WHERE class_id=?;';
+  let qry = 'SELECT* FROM classes WHERE class_id=?;';
   db.get(qry, [req.body.class_id], (err, row) => {
     if (err) {
       console.log(err)
@@ -118,7 +118,7 @@ app.post('/getClass', async (req,res) => {
 
 app.post('/getProfessor', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM classes WHERE net_id=?;';
+  let qry = 'SELECT* FROM professors WHERE net_id=?;';
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
