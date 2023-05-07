@@ -196,8 +196,9 @@ app.post('/getAdviser', async (req,res) => {
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
+      res.send({'Adviser' : 'error'});
     } else {
-      res.send({'Advisor' : row});
+      res.send({'Adviser' : row});
     }
   })
 })
@@ -290,7 +291,7 @@ app.post('/addAdviser', async (req, res) => {
   let department = req.body.department;
   let email = req.body.email;
 
-  let addAdviser = 'INSERT INTO advisers(net_id, adviser_name, department, email) VALUES (?, ?, ?, ?, ?, ?);';
+  let addAdviser = 'INSERT INTO advisers(net_id, adviser_name, department, email) VALUES (?, ?, ?, ?);';
   db.run(addAdviser, [net_id, adviser_name, department, email], function (err) {
     if (err) {
       console.error('Error inserting Adviser:', err);
@@ -533,22 +534,22 @@ app.post('/updateStudent', async (req, res) => {
 })
 
 
-app.post('/updateAdvisor', async (req, res) => {
+app.post('/updateAdviser', async (req, res) => {
   let db = await getDBConnection()
   let net_id = req.body.net_id;
-  let advisor_name = req.body.advisor_name;
+  let adviser_name = req.body.adviser_name;
   let department = req.body.department;
   let email = req.body.email;
 
-  let qry = 'SELECT* FROM advisors WHERE net_id = ?;';
+  let qry = 'SELECT* FROM advisers WHERE net_id = ?;';
 
   db.get(qry, [net_id], (err, row) => {
     if (err) {
       console.log(err)
-      res.json({'Advisor' : 'error'})
+      res.json({'Adviser' : 'error'})
     } else {
       var update_net_id = row.net_id;
-      var update_advisor_name = row.advisor_name;
+      var update_adviser_name = row.adviser_name;
       var update_department = row.department;
       let update_email = row.email;
 
@@ -558,8 +559,8 @@ app.post('/updateAdvisor', async (req, res) => {
         update_net_id = net_id
       }
 
-      if (advisor_name != undefined) {
-        update_advisor_name = advisor_name
+      if (adviser_name != undefined) {
+        update_adviser_name = adviser_name
       }
 
       if (department != undefined) {
@@ -572,13 +573,13 @@ app.post('/updateAdvisor', async (req, res) => {
       }
 
       // now we will update
-      let updateAdvisor = 'UPDATE advisors SET net_id=?, advisor_name=?, department=?, email=? WHERE net_id=?;';
-      db.run(updateAdvisor, [update_net_id, update_advisor_name, update_department, update_email, net_id], function (err) {
+      let updateAdviser = 'UPDATE advisers SET net_id=?, adviser_name=?, department=?, email=? WHERE net_id=?;';
+      db.run(updateAdviser, [update_net_id, update_adviser_name, update_department, update_email, net_id], function (err) {
         if (err) {
-          console.error('Error inserting advisor:', err);
-          res.status(500).json({'Advisor': err });
+          console.error('Error inserting adviser:', err);
+          res.status(500).json({'Adviser': err });
         } else {
-          res.status(201).json({'Advisor' : [update_net_id, update_advisor_name, update_department, update_email]});
+          res.status(201).json({'Adviser' : [update_net_id, update_adviser_name, update_department, update_email]});
         }
       });
     }

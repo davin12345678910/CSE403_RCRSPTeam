@@ -82,7 +82,7 @@ describe("POST /users", () => {
 
     test("Test addStudent", async () => {
       const req = {
-        net_id: 'pokemon789',
+        net_id: 'pokemon8910',
         student_name: 'pickachu',
         major: 'electrical engineering',
         email: 'pika@uw.edu',
@@ -91,10 +91,10 @@ describe("POST /users", () => {
       };
       const addResponse = await request(app).post("/addStudent").send(req);
       console.log(addResponse.body.message)
-      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon789'});
+      const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
       var net_id = getStudent.body.Student.net_id
       console.log("This is the student net_id: " + net_id)
-      expect(net_id).toBe('pokemon789')
+      expect(net_id).toBe('pokemon8910')
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, 100000)
 
@@ -144,7 +144,43 @@ describe("POST /users", () => {
       var professor = addResponse.body.Professor.professor_name
       console.log(professor)
 
+      expect(professor).toBe('cat');
+
       await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x'});
+    }, 100000)
+
+
+    /*
+    These are the endpoint tests for advisers
+    */
+    test("Test addAdviser", async () => {
+      const req = {
+        net_id: '345',
+        adviser_name: 'x',
+        department: 'y',
+        email: 'z'
+      };
+      const addResponse = await request(app).post("/addAdviser").send(req);
+      console.log(addResponse.body.message)
+
+      const getResponse = await request(app).post("/getAdviser").send({'net_id' : '345'});
+      var adviser = getResponse.body.Adviser.adviser_name
+      console.log('This is the Adviser name: ' + adviser)
+      expect(adviser).toBe('x')
+
+      var removeResponse = await request(app).post("/removeAdviser").send({'net_id' : '345'});
+    }, 100000)
+
+
+    test("Test updateAdviser", async () => {
+      const updateResponse = await request(app).post("/updateAdviser").send({'net_id' : '123', 'adviser_name' : 'cat'});
+      console.log(updateResponse.body.Adviser);
+      const addResponse = await request(app).post("/getAdviser").send({'net_id' : '123'});
+      var adviser = addResponse.body.Adviser.adviser_name
+      console.log(adviser)
+      expect(adviser).toBe('cat');
+
+      await request(app).post("/updateAdviser").send({'net_id' : '123', 'adviser_name' : 'x'});
     }, 100000)
 
 
