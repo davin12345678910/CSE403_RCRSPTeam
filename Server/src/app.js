@@ -206,7 +206,7 @@ app.post('/getAdviser', async (req,res) => {
 app.post('/getSection', async (req,res) => {
   let db = await getDBConnection();
   let qry = 'SELECT* FROM sections WHERE section_id=?;';
-  db.get(qry, [req.body.net_id], (err, row) => {
+  db.get(qry, [req.body.section_id], (err, row) => {
     if (err) {
       console.log(err)
     } else {
