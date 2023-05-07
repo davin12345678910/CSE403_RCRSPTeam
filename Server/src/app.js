@@ -169,6 +169,7 @@ app.post('/getProfessor', async (req,res) => {
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
+      res.send({'Professor' : 'error'});
     } else {
       res.send({'Professor' : row});
     }
@@ -253,7 +254,7 @@ app.post('/addProfessor', async (req, res) => {
       console.error('Error inserting Professor:', err);
       res.status(500).json({ message: 'Error inserting Professor', error: err });
     } else {
-      res.status(201).json({ message: 'Professor added successfully', net_id: professor_name });
+      res.status(201).json({ message: 'Professor added successfully'});
     }
   });
   db.close();
@@ -410,17 +411,17 @@ app.post('/updateProfessor', async (req, res) => {
 
   let qry = 'SELECT* FROM professors WHERE net_id = ?;';
 
-  db.get(qry, [req.body.net_id], (err, row) => {
+  db.get(qry, [net_id], (err, row) => {
     if (err) {
       console.log(err)
-      res.json({'Proffesor' : 'error'})
+      res.json({'Professor' : 'error'})
     } else {
       var update_net_id = row.net_id;
       var update_professor_name = row.professor_name;
       var update_department = row.department;
       let update_tenure = row.tenure;
       let update_email = row.email;
-      let update_rating = row.assistant_professor;
+      let update_rating = row.rating;
 
 
       // update
@@ -453,9 +454,9 @@ app.post('/updateProfessor', async (req, res) => {
       db.run(updateClass, [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating, net_id], function (err) {
         if (err) {
           console.error('Error inserting professor:', err);
-          res.status(500).json({'professor': err });
+          res.status(500).json({'Professor': err });
         } else {
-          res.status(201).json({'professor' : [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating]});
+          res.status(201).json({'Professor' : [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating]});
         }
       });
     }

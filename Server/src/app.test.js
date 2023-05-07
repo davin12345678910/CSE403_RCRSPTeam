@@ -113,6 +113,41 @@ describe("POST /users", () => {
 
 
 
+    //These are the tests for the professor endpoints
+
+    test("Test addProfessor", async () => {
+      const req = {
+        net_id: '678',
+        professor_name: 'x',
+        department: 'y',
+        tenure: '10',
+        email: 'z',
+        rating: '10'
+      };
+      const addResponse = await request(app).post("/addProfessor").send(req);
+      console.log(addResponse.body.message)
+      const getResponse = await request(app).post("/getProfessor").send({'net_id' : '678'});
+      var professors = getResponse.body.Professor.professor_name
+      console.log('This is the professors name: ' + professors)
+      expect(professors).toBe('x')
+
+      var removeResponse = await request(app).post("/removeProfessor").send({'net_id' : '678'});
+    }, 100000)
+
+
+
+
+    test("Test updateProfessor", async () => {
+      const updateResponse = await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'cat'});
+      console.log(updateResponse.body.Professor);
+      const addResponse = await request(app).post("/getProfessor").send({'net_id' : '123'});
+      var professor = addResponse.body.Professor.professor_name
+      console.log(professor)
+
+      await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x'});
+    }, 100000)
+
+
   })
 
   describe("Unit Testing", () => {
