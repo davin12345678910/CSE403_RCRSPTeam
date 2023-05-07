@@ -98,6 +98,8 @@ describe("POST /users", () => {
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, 100000)
 
+
+
     test("Test updateStudent", async () => {
       const updateResponse = await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
       console.log("This is the student:  " + updateResponse.body.Student);
@@ -181,6 +183,39 @@ describe("POST /users", () => {
       expect(adviser).toBe('cat');
 
       await request(app).post("/updateAdviser").send({'net_id' : '123', 'adviser_name' : 'x'});
+    }, 100000)
+
+
+    test("Test addSection", async () => {
+      const req = {
+        section_id: '157',
+        ta: 'x',
+        co_ta: 'y',
+        section_times: 'z', 
+        class_id: 'w'
+      };
+      const addSection = await request(app).post("/addSection").send(req);
+      console.log(addSection.body.message)
+
+      const getResponse = await request(app).post("/getSection").send({'section_id' : '157'});
+      console.log(getResponse.body.message)
+      var ta = getResponse.body.Section.ta
+      console.log('This is the ta name: ' + ta)
+      expect(ta).toBe('x')
+
+      var removeResponse = await request(app).post("/removeSection").send({'section_id' : '157'});
+    }, 100000)
+
+
+    test("Test updateSection", async () => {
+      const updateResponse = await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'cat'});
+      console.log(updateResponse.body.Section);
+      const addResponse = await request(app).post("/getSection").send({'section_id' : '331'});
+      var ta = addResponse.body.Section.ta
+      console.log(ta)
+      expect(ta).toBe('cat');
+
+      await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, 100000)
 
 
