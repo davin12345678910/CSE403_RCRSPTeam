@@ -81,15 +81,49 @@ app.get('/getClasses', async (req, res) => {
   database.close()
 })
 
+app.get('/getProfessors', async (req, res) => {
+  var database = await getDBConnection();
+
+  let qry2 = "SELECT* FROM professors;";
+
+  try {
+    database.all(qry2, [], (err,rows) => {
+      if(err) return console.error(err.message);
+      var professors = []
+      rows.forEach((row) => {
+        professors.push(row)
+      });
+      //console.log(professors)
+      res.send({"professor" : professors})
+    })
+
+  } catch (error) {
+    res.send({"professor": "error"})
+  }
+  database.close()
+})
+
 
 app.post('/getClass', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM classes WHERE class_id=?;';
+  let qry = 'SELECT* FROM professors WHERE class_id=?;';
   db.get(qry, [req.body.class_id], (err, row) => {
     if (err) {
       console.log(err)
     } else {
       res.send({'class' : row});
+    }
+  })
+})
+
+app.post('/getProfessor', async (req,res) => {
+  let db = await getDBConnection();
+  let qry = 'SELECT* FROM classes WHERE net_id=?;';
+  db.get(qry, [req.body.net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+    } else {
+      res.send({'Professor' : row});
     }
   })
 })
@@ -114,6 +148,27 @@ app.post('/addClasses', async (req, res) => {
       res.status(500).json({ message: 'Error inserting class', error: err });
     } else {
       res.status(201).json({ message: 'Class added successfully', class_id: class_id });
+    }
+  });
+  db.close();
+})
+
+app.post('/addProfessor', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.class_id;
+  let professor_name = req.body.professor_name;
+  let department = req.body.department;
+  let tenure = req.body.tenure;
+  let email = req.body.email;
+  let rating = req.body.rating;
+  
+  let addProfessor = 'INSERT INTO professors(net_id, professor_name, department, tenure, email, rating) VALUES (?, ?, ?, ?, ?, ?);';
+  db.run(addProfessor, [net_id, professor_name, department, tenure, email, rating], function (err) {
+    if (err) {
+      console.error('Error inserting Professor:', err);
+      res.status(500).json({ message: 'Error inserting Professor', error: err });
+    } else {
+      res.status(201).json({ message: 'Professor added successfully', net_id: professor_name });
     }
   });
   db.close();
