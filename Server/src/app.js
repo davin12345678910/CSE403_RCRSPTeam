@@ -532,9 +532,6 @@ app.post('/updateStudent', async (req, res) => {
 })
 
 
-
-
-
 app.post('/updateAdvisor', async (req, res) => {
   let db = await getDBConnection()
   let net_id = req.body.net_id;
@@ -544,7 +541,7 @@ app.post('/updateAdvisor', async (req, res) => {
 
   let qry = 'SELECT* FROM advisors WHERE net_id = ?;';
 
-  db.get(qry, [req.body.net_id], (err, row) => {
+  db.get(qry, [net_id], (err, row) => {
     if (err) {
       console.log(err)
       res.json({'Advisor' : 'error'})
@@ -578,9 +575,9 @@ app.post('/updateAdvisor', async (req, res) => {
       db.run(updateAdvisor, [update_net_id, update_advisor_name, update_department, update_email, net_id], function (err) {
         if (err) {
           console.error('Error inserting advisor:', err);
-          res.status(500).json({'advisor': err });
+          res.status(500).json({'Advisor': err });
         } else {
-          res.status(201).json({'advisor' : [update_net_id, update_advisor_name, update_department, update_email]});
+          res.status(201).json({'Advisor' : [update_net_id, update_advisor_name, update_department, update_email]});
         }
       });
     }
@@ -635,9 +632,9 @@ app.post('/updateSection', async (req, res) => {
       db.run(updateSection, [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id, section_id], function (err) {
         if (err) {
           console.error('Error inserting section:', err);
-          res.status(500).json({'section': err });
+          res.status(500).json({'Section': err });
         } else {
-          res.status(201).json({'section' : [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id]});
+          res.status(201).json({'Section' : [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id]});
         }
       });
     }
