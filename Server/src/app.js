@@ -365,6 +365,71 @@ app.post('/updateClass', async (req, res) => {
   })
 })
 
+
+// This is the update endpoint for classes
+app.post('/updateStudent', async (req, res) => {
+  let db = await getDBConnection()
+  let net_id = req.body.net_id;
+  let student_name = req.body.student_name;
+  let major = req.body.major;
+  let email = req.body.email;
+  let hash_pass = req.body.hash_pass;
+  let salt = req.body.salt;
+
+  let qry = 'SELECT* FROM students WHERE net_id=?;';
+
+  db.get(qry, [net_id], (err, row) => {
+    if (err) {
+      console.log(err)
+      res.json({'students' : 'error'})
+    } else {
+      var update_net_id = row.net_id;
+      var update_student_name = row.student_name;
+      var update_major = row.major;
+      var update_email = row.email;
+      var update_hash_pass = row.hash_pass;
+      var update_salt = row.salt;
+
+
+      // update
+      if (net_id != undefined) {
+        update_net_id = net_id
+      }
+
+      if (student_name != undefined) {
+        update_student_name = student_name
+      }
+
+      if (major != undefined) {
+        update_major = major
+      }
+
+      if (email != undefined) {
+        update_email = email
+      }
+
+      if (hash_pass != undefined) {
+        update_hash_pass = hash_pass
+      }
+
+      if (salt != undefined) {
+        update_salt = salt
+      }
+
+      // now we will update
+      let updateClass = 'UPDATE students SET net_id=?, student_name=?, major=?, email=?, hash_pass=?, salt=? WHERE net_id=?;';
+      db.run(updateClass, [update_net_id, update_student_name, update_major, update_email, update_hash_pass, update_salt], function (err) {
+        if (err) {
+          console.error('Error inserting student:', err);
+          res.status(500).json({'student': err });
+        } else {
+          res.status(201).json({'student' : "successful"});
+        }
+      });
+    }
+  })
+})
+
 app.post('/removeClasses', async (req, res) => {
   let db = await getDBConnection()
   let class_id = req.body.class_id;
