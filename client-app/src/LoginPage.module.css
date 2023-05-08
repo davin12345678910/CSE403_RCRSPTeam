@@ -63,3 +63,7 @@
     background-color: #e0e0e0;
     cursor: not-allowed;
 }
+
+.text-stroke {
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+}

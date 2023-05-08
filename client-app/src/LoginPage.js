@@ -14,7 +14,7 @@ const LoginPage = () => {
 
         console.log('Email:', email, 'Password:', password);
 
-        const endpoint = "/login";
+        const endpoint = "/log";
         const options = {
             method: "POST",
             headers: {
