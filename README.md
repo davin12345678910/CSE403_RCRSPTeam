@@ -32,9 +32,18 @@ We are making an app that is building on top of the current registration system 
 
 ## How to build and test the system 
 
-Clearly labeled instructions for how to build and test the system. (Strive for a high degree of automation.)
+### How to build the system steps:
+- 1. Make two terminals 
+- 2. In one terminal `cd Server`
+- 3. Then `cd src`
+- 4. Then `npm install express`
+- 5. run this in terminal `node server.js`
+- 6. Next in the other terminal 
+- 7. Then type `npm install`
+- 8. Then run `npm start`
 
-Clearly labeled instructions for how to run the system.
-
-Based on the provided instructions, the course staff must be able to build and test the system without issues.
+### How to test the system 
+- 1. Make a new terminal 
+- 2. Then `cd server`
+- 3. Then run `NODE_OPTIONS=--experimental-vm-modules npx jest`
 
