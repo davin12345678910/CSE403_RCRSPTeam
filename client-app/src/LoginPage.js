@@ -36,7 +36,7 @@ const LoginPage = () => {
         try {
             const data = await fetchData(endpoint, options);
             console.log(data);
-            // navigate('/register');
+            navigate('/register');
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -44,7 +44,7 @@ const LoginPage = () => {
         try {
             const data = await fetchData(loginEndpoint, loginOptions);
             console.log(data);
-            // navigate('/register');
+            navigate('/register');
         } catch (error) {
             console.error('Error fetching data:', error);
         }

@@ -860,13 +860,13 @@ app.post('/login', async (req, res) => {
   db.get(query, [net_id], (err, result) => {
     if (err) {
       console.error("Error logging in: ", err.message);
-      res.status(500).json({ message: 'Error logging in: ', error: err.message })
+      res.status(500).json({ message: 'Error logging in: ', error: err.message, status: 500 })
       return
     }
 
     if (!result) {
       console.error("Could not log in: " + net_id + " not found in database")
-      res.status(400).json({ message: 'Could not log in: Invalid net_id'})
+      res.status(404).json({ message: 'Could not log in: Invalid net_id', status: 404 })
       return
     }
 
@@ -874,10 +874,10 @@ app.post('/login', async (req, res) => {
     const salt = result.salt;
     if (hashCode(password + salt) == hash_pass) {
       console.log('Signed in with net_id ' + net_id)
-      res.status(200).json({ message: 'Logged in successfully'})
+      res.status(200).json({ message: 'Logged in successfully', status: 200 })
     } else {
       console.log('Invalid password')
-      res.status(400).json({ message: 'Could not log in: Invalid password'});
+      res.status(404).json({ message: 'Could not log in: Invalid password', status: 404});
     }
   });
 
