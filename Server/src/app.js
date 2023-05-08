@@ -854,7 +854,7 @@ app.post('/login', async (req, res) => {
     const hash_pass = result.hash_pass;
     const salt = result.salt;
     if (hashCode(password + salt) == hash_pass) {
-      console.log('Signed in with email ' + net_id)
+      console.log('Signed in with net_id ' + net_id)
       res.status(200).json({ message: 'Logged in successfully'})
     } else {
       console.log('Invalid password')
