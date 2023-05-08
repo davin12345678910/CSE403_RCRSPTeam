@@ -15,7 +15,7 @@ function hashCode(str) {
       let chr = str.charCodeAt(i);
       hash = (hash * 31) + ((chr | 0) * 37); // bit-wise OR with 0 to convert to integer
   }
-  return hash;
+  return hash % (10 ** 14);
 }
 
 // This is how we will get the database that is within our system
@@ -833,12 +833,12 @@ app.post('registerClass', async(req, res) => {
 
 app.post('/login', async (req, res) => {
   const db = await getDBConnection();
-  let query = 'SELECT email, hash_pass, salt FROM students WHERE student.email = ?';
+  let query = 'SELECT hash_pass, salt FROM people WHERE net_id = ?';
 
-  const email = req.body.email;
+  const net_id = req.body.net_id;
   const password = req.body.password;
 
-  db.get(query, [email], (err, result) => {
+  db.get(query, [net_id], (err, result) => {
     if (err) {
       console.error("Error logging in: ", err.message);
       res.status(500).json({ message: 'Error logging in: ', error: err.message })
@@ -846,19 +846,19 @@ app.post('/login', async (req, res) => {
     }
 
     if (!result) {
-      console.error("Could not log in: " + email + " not found in database")
-      res.status(400).json({ message: 'Could not log in: Invalid email'})
+      console.error("Could not log in: " + net_id + " not found in database")
+      res.status(400).json({ message: 'Could not log in: Invalid net_id'})
       return
     }
 
-    const hash_pass = result.hash_pass | 0;
+    const hash_pass = result.hash_pass;
     const salt = result.salt;
     if (hashCode(password + salt) == hash_pass) {
-      console.log('Signed in with email ' + email)
-      res.status(200).json({ message: 'Signed in'})
+      console.log('Signed in with email ' + net_id)
+      res.status(200).json({ message: 'Logged in successfully'})
     } else {
-      console.log('Passwords don\'t match')
-      res.status(400).json({ message: 'Invalid password'})
+      console.log('Invalid password')
+      res.status(400).json({ message: 'Could not log in: Invalid password'});
     }
   });
 

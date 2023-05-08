@@ -2,6 +2,7 @@ import request from 'supertest'
 import app from './app.js'
 import { response } from 'express'
 
+const TIMEOUT = 5000;
 
 describe("POST /users", () => {
   describe("given a username and password", () => {
@@ -15,7 +16,7 @@ describe("POST /users", () => {
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
       var professor = addResponse.body.class.professor
       expect(professor).toBe('x')
-    }, 100000)
+    }, TIMEOUT)
 
     // We are always going to have 345 in the database, so we are going to check
     // if 345 is still in the database
@@ -30,7 +31,7 @@ describe("POST /users", () => {
         }
       })
       expect(found).toBe(true)
-    }, 100000)
+    }, TIMEOUT)
 
     test("Test addClasses", async () => {
       const req = {
@@ -56,7 +57,7 @@ describe("POST /users", () => {
 
       // remove the class once we are done testing
       var removeResponse = await request(app).post("/removeClasses").send({'class_id' : req.class_id});
-    }, 100000)
+    }, TIMEOUT)
 
     test("Test updateClass", async () => {
       const updateResponse = await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
@@ -68,7 +69,7 @@ describe("POST /users", () => {
       expect(professor).toBe('cat')
 
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
-    }, 100000)
+    }, TIMEOUT)
 
 
     // These are the tests for the student endpoints
@@ -77,7 +78,7 @@ describe("POST /users", () => {
       var net_id = getStudent.body.Student.net_id
       console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon678')
-    }, 100000)
+    }, TIMEOUT)
 
 
     test("Test addStudent", async () => {
@@ -96,7 +97,7 @@ describe("POST /users", () => {
       console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon8910')
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
-    }, 100000)
+    }, TIMEOUT)
 
 
 
@@ -111,7 +112,7 @@ describe("POST /users", () => {
       expect(major).toBe('computer engineering')
 
       await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'email' : 'pokemon678@uw.edu', 'student_name' : 'azaan', 'password' : '123', 'major' : 'electrical engineering'});
-    }, 100000)
+    }, TIMEOUT)
 
 
 
@@ -134,7 +135,7 @@ describe("POST /users", () => {
       expect(professors).toBe('x')
 
       var removeResponse = await request(app).post("/removeProfessor").send({'net_id' : '678'});
-    }, 100000)
+    }, TIMEOUT)
 
 
 
@@ -149,7 +150,7 @@ describe("POST /users", () => {
       expect(professor).toBe('cat');
 
       await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x', 'email' : '123@uw.edu', 'password' : 'pass123', 'department' : 'math', 'tenure' : '0', 'rating' : '4'});
-    }, 100000)
+    }, TIMEOUT)
 
 
     /*
@@ -171,7 +172,7 @@ describe("POST /users", () => {
       expect(adviser).toBe('x')
 
       var removeResponse = await request(app).post("/removeAdviser").send({'net_id' : '345'});
-    }, 100000)
+    }, TIMEOUT)
 
 
     test("Test updateAdviser", async () => {
@@ -183,7 +184,7 @@ describe("POST /users", () => {
       expect(adviser).toBe('cat');
 
       await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x', 'email' : '456@uw.edu', 'password' : 'pass456', 'department' : 'math'});
-    }, 100000)
+    }, TIMEOUT)
 
 
     test("Test addSection", async () => {
@@ -204,7 +205,7 @@ describe("POST /users", () => {
       expect(ta).toBe('x')
 
       var removeResponse = await request(app).post("/removeSection").send({'section_id' : '157'});
-    }, 100000)
+    }, TIMEOUT)
 
 
     test("Test updateSection", async () => {
@@ -216,9 +217,25 @@ describe("POST /users", () => {
       expect(ta).toBe('cat');
 
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
-    }, 100000)
+    }, TIMEOUT)
 
+    test("Test login successful", async () => {
+      const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : '123'});
+      console.log(loginResponse.body.message);
+      expect(loginResponse.body.message).toBe('Logged in successfully')
+    }, TIMEOUT)
 
+    test("Test login wrong password", async () => {
+      const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : 'pass123'});
+      console.log(loginResponse.body.message);
+      expect(loginResponse.body.message).toBe('Could not log in: Invalid password')
+    }, TIMEOUT)
+
+    test("Test login wrong net_id", async () => {
+      const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon789', 'password' : '123'});
+      console.log(loginResponse.body.message);
+      expect(loginResponse.body.message).toBe('Could not log in: Invalid net_id')
+    }, TIMEOUT)
   })
 
   describe("Unit Testing", () => {
