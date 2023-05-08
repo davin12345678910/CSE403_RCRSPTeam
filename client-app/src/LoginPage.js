@@ -24,12 +24,13 @@ const LoginPage = () => {
         };
 
         const uwid = email.split('@')[0];
-        const loginEndpoint = "/login?net_id=" + uwid + "&password=" + password;
+        const loginEndpoint = "/login";
         const loginOptions = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-            }
+            },
+            body: JSON.stringify({ 'net_id' : uwid, 'password' : password })
         }
 
         try {
