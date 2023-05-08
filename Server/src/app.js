@@ -3,11 +3,14 @@
 // These are the imports that we will require
 import express from 'express';
 import sqlite3 from 'sqlite3';
-import fs from 'fs'
+import fs from 'fs';
+import cors from 'cors';
+
 
 // we need these
 const verboseSqlite = sqlite3.verbose();
 const app = express();
+app.use(cors());
 
 // Hashing function for passwords
 function hashCode(str) {
