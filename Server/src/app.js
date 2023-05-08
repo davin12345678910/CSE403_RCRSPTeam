@@ -3,6 +3,7 @@
 // These are the imports that we will require
 import express from 'express';
 import sqlite3 from 'sqlite3';
+import fs from 'fs'
 
 // we need these
 const verboseSqlite = sqlite3.verbose();
@@ -827,6 +828,21 @@ app.post('/removeSection', async (req, res) => {
 app.post('registerClass', async(req, res) => {
   let db = await getDBConnection()
 })
+
+
+
+const logStream = fs.createWriteStream("login.log", { flags: "a" });
+
+app.post("/log", (req, res) => {
+  console.log(req.body);
+  const { email, password } = req.body;
+  const timestamp = new Date().toLocaleString();
+  const logEntry = `${timestamp}: ${email} logged in\n`;
+
+  logStream.write(logEntry);
+
+  res.status(200).json({ message: "Login successful" });
+});
 
 
 
