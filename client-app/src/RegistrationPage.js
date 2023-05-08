@@ -13,7 +13,7 @@ const RegistrationPage = () => {
     }
     return (
         <div className={styles.RegistrationPage}>
-            <h1>Registration - Autumn 2023</h1>
+            <h1 className={styles.textStroke}>Registration - Autumn 2023</h1>
             <div>
                 <select name="quarter" id="quarter">
                     <option value="autumn">Autumn 2023</option>

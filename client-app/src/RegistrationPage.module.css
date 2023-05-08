@@ -1,6 +1,8 @@
 .RegistrationPage {
     display: flex;
     flex-direction: column;
+    margin-top: 3rem;
+    padding: 2rem;
 }
 
 .Overlay {
@@ -25,9 +27,14 @@
     overflow: auto;
 }
 
+.textStroke {
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+}
+
 @media screen and (max-width: 600px) {
     .Modal {
         max-width: 90%;
         max-height: 90%;
     }
 }
+
