@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from "react-modal";
-import styles from './RegistrationPage.module.css';
+import styles from './RegistrationPage.css';
 
 const RegistrationPage = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -13,6 +13,9 @@ const RegistrationPage = () => {
     }
     return (
         <div className={styles.RegistrationPage}>
+            <br></br>
+            <br></br>
+            <br></br>
             <h1 className={styles.textStroke}>Registration - Autumn 2023</h1>
             <div>
                 <select name="quarter" id="quarter">
@@ -39,12 +42,10 @@ const RegistrationPage = () => {
                     <p>xxxxxxxxxxxxxx</p>
                     <button onClick={closeModal}>Close</button>
                 </Modal>
-                
-    
             </div>
         </div>
     )
-    
+
 }
 
 export default RegistrationPage;

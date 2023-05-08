@@ -4,6 +4,16 @@
     padding: 4rem 2rem;
 }
 
+
+body {
+    height: 100vh;
+    background-image: url("./assets/Registration_page.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
 .Overlay {
     background-color: rgba(0, 0, 0, 0.5);
     position: fixed;
@@ -11,6 +21,10 @@
     left: 0;
     right: 0;
     bottom: 0;
+}
+
+h1 {
+    color: #670967
 }
 
 .Modal {
