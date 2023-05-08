@@ -8,11 +8,20 @@ import sqlite3 from 'sqlite3';
 const verboseSqlite = sqlite3.verbose();
 const app = express();
 
+// Hashing function for passwords
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+      let chr = str.charCodeAt(i);
+      hash = (hash * 31) + ((chr | 0) * 37); // bit-wise OR with 0 to convert to integer
+  }
+  return hash;
+}
 
 // This is how we will get the database that is within our system
 function getDBConnection() {
 
-  const db = new verboseSqlite.Database("./registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
+  const db = new verboseSqlite.Database("./src/registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message)
   })
   return db;
@@ -25,23 +34,27 @@ async function makeTables() {
   var database = await getDBConnection();
 
   // here we will be inputting the tables we need into the database
-  // 1. Students
-  let queryStudents = 'CREATE TABLE students(net_id TEXT PRIMARY KEY, student_name TEXT, major TEXT, email TEXT, hash_pass TEXT, salt TEXT);';
+  // 1. People
+  let queryPeople = "CREATE TABLE people(net_id TEXT PRIMARY KEY, email TEXT, hash_pass TEXT, salt TEXT, role TEXT)"
 
-  // 2. Professor
-  let queryProfessors = 'CREATE TABLE professors(net_id TEXT PRIMARY KEY, professor_name TEXT, department TEXT, tenure INTEGER, email TEXT, rating INT);';
+  // 2. Students
+  let queryStudents = 'CREATE TABLE students(net_id TEXT PRIMARY KEY REFERENCES people(net_id), student_name TEXT, major TEXT);';
 
-  // 3. Advisers
-  let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY, adviser_name TEXT, department TEXT, email TEXT);';
+  // 3. Professor
+  let queryProfessors = 'CREATE TABLE professors(net_id TEXT PRIMARY KEY REFERENCES people(net_id), professor_name TEXT, department TEXT, tenure INTEGER, rating INT);';
 
-  // 4. Classes
+  // 4. Advisers
+  let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY REFERENCES people(net_id), adviser_name TEXT, department TEXT);';
+
+  // 5. Classes
   let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT);';
 
-  // 5. Sections
+  // 6. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
 
-  // 6. Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
+  // 7. Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
+  database.run(queryPeople);
   database.run(queryStudents);
   database.run(queryProfessors);
   database.run(queryAdvisers);
@@ -51,7 +64,64 @@ async function makeTables() {
   database.close();
 }
 
+async function addStartupData() {
+  // Add default class
+  let db = await getDBConnection();
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, ['345', null, null, null, 'x', null, null, null], function (err) {
+    if (err) {
+      console.error('Error inserting class: ', err);
+    }
+  });
+  db.close();
+
+  // Add default student
+  addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
+  db = await getDBConnection();
+  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
+  db.run(addStudent, ['pokemon678', null, null], function (err) {
+    if (err) {
+      console.error('Error inserting student: ', err);
+    }
+  });
+  db.close();
+
+  // Add default professor
+  addPerson('123', '123@uw.edu', 'pass123', 'professor');
+  db = await getDBConnection();
+  let addProfessor = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
+  db.run(addProfessor, ['123', 'x', 'math', '0', '4'], function (err) {
+    if (err) {
+      console.error('Error inserting professor: ', err);
+    }
+  })
+  db.close()
+
+  // Add default advisor
+  addPerson('456', '456@uw.edu', 'pass456', 'adviser');
+  db = await getDBConnection();
+  let addAdvisor = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
+  db.run(addAdvisor, ['456', 'x', 'math'], function (err) {
+    if (err) {
+      console.error('Error inserting advisor: ', err);
+    }
+  })
+  db.close();
+
+  // Add default section
+  db = await getDBConnection();
+  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
+  db.run(addSection, ['331', 'x', 'y', '12:30-1:20', '345'], function (err) {
+    if (err) {
+      console.error('Error inserting section: ', err);
+    }
+  })
+  db.close();
+}
+
+/* Must uncomment and run one at a time. */
 // makeTables();
+// addStartupData();
 
 app.use(express.json())
 // this is a basic test for status checking
@@ -215,7 +285,20 @@ app.post('/getSection', async (req,res) => {
   })
 })
 
+async function addPerson(net_id, email, password, role) {
+  let db = await getDBConnection()
 
+  let salt = Math.random() * Number.MAX_SAFE_INTEGER;
+  let hash_pass = hashCode(password + salt);
+
+  let addPerson = 'INSERT INTO people(net_id, email, hash_pass, salt, role) VALUES (?, ?, ?, ?, ?);';
+  db.run(addPerson, [net_id, email, hash_pass, salt, role], function (err) {
+    if (err) {
+      console.error('Error adding person:', err);
+    }
+  })
+  db.close();
+}
 
 app.post('/addClasses', async (req, res) => {
   let db = await getDBConnection()
@@ -241,16 +324,18 @@ app.post('/addClasses', async (req, res) => {
 })
 
 app.post('/addProfessor', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let professor_name = req.body.professor_name;
   let department = req.body.department;
   let tenure = req.body.tenure;
   let email = req.body.email;
+  let password = req.body.password;
   let rating = req.body.rating;
+  addPerson(net_id, email, password);
+  let db = await getDBConnection()
 
-  let addProfessor = 'INSERT INTO professors(net_id, professor_name, department, tenure, email, rating) VALUES (?, ?, ?, ?, ?, ?);';
-  db.run(addProfessor, [net_id, professor_name, department, tenure, email, rating], function (err) {
+  let addProfessor = 'INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);';
+  db.run(addProfessor, [net_id, professor_name, department, tenure, rating], function (err) {
     if (err) {
       console.error('Error inserting Professor:', err);
       res.status(500).json({ message: 'Error inserting Professor', error: err });
@@ -263,16 +348,16 @@ app.post('/addProfessor', async (req, res) => {
 
 
 app.post('/addStudent', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let student_name = req.body.student_name;
   let major = req.body.major;
   let email = req.body.email;
-  let hash_pass = req.body.hash_pass;
-  let salt = req.body.salt;
+  let password = req.body.password;
+  addPerson(net_id, email, password);
+  let db = await getDBConnection()
 
-  let addStudent = 'INSERT INTO students(net_id, student_name, major, email, hash_pass, salt) VALUES (?, ?, ?, ?, ?, ?);';
-  db.run(addStudent, [net_id, student_name, major, email, hash_pass, salt], function (err) {
+  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
+  db.run(addStudent, [net_id, student_name, major], function (err) {
     if (err) {
       console.error('Error inserting student:', err);
       res.status(500).json({ message: 'Error inserting student', error: err });
@@ -285,14 +370,16 @@ app.post('/addStudent', async (req, res) => {
 
 
 app.post('/addAdviser', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let adviser_name = req.body.adviser_name;
   let department = req.body.department;
   let email = req.body.email;
+  let password = req.body.password;
+  addPerson(net_id, email, password);
+  let db = await getDBConnection()
 
-  let addAdviser = 'INSERT INTO advisers(net_id, adviser_name, department, email) VALUES (?, ?, ?, ?);';
-  db.run(addAdviser, [net_id, adviser_name, department, email], function (err) {
+  let addAdviser = 'INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);';
+  db.run(addAdviser, [net_id, adviser_name, department], function (err) {
     if (err) {
       console.error('Error inserting Adviser:', err);
       res.status(500).json({ message: 'Error inserting Adviser', error: err });
@@ -322,6 +409,29 @@ app.post('/addSection', async (req, res) => {
   });
   db.close();
 })
+
+async function updatePerson(net_id, new_email, new_password, new_role) {
+  let db = await getDBConnection()
+
+  let query = 'SELECT * FROM people WHERE net_id = ?'
+  db.get(query, [net_id], (err, res) => {
+    if (err) {
+      console.log(err)
+      res.json({ 'people' : 'error'})
+    } else {
+      let new_salt = Math.random() * Number.MAX_SAFE_INTEGER;
+      let new_hash_pass = hashCode(new_password + new_salt);
+
+      let updatePerson = 'UPDATE people SET net_id = ?, email = ?, hash_pass = ?, salt = ?, role = ? WHERE net_id = ?';
+      db.run(updatePerson, [net_id, new_email, new_hash_pass, new_salt, new_role, net_id], function (err) {
+        if (err) {
+          console.error('Error inserting person')
+        }
+      })
+    }
+  })
+  db.close();
+}
 
 
 // This is the update endpoint for classes
@@ -402,13 +512,15 @@ app.post('/updateClass', async (req, res) => {
 
 // This is the update endpoint for professor
 app.post('/updateProfessor', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let professor_name = req.body.professor_name;
   let department = req.body.department;
   let tenure = req.body.tenure;
-  let email = req.body.email;
   let rating = req.body.rating;
+  let email = req.body.email;
+  let password = req.body.password;
+  updatePerson(net_id, email, password);
+  let db = await getDBConnection()
 
   let qry = 'SELECT* FROM professors WHERE net_id = ?;';
 
@@ -417,19 +529,13 @@ app.post('/updateProfessor', async (req, res) => {
       console.log(err)
       res.json({'Professor' : 'error'})
     } else {
-      var update_net_id = row.net_id;
       var update_professor_name = row.professor_name;
       var update_department = row.department;
       let update_tenure = row.tenure;
-      let update_email = row.email;
       let update_rating = row.rating;
 
 
       // update
-      if (net_id != undefined) {
-        update_net_id = net_id
-      }
-
       if (professor_name != undefined) {
         update_professor_name = professor_name
       }
@@ -442,22 +548,18 @@ app.post('/updateProfessor', async (req, res) => {
         update_tenure = tenure
       }
 
-      if (email != undefined) {
-        update_email = email
-      }
-
       if (rating != undefined) {
         update_rating = rating
       }
 
       // now we will update
-      let updateClass = 'UPDATE professors SET net_id=?, professor_name=?, department=?, tenure=?, email=?, rating=? WHERE net_id=?;';
-      db.run(updateClass, [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating, net_id], function (err) {
+      let updateProf = 'UPDATE professors SET net_id=?, professor_name=?, department=?, tenure=?, rating=? WHERE net_id=?;';
+      db.run(updateProf, [net_id, update_professor_name, update_department, update_tenure, update_rating, net_id], function (err) {
         if (err) {
           console.error('Error inserting professor:', err);
           res.status(500).json({'Professor': err });
         } else {
-          res.status(201).json({'Professor' : [update_net_id, update_professor_name, update_department, update_tenure, update_email, update_rating]});
+          res.status(201).json({'Professor' : [net_id, update_professor_name, update_department, update_tenure, update_rating]});
         }
       });
     }
@@ -468,13 +570,13 @@ app.post('/updateProfessor', async (req, res) => {
 
 // This is the update endpoint for classes
 app.post('/updateStudent', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let student_name = req.body.student_name;
   let major = req.body.major;
   let email = req.body.email;
-  let hash_pass = req.body.hash_pass;
-  let salt = req.body.salt;
+  let password = req.body.password;
+  updatePerson(net_id, email, password);
+  let db = await getDBConnection()
 
   let qry = 'SELECT* FROM students WHERE net_id=?;';
 
@@ -487,9 +589,6 @@ app.post('/updateStudent', async (req, res) => {
       let update_net_id = row.net_id;
       let update_student_name = row.student_name;
       let update_major = row.major;
-      let update_email = row.email;
-      let update_hash_pass = row.hash_pass;
-      let update_salt = row.salt;
 
 
       // update
@@ -505,27 +604,14 @@ app.post('/updateStudent', async (req, res) => {
         update_major = major
       }
 
-      if (email != undefined) {
-        update_email = email
-      }
-
-      if (hash_pass != undefined) {
-        update_hash_pass = hash_pass
-      }
-
-      if (salt != undefined) {
-        update_salt = salt
-      }
-
-
       // now we will update
-      let updateStudent = 'UPDATE students SET net_id=?, major=?, email=?, hash_pass=?, salt=? WHERE net_id=?;';
-      db.run(updateStudent, [update_net_id, update_major, update_email, update_hash_pass, update_salt, update_net_id], function (err) {
+      let updateStudent = 'UPDATE students SET net_id=?, major=? WHERE net_id=?;';
+      db.run(updateStudent, [update_net_id, update_major, update_net_id], function (err) {
         if (err) {
           console.error('Error updating Student:', err);
           res.status(500).json({'Student': err });
         } else {
-          res.status(201).json({'Student' : [update_net_id, update_major, update_email, update_hash_pass, update_salt, update_net_id]});
+          res.status(201).json({'Student' : [update_net_id, update_major, update_net_id]});
         }
       });
 
@@ -535,11 +621,13 @@ app.post('/updateStudent', async (req, res) => {
 
 
 app.post('/updateAdviser', async (req, res) => {
-  let db = await getDBConnection()
   let net_id = req.body.net_id;
   let adviser_name = req.body.adviser_name;
   let department = req.body.department;
   let email = req.body.email;
+  let password = req.body.password;
+  updatePerson(net_id, email, password);
+  let db = await getDBConnection()
 
   let qry = 'SELECT* FROM advisers WHERE net_id = ?;';
 
@@ -548,17 +636,11 @@ app.post('/updateAdviser', async (req, res) => {
       console.log(err)
       res.json({'Adviser' : 'error'})
     } else {
-      var update_net_id = row.net_id;
       var update_adviser_name = row.adviser_name;
       var update_department = row.department;
-      let update_email = row.email;
 
 
       // update
-      if (net_id != undefined) {
-        update_net_id = net_id
-      }
-
       if (adviser_name != undefined) {
         update_adviser_name = adviser_name
       }
@@ -567,19 +649,14 @@ app.post('/updateAdviser', async (req, res) => {
         update_department = department
       }
 
-
-      if (email != undefined) {
-        update_email = email
-      }
-
       // now we will update
-      let updateAdviser = 'UPDATE advisers SET net_id=?, adviser_name=?, department=?, email=? WHERE net_id=?;';
-      db.run(updateAdviser, [update_net_id, update_adviser_name, update_department, update_email, net_id], function (err) {
+      let updateAdviser = 'UPDATE advisers SET net_id=?, adviser_name=?, department=? WHERE net_id=?;';
+      db.run(updateAdviser, [net_id, update_adviser_name, update_department, net_id], function (err) {
         if (err) {
           console.error('Error inserting adviser:', err);
           res.status(500).json({'Adviser': err });
         } else {
-          res.status(201).json({'Adviser' : [update_net_id, update_adviser_name, update_department, update_email]});
+          res.status(201).json({'Adviser' : [net_id, update_adviser_name, update_department]});
         }
       });
     }
@@ -643,6 +720,18 @@ app.post('/updateSection', async (req, res) => {
   })
 })
 
+async function removePerson(net_id) {
+  let db = await getDBConnection()
+
+  let removePerson = 'DELETE FROM people WHERE net_id = ?';
+  db.run(removePerson, [net_id], function (err) {
+    if (err) {
+      console.error('Error removing person:', err)
+    }
+  });
+  db.close();
+}
+
 app.post('/removeClasses', async (req, res) => {
   let db = await getDBConnection()
   let class_id = req.body.class_id;
@@ -675,6 +764,7 @@ app.post('/removeProfessor', async (req, res) => {
     }
   });
   db.close();
+  removePerson(net_id);
 })
 
 
@@ -693,6 +783,7 @@ app.post('/removeStudent', async (req, res) => {
     }
   });
   db.close();
+  removePerson(net_id);
 })
 
 
@@ -711,6 +802,7 @@ app.post('/removeAdviser', async (req, res) => {
     }
   });
   db.close();
+  removePerson(net_id);
 })
 
 app.post('/removeSection', async (req, res) => {
@@ -745,19 +837,34 @@ app.post('registerClass', async(req, res) => {
 
 app.post('/login', async (req, res) => {
   const db = await getDBConnection();
-  let query = 'SELECT email, hash_pass, salt FROM students WHERE student.email == email';
+  let query = 'SELECT email, hash_pass, salt FROM students WHERE student.email = ?';
 
   const email = req.body.email;
   const password = req.body.password;
 
-  try {
-    db.all(query, [], (err, result) => {
-      if (err) return console.error(err.message);
-      const hash_pass = result[1]
-    });
-  } catch (error) {
-    res.send({"login" : "error"})
-  }
+  db.get(query, [email], (err, result) => {
+    if (err) {
+      console.error("Error logging in: ", err.message);
+      res.status(500).json({ message: 'Error logging in: ', error: err.message })
+      return
+    }
+
+    if (!result) {
+      console.error("Could not log in: " + email + " not found in database")
+      res.status(400).json({ message: 'Could not log in: Invalid email'})
+      return
+    }
+
+    const hash_pass = result.hash_pass | 0;
+    const salt = result.salt;
+    if (hashCode(password + salt) == hash_pass) {
+      console.log('Signed in with email ' + email)
+      res.status(200).json({ message: 'Signed in'})
+    } else {
+      console.log('Passwords don\'t match')
+      res.status(400).json({ message: 'Invalid password'})
+    }
+  });
 
   db.close()
 })

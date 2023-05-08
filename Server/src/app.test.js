@@ -175,14 +175,14 @@ describe("POST /users", () => {
 
 
     test("Test updateAdviser", async () => {
-      const updateResponse = await request(app).post("/updateAdviser").send({'net_id' : '123', 'adviser_name' : 'cat'});
+      const updateResponse = await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'cat'});
       console.log(updateResponse.body.Adviser);
-      const addResponse = await request(app).post("/getAdviser").send({'net_id' : '123'});
+      const addResponse = await request(app).post("/getAdviser").send({'net_id' : '456'});
       var adviser = addResponse.body.Adviser.adviser_name
       console.log(adviser)
       expect(adviser).toBe('cat');
 
-      await request(app).post("/updateAdviser").send({'net_id' : '123', 'adviser_name' : 'x'});
+      await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x'});
     }, 100000)
 
 
