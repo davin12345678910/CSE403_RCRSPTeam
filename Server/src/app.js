@@ -79,7 +79,7 @@ async function addStartupData() {
   addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
   db = await getDBConnection();
   let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
-  db.run(addStudent, ['pokemon678', null, null], function (err) {
+  db.run(addStudent, ['pokemon678', 'azaan', 'electrical engineering'], function (err) {
     if (err) {
       console.error('Error inserting student: ', err);
     }
@@ -288,7 +288,7 @@ app.post('/getSection', async (req,res) => {
 async function addPerson(net_id, email, password, role) {
   let db = await getDBConnection()
 
-  let salt = Math.random() * Number.MAX_SAFE_INTEGER;
+  let salt = Math.floor(Math.random() * 999999);
   let hash_pass = hashCode(password + salt);
 
   let addPerson = 'INSERT INTO people(net_id, email, hash_pass, salt, role) VALUES (?, ?, ?, ?, ?);';
@@ -419,7 +419,7 @@ async function updatePerson(net_id, new_email, new_password, new_role) {
       console.log(err)
       res.json({ 'people' : 'error'})
     } else {
-      let new_salt = Math.random() * Number.MAX_SAFE_INTEGER;
+      let new_salt = Math.floor(Math.random() * 999999);
       let new_hash_pass = hashCode(new_password + new_salt);
 
       let updatePerson = 'UPDATE people SET net_id = ?, email = ?, hash_pass = ?, salt = ?, role = ? WHERE net_id = ?';
@@ -519,7 +519,7 @@ app.post('/updateProfessor', async (req, res) => {
   let rating = req.body.rating;
   let email = req.body.email;
   let password = req.body.password;
-  updatePerson(net_id, email, password);
+  updatePerson(net_id, email, password, 'professor');
   let db = await getDBConnection()
 
   let qry = 'SELECT* FROM professors WHERE net_id = ?;';
@@ -575,7 +575,7 @@ app.post('/updateStudent', async (req, res) => {
   let major = req.body.major;
   let email = req.body.email;
   let password = req.body.password;
-  updatePerson(net_id, email, password);
+  updatePerson(net_id, email, password, 'student');
   let db = await getDBConnection()
 
   let qry = 'SELECT* FROM students WHERE net_id=?;';
@@ -592,10 +592,6 @@ app.post('/updateStudent', async (req, res) => {
 
 
       // update
-      if (net_id != undefined) {
-        update_net_id = net_id
-      }
-
       if (student_name != undefined) {
         update_student_name = student_name
       }
@@ -605,13 +601,13 @@ app.post('/updateStudent', async (req, res) => {
       }
 
       // now we will update
-      let updateStudent = 'UPDATE students SET net_id=?, major=? WHERE net_id=?;';
-      db.run(updateStudent, [update_net_id, update_major, update_net_id], function (err) {
+      let updateStudent = 'UPDATE students SET net_id=?, student_name=?, major=? WHERE net_id=?;';
+      db.run(updateStudent, [net_id, update_student_name, update_major, net_id], function (err) {
         if (err) {
           console.error('Error updating Student:', err);
           res.status(500).json({'Student': err });
         } else {
-          res.status(201).json({'Student' : [update_net_id, update_major, update_net_id]});
+          res.status(201).json({'Student' : [net_id, update_major, update_net_id]});
         }
       });
 
@@ -626,7 +622,7 @@ app.post('/updateAdviser', async (req, res) => {
   let department = req.body.department;
   let email = req.body.email;
   let password = req.body.password;
-  updatePerson(net_id, email, password);
+  updatePerson(net_id, email, password, 'adviser');
   let db = await getDBConnection()
 
   let qry = 'SELECT* FROM advisers WHERE net_id = ?;';

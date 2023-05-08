@@ -110,7 +110,7 @@ describe("POST /users", () => {
 
       expect(major).toBe('computer engineering')
 
-      await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'electrical engineering'});
+      await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'email' : 'pokemon678@uw.edu', 'student_name' : 'azaan', 'password' : '123', 'major' : 'electrical engineering'});
     }, 100000)
 
 
@@ -148,7 +148,7 @@ describe("POST /users", () => {
 
       expect(professor).toBe('cat');
 
-      await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x'});
+      await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'x', 'email' : '123@uw.edu', 'password' : 'pass123', 'department' : 'math', 'tenure' : '0', 'rating' : '4'});
     }, 100000)
 
 
@@ -182,7 +182,7 @@ describe("POST /users", () => {
       console.log(adviser)
       expect(adviser).toBe('cat');
 
-      await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x'});
+      await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x', 'email' : '456@uw.edu', 'password' : 'pass456', 'department' : 'math'});
     }, 100000)
 
 
