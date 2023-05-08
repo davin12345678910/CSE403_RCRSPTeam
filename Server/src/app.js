@@ -831,12 +831,12 @@ app.post('registerClass', async(req, res) => {
 
 
 
-app.post('/login', async (req, res) => {
+app.get('/login', async (req, res) => {
   const db = await getDBConnection();
   let query = 'SELECT hash_pass, salt FROM people WHERE net_id = ?';
 
-  const net_id = req.body.net_id;
-  const password = req.body.password;
+  const net_id = req.params.net_id;
+  const password = req.params.password;
 
   db.get(query, [net_id], (err, result) => {
     if (err) {
