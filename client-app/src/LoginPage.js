@@ -23,13 +23,31 @@ const LoginPage = () => {
             body: JSON.stringify({ email: email, password: password }),
         };
 
+        const uwid = email.split('@')[0];
+        const loginEndpoint = "/login?net_id=" + uwid + "&password=" + password;
+        const loginOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+
         try {
             const data = await fetchData(endpoint, options);
             console.log(data);
-            navigate('/register');
+            // navigate('/register');
         } catch (error) {
             console.error('Error fetching data:', error);
         }
+
+        try {
+            const data = await fetchData(loginEndpoint, loginOptions);
+            console.log(data);
+            // navigate('/register');
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+
     };
 
     const isFormValid = () => {
