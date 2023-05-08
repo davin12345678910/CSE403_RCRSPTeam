@@ -45,12 +45,19 @@ const LoginPage = () => {
             console.log(data);
             if (data['status'] === 200) {
                 navigate('/register');
+            } else {
+                alert("Invalid username or password. Please try again.");
+                setEmail('');
+                setPassword('');
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+            alert("There was an error logging in. Please try again later.");
+            setEmail('');
+            setPassword('');
         }
-
     };
+
 
     const isFormValid = () => {
         return email.trim() !== '' && password.trim() !== '';
