@@ -13,6 +13,14 @@
   }
 }
 
+body {
+  height: 100vh;
+  background-image: url("./assets/Registration_page.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
