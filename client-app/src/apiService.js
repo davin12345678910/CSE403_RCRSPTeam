@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 const fetchData = async (endpoint, options) => {
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
