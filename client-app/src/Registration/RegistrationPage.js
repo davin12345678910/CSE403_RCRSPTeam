@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import styles from './RegistrationPage.module.css';
 import { useLocation } from 'react-router-dom';
 import {fetchData} from "../apiService";
+import ReactStars from "react-rating-stars-component";
 
 const RegistrationPage = () => {
     const location = useLocation();
@@ -167,6 +168,7 @@ const RegistrationPage = () => {
                         <th>Professor</th>
                         <th>Class Time</th>
                         <th>Average GPA</th>
+                        <th>Rating</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -193,6 +195,15 @@ const RegistrationPage = () => {
                                 <td>{course.professor}</td>
                                 <td>{course.class_times}</td>
                                 <td>{course.average_gpa}</td>
+                                <td>
+                                    <ReactStars
+                                        count={5} // total number of stars
+                                        size={24} // size of stars
+                                        activeColor="#ffd700" // color of active stars
+                                        value={course.rating / 2} // convert rating from 0-10 to 0-5 scale
+                                        edit={false} // make it read-only
+                                    />
+                                </td>
                             </tr>
                         );
                     })}
