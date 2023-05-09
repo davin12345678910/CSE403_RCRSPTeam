@@ -105,7 +105,8 @@ const RegistrationPage = () => {
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
-            <div>
+            <div className={styles.StudentInfoClass}>
+
                 <select name="quarter" id="quarter">
                     <option value="autumn">Autumn 2023</option>
                     <option value="winter">Winter 2024</option>
