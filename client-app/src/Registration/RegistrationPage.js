@@ -76,7 +76,9 @@ const RegistrationPage = () => {
                     overlayClassName={styles.Overlay}
                 >
                     <h2>Search and Add Course</h2>
-                    <p>xxxxxxxxxxxxxx</p>
+                    <div id="classes">
+
+                    </div>
                     <button onClick={closeModal}>Close</button>
                 </Modal>
             </div>

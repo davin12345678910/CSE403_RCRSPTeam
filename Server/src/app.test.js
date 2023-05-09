@@ -42,7 +42,9 @@ describe("POST /users", () => {
         professor: 'x',
         assistant_professor: 'y',
         class_times: 'mon-fri',
-        quarter: 'spring'
+        quarter: 'spring',
+        class_name: 'gynecology',
+        sln: '789'
       };
       const addResponse = await request(app).post("/addClasses").send(req);
       const getResponse = await request(app).get("/getClasses").send();
@@ -192,7 +194,7 @@ describe("POST /users", () => {
         section_id: '157',
         ta: 'x',
         co_ta: 'y',
-        section_times: 'z', 
+        section_times: 'z',
         class_id: 'w'
       };
       const addSection = await request(app).post("/addSection").send(req);
@@ -218,6 +220,7 @@ describe("POST /users", () => {
 
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
+
 
     test("Test login successful", async () => {
       const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : '123'});

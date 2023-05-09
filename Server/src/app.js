@@ -25,7 +25,7 @@ function hashCode(str) {
 // This is how we will get the database that is within our system
 function getDBConnection() {
 
-  const db = new verboseSqlite.Database("./src/registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
+  const db = new verboseSqlite.Database("./registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message)
   })
   return db;
@@ -51,7 +51,7 @@ async function makeTables() {
   let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY REFERENCES people(net_id), adviser_name TEXT, department TEXT);';
 
   // 5. Classes
-  let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT);';
+  let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER);';
 
   // 6. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
@@ -68,11 +68,13 @@ async function makeTables() {
   database.close();
 }
 
+// makeTables();
+
 async function addStartupData() {
   // Add default class
   let db = await getDBConnection();
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, ['345', null, null, null, 'x', null, null, null], function (err) {
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, ['345', null, null, null, 'x', null, null, null, null, null], function (err) {
     if (err) {
       console.error('Error inserting class: ', err);
     }
@@ -314,9 +316,11 @@ app.post('/addClasses', async (req, res) => {
   let assistant_professor = req.body.assistant_professor;
   let class_times = req.body.class_times;
   let quarter = req.body.quarter;
+  let class_name = req.body.class_name;
+  let sln = req.body.sln;
 
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter) VALUES (?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter], function (err) {
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ message: 'Error inserting class', error: err });
@@ -449,6 +453,8 @@ app.post('/updateClass', async (req, res) => {
   let assistant_professor = req.body.assistant_professor;
   let class_times = req.body.class_times;
   let quarter = req.body.quarter;
+  let class_name = req.body.class_name;
+  let sln = req.body.sln;
 
   let qry = 'SELECT* FROM classes WHERE class_id=?;';
 
@@ -465,6 +471,8 @@ app.post('/updateClass', async (req, res) => {
       let update_assistant_professor = row.assistant_professor;
       let update_class_times = row.class_times;
       let update_quarter = row.quarter;
+      let update_class_name = row.class_name;
+      let update_sln = row.sln;
 
 
       // update
@@ -500,14 +508,22 @@ app.post('/updateClass', async (req, res) => {
         update_quarter = quarter
       }
 
+      if (class_name != undefined) {
+        update_class_name = class_name
+      }
+
+      if (quarter != undefined) {
+        update_quarter = quarter
+      }
+
       // now we will update
-      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=? WHERE class_id=?;';
-      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, class_id], function (err) {
+      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=?, class_name = ?, sln = ? WHERE class_id=?;';
+      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, class_id], function (err) {
         if (err) {
           console.error('Error inserting class:', err);
           res.status(500).json({'class': err });
         } else {
-          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter]});
+          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln]});
         }
       });
     }
