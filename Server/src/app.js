@@ -874,6 +874,9 @@ app.post('/login', async (req, res) => {
     const salt = result.salt;
     if (hashCode(password + salt) == hash_pass) {
       console.log('Signed in with net_id ' + net_id)
+      const timestamp = new Date().toLocaleString();
+      const logEntry = `${timestamp}: ${net_id} logged in\n`;
+      logStream.write(logEntry);
       res.status(200).json({ message: 'Logged in successfully', status: 200 })
     } else {
       console.log('Invalid password')
