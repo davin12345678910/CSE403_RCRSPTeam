@@ -13,8 +13,6 @@ const LoginPage = () => {
     const HandleSubmit = async (event) => {
         event.preventDefault();
 
-        console.log('Email:', email, 'Password:', password);
-
         const endpoint = "/log";
         const options = {
             method: "POST",
