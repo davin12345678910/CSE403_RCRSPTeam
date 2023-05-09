@@ -169,6 +169,24 @@ const RegistrationPage = () => {
                 </Modal>
             </div>
             {selectedCourses.length > 0 && (
+                <div className={styles.LegendContainer}>
+                    <div className={styles.legend}>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'green'}}></div>
+                            <div>Easy (Average GPA: 3.4 - 4.0)</div>
+                        </div>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'orange'}}></div>
+                            <div>Hard (Average GPA: 2.6 - 3.3)</div>
+                        </div>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'red'}}></div>
+                            <div>Extremely Hard (Average GPA: 0 - 2.5)</div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {selectedCourses.length > 0 && (
                 <table className={styles.RegistrationTable}>
                     <thead>
                     <tr>
