@@ -15,7 +15,7 @@
 
 body {
   height: 100vh;
-  background-image: url("./assets/Registration_page.png");
+  background-image: url("../assets/Registration_page.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

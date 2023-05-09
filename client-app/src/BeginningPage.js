@@ -1,6 +1,6 @@
 // src/LoginPage.js
 import React, { useState } from 'react';
-import styles from './LoginPage.module.css';
+import styles from './Login/LoginPage.module.css';
 
 const BeginningPage = () => {
 

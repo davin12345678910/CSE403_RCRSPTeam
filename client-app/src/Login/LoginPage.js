@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import registrationIcon from './assets/icon.png';
+import registrationIcon from '../assets/icon.png';
 import styles from './LoginPage.module.css';
 import { useNavigate } from 'react-router-dom';
-import { fetchData } from './apiService';
+import { fetchData } from '../apiService';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -43,7 +43,7 @@ const LoginPage = () => {
             const data = await fetchData(loginEndpoint, loginOptions);
             console.log(data);
             if (data['status'] === 200) {
-                navigate('/register');
+                navigate('/register', { state: { uwid } });
             } else {
                 setErrorMessage("Invalid username or password. Please try again.");
                 setEmail('');

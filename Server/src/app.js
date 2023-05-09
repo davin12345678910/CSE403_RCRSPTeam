@@ -252,7 +252,7 @@ app.post('/getProfessor', async (req,res) => {
 
 app.post('/getStudent', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM students WHERE net_id=?;';
+  let qry = 'SELECT * FROM students WHERE net_id=?;';
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
