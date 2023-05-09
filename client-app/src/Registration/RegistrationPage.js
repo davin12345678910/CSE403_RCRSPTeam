@@ -197,11 +197,11 @@ const RegistrationPage = () => {
                                 <td>{course.average_gpa}</td>
                                 <td>
                                     <ReactStars
-                                        count={5} // total number of stars
-                                        size={24} // size of stars
-                                        activeColor="#ffd700" // color of active stars
-                                        value={course.rating / 2} // convert rating from 0-10 to 0-5 scale
-                                        edit={false} // make it read-only
+                                        count={5}
+                                        size={24}
+                                        activeColor="#ffd700"
+                                        value={course.rating / 2}
+                                        edit={false}
                                     />
                                 </td>
                             </tr>
