@@ -17,10 +17,8 @@ const RegistrationPage = () => {
     const handleCheckboxChange = (course) => {
         setCheckedCourses((prevCheckedCourses) => {
             if (prevCheckedCourses.includes(course)) {
-                // If the course is already checked, remove it from the array
                 return prevCheckedCourses.filter((c) => c !== course);
             } else {
-                // If the course is not checked, add it to the array
                 return [...prevCheckedCourses, course];
             }
         });
@@ -28,7 +26,6 @@ const RegistrationPage = () => {
 
     const handleCloseModal = () => {
         setSelectedCourses((prevSelectedCourses) => {
-            // Remove any course from checkedCourses that is already in prevSelectedCourses
             const newCourses = checkedCourses.filter(
                 (course) => !prevSelectedCourses.find((c) => c.sln === course.sln)
             );
