@@ -89,7 +89,7 @@ h1 {
 
 .RegistrationTable {
     border-collapse: collapse;
-    margin: 25px 0;
+    margin: 0px 0 25px 0;
     font-size: 0.9em;
     min-width: 400px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
@@ -116,8 +116,53 @@ h1 {
     background-color: #f3f3f3;
 }
 
-.RegistrationTable tbody tr:last-of-type {
+.RegistrationTable tbody tr:nth-last-child(2) {
     border-bottom: 2px solid #1f4068;
+}
+
+.RegistrationTable tbody tr:last-of-type {
+    background-color: lightslategrey;
+    border-bottom: none;
+}
+
+.StudentInfoClass{
+    text-shadow: none;
+    color: black;
+    width: fit-content;
+    width: -moz-fit-content;
+    padding: 1rem;
+    background-color: rgba(255,255,255,0.5);
+    border-radius: 0.7rem;
+}
+
+.LegendContainer {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    width: fit-content;
+    margin-top: 1rem;
+    padding: 1rem 1rem 0rem 1rem;
+    border-radius: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.legendItem {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.legendColor {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
 
 

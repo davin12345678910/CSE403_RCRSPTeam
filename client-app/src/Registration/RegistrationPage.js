@@ -6,6 +6,7 @@ import {fetchData} from "../apiService";
 import ReactStars from "react-rating-stars-component";
 
 const RegistrationPage = () => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
     const location = useLocation();
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [uwId, setUwId] = useState('');
@@ -30,6 +31,10 @@ const RegistrationPage = () => {
     };
 
     const handleCloseModal = () => {
+        console.log("These are the courses that were added: " + courses);
+        if (courses == '') {
+            window.alert("No classes were added!");
+        }
         setSelectedCourses((prevSelectedCourses) => {
             const newCourses = checkedCourses.filter(
                 (course) => !prevSelectedCourses.find((c) => c.sln === course.sln)
@@ -84,6 +89,11 @@ const RegistrationPage = () => {
         try {
             const data = await fetchData(getClassEndpoint, getClassOptions);
             console.log("Class data fetched: ", data);
+
+            if (data.class === undefined) {
+                window.alert("No class found!");
+                return;
+            }
             setCourses([data.class]);
         } catch (error) {
             console.error('Error fetching class data:', error);
@@ -102,7 +112,8 @@ const RegistrationPage = () => {
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
-            <div>
+            <div className={styles.StudentInfoClass}>
+
                 <select name="quarter" id="quarter">
                     <option value="autumn">Autumn 2023</option>
                     <option value="winter">Winter 2024</option>
@@ -114,7 +125,7 @@ const RegistrationPage = () => {
                 {studentInfo && (
                     <>
                         <p>Prepared for: {studentInfo.Student.student_name}</p>
-                        <p>Prepared on: {new Date().toLocaleDateString()}</p>
+                        <p>Prepared on: {new Date().toLocaleString('en-US', options)}</p>
                         <p>Major: {studentInfo.Student.major}</p>
                     </>
                 )}
@@ -163,6 +174,24 @@ const RegistrationPage = () => {
                     <button onClick={handleCloseModal}>Add Course</button>
                 </Modal>
             </div>
+            {selectedCourses.length > 0 && (
+                <div className={styles.LegendContainer}>
+                    <div className={styles.legend}>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'green'}}></div>
+                            <div>Easy (Average GPA: 3.4 - 4.0)</div>
+                        </div>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'orange'}}></div>
+                            <div>Hard (Average GPA: 2.6 - 3.3)</div>
+                        </div>
+                        <div className={styles.legendItem}>
+                            <div className={styles.legendColor} style={{backgroundColor: 'red'}}></div>
+                            <div>Extremely Hard (Average GPA: 0 - 2.5)</div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {selectedCourses.length > 0 && (
                 <table className={styles.RegistrationTable}>
                     <thead>
@@ -214,6 +243,10 @@ const RegistrationPage = () => {
                             </tr>
                         );
                     })}
+                    <tr>
+                        <td colSpan={2}>Total Credits</td>
+                        <td>{selectedCourses.reduce((total, course) => total + Number(course.credits), 0)}</td>
+                    </tr>
                     </tbody>
                 </table>
             )}
