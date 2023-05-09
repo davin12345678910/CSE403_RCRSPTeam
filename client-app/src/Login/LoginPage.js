@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import registrationIcon from './assets/icon.png';
+import registrationIcon from '../assets/icon.png';
 import styles from './LoginPage.module.css';
 import { useNavigate } from 'react-router-dom';
-import { fetchData } from './apiService';
+import { fetchData } from '../apiService';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const HandleSubmit = async (event) => {
         event.preventDefault();
-
-        console.log('Email:', email, 'Password:', password);
 
         const endpoint = "/log";
         const options = {
@@ -36,7 +35,6 @@ const LoginPage = () => {
         try {
             const data = await fetchData(endpoint, options);
             console.log(data);
-            // navigate('/register');
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -44,12 +42,21 @@ const LoginPage = () => {
         try {
             const data = await fetchData(loginEndpoint, loginOptions);
             console.log(data);
-            // navigate('/register');
+            if (data['status'] === 200) {
+                navigate('/register', { state: { uwid } });
+            } else {
+                setErrorMessage("Invalid username or password. Please try again.");
+                setEmail('');
+                setPassword('');
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
+            setErrorMessage("There was an error logging in. Please try again later.");
+            setEmail('');
+            setPassword('');
         }
-
     };
+
 
     const isFormValid = () => {
         return email.trim() !== '' && password.trim() !== '';
@@ -97,6 +104,17 @@ const LoginPage = () => {
                     </button>
                 </form>
             </div>
+            {errorMessage &&
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.alertHeader}>Alert</div>
+                        <p>{errorMessage}</p>
+                        <button className={styles.closeButton} onClick={() => setErrorMessage('')}>
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
     );
 };

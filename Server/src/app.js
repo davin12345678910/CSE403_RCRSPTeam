@@ -3,11 +3,14 @@
 // These are the imports that we will require
 import express from 'express';
 import sqlite3 from 'sqlite3';
-import fs from 'fs'
+import fs from 'fs';
+import cors from 'cors';
+
 
 // we need these
 const verboseSqlite = sqlite3.verbose();
 const app = express();
+app.use(cors());
 
 // Hashing function for passwords
 function hashCode(str) {
@@ -249,7 +252,7 @@ app.post('/getProfessor', async (req,res) => {
 
 app.post('/getStudent', async (req,res) => {
   let db = await getDBConnection();
-  let qry = 'SELECT* FROM students WHERE net_id=?;';
+  let qry = 'SELECT * FROM students WHERE net_id=?;';
   db.get(qry, [req.body.net_id], (err, row) => {
     if (err) {
       console.log(err)
@@ -857,24 +860,27 @@ app.post('/login', async (req, res) => {
   db.get(query, [net_id], (err, result) => {
     if (err) {
       console.error("Error logging in: ", err.message);
-      res.status(500).json({ message: 'Error logging in: ', error: err.message })
+      res.status(500).json({ message: 'Error logging in: ', error: err.message, status: 500 })
       return
     }
 
     if (!result) {
       console.error("Could not log in: " + net_id + " not found in database")
-      res.status(400).json({ message: 'Could not log in: Invalid net_id'})
+      res.status(404).json({ message: 'Could not log in: Invalid net_id', status: 404 })
       return
     }
 
     const hash_pass = result.hash_pass;
     const salt = result.salt;
     if (hashCode(password + salt) == hash_pass) {
-      console.log('Signed in with email ' + net_id)
-      res.status(200).json({ message: 'Logged in successfully'})
+      console.log('Signed in with net_id ' + net_id)
+      const timestamp = new Date().toLocaleString();
+      const logEntry = `${timestamp}: ${net_id} logged in\n`;
+      logStream.write(logEntry);
+      res.status(200).json({ message: 'Logged in successfully', status: 200 })
     } else {
       console.log('Invalid password')
-      res.status(400).json({ message: 'Could not log in: Invalid password'});
+      res.status(404).json({ message: 'Could not log in: Invalid password', status: 404});
     }
   });
 
