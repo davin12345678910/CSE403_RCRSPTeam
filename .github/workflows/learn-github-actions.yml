@@ -8,9 +8,9 @@ jobs:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@v2
-      - name: Install supertest
-        run: npm install supertest
+      - name: Install npm
+        run: npm install
       - name: Run tests
-        run: cd Server && npx jest --verbose
+        run: cd Server && npm run test
 
 
