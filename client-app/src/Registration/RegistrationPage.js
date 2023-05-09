@@ -16,13 +16,18 @@ const RegistrationPage = () => {
     const [checkedCourses, setCheckedCourses] = useState([]);
 
     const handleCheckboxChange = (course) => {
-        setCheckedCourses((prevCheckedCourses) => {
-            if (prevCheckedCourses.includes(course)) {
-                return prevCheckedCourses.filter((c) => c !== course);
-            } else {
-                return [...prevCheckedCourses, course];
-            }
-        });
+        console.log("This is the course: " + course);
+        if (course.sln === undefined) {
+            window.alert("Class not found!");
+        } else {
+            setCheckedCourses((prevCheckedCourses) => {
+                if (prevCheckedCourses.includes(course)) {
+                    return prevCheckedCourses.filter((c) => c !== course);
+                } else {
+                    return [...prevCheckedCourses, course];
+                }
+            });
+        }
     };
 
     const handleCloseModal = () => {
@@ -78,6 +83,11 @@ const RegistrationPage = () => {
         try {
             const data = await fetchData(getClassEndpoint, getClassOptions);
             console.log("Class data fetched: ", data);
+
+            if (data.class === undefined) {
+                window.alert("No class found!");
+                return;
+            }
             setCourses([data.class]);
         } catch (error) {
             console.error('Error fetching class data:', error);
