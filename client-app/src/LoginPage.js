@@ -109,6 +109,7 @@ const LoginPage = () => {
             {errorMessage &&
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
+                        <div className={styles.alertHeader}>Alert</div>
                         <p>{errorMessage}</p>
                         <button className={styles.closeButton} onClick={() => setErrorMessage('')}>
                             &times;
