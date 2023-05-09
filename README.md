@@ -45,6 +45,7 @@ We are making an app that is building on top of the current registration system 
 
 ### How to test the system 
 - 1. Make a new terminal 
-- 2. Download depecadies do `npm install` `npm install supertest` `npm install cors`
+- 2. Download depecadies do `npm install`
 - 3. Then `cd server`
-- 4. Then run `NODE_OPTIONS=--experimental-vm-modules npx jest`
+- 4. Then `cd src`
+- 5. Then run `NODE_OPTIONS=--experimental-vm-modules npx jest`
