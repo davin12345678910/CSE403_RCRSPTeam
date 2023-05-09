@@ -16,13 +16,17 @@ const RegistrationPage = () => {
     const [checkedCourses, setCheckedCourses] = useState([]);
 
     const handleCheckboxChange = (course) => {
-        setCheckedCourses((prevCheckedCourses) => {
-            if (prevCheckedCourses.includes(course)) {
-                return prevCheckedCourses.filter((c) => c !== course);
-            } else {
-                return [...prevCheckedCourses, course];
-            }
-        });
+        if (course === undefined) {
+            window.alert("No courses found!");
+        } else{
+            setCheckedCourses((prevCheckedCourses) => {
+                if (prevCheckedCourses.includes(course)) {
+                    return prevCheckedCourses.filter((c) => c !== course);
+                } else {
+                    return [...prevCheckedCourses, course];
+                }
+            });
+        }
     };
 
     const handleCloseModal = () => {
@@ -37,7 +41,7 @@ const RegistrationPage = () => {
     };
 
 
-
+    // React use effect
     useEffect(() => {
         if (location.state && location.state.uwid) {
             const uwId = location.state.uwid;
@@ -46,6 +50,7 @@ const RegistrationPage = () => {
         }
     }, [location, location.state]);
 
+    // This is the get the student info
     const getStudentInfo = async (uwId) => {
         const getStudentEndpoint = "/getStudent";
         const getStudentOptions = {
@@ -66,6 +71,7 @@ const RegistrationPage = () => {
         }
     }
 
+    // This will allow us to search for a course that we are intrested in
     const searchCourse = async () => {
         const getClassEndpoint = "/getClass";
         const getClassOptions = {
