@@ -202,6 +202,7 @@ const RegistrationPage = () => {
                                         activeColor="#ffd700"
                                         value={course.rating / 2}
                                         edit={false}
+                                        isHalf={true}
                                     />
                                 </td>
                             </tr>
