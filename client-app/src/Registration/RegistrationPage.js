@@ -16,18 +16,13 @@ const RegistrationPage = () => {
     const [checkedCourses, setCheckedCourses] = useState([]);
 
     const handleCheckboxChange = (course) => {
-        console.log("This is the course: " + course);
-        if (course.sln === undefined) {
-            window.alert("Class not found!");
-        } else {
-            setCheckedCourses((prevCheckedCourses) => {
-                if (prevCheckedCourses.includes(course)) {
-                    return prevCheckedCourses.filter((c) => c !== course);
-                } else {
-                    return [...prevCheckedCourses, course];
-                }
-            });
-        }
+        setCheckedCourses((prevCheckedCourses) => {
+            if (prevCheckedCourses.includes(course)) {
+                return prevCheckedCourses.filter((c) => c !== course);
+            } else {
+                return [...prevCheckedCourses, course];
+            }
+        });
     };
 
     const handleCloseModal = () => {
