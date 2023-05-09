@@ -306,6 +306,9 @@ async function addPerson(net_id, email, password, role) {
   db.close();
 }
 
+
+//addPerson('567', '123@uw.edu', 'pass123', 'student');
+
 app.post('/addClasses', async (req, res) => {
   let db = await getDBConnection()
   let class_id = req.body.class_id;
