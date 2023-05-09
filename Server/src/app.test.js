@@ -76,6 +76,15 @@ describe("POST /users", () => {
 
     // These are the tests for the student endpoints
     test("Test getStudent", async () => {
+      const req = {
+        net_id: '123',
+        student_name: 'pickachu',
+        major: 'electrical engineering',
+        email: '123@uw.edu',
+        hash_pass: 'pass123',
+        salt: 'poo'
+      };
+      const addResponse = await request(app).post("/addStudent").send(req);
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
       var net_id = getStudent.body.Student.net_id
       console.log("This is the student net_id: " + net_id)
