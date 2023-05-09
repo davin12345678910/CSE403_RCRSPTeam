@@ -219,6 +219,10 @@ const RegistrationPage = () => {
                             </tr>
                         );
                     })}
+                    <tr>
+                        <td colSpan={2}>Total Credits</td>
+                        <td>{selectedCourses.reduce((total, course) => total + Number(course.credits), 0)}</td>
+                    </tr>
                     </tbody>
                 </table>
             )}

@@ -116,8 +116,13 @@ h1 {
     background-color: #f3f3f3;
 }
 
-.RegistrationTable tbody tr:last-of-type {
+.RegistrationTable tbody tr:nth-last-child(2) {
     border-bottom: 2px solid #1f4068;
+}
+
+.RegistrationTable tbody tr:last-of-type {
+    background-color: lightslategrey;
+    border-bottom: none;
 }
 
 .StudentInfoClass{
