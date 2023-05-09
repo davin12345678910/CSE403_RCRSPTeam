@@ -6,6 +6,7 @@ import {fetchData} from "../apiService";
 import ReactStars from "react-rating-stars-component";
 
 const RegistrationPage = () => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
     const location = useLocation();
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [uwId, setUwId] = useState('');
@@ -118,7 +119,7 @@ const RegistrationPage = () => {
                 {studentInfo && (
                     <>
                         <p>Prepared for: {studentInfo.Student.student_name}</p>
-                        <p>Prepared on: {new Date().toLocaleDateString()}</p>
+                        <p>Prepared on: {new Date().toLocaleString('en-US', options)}</p>
                         <p>Major: {studentInfo.Student.major}</p>
                     </>
                 )}
