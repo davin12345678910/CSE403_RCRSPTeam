@@ -60,7 +60,7 @@ h1 {
 }
 
 .ModalTable thead tr {
-    background-color: #009879;
+    background-color: #85754d;
     color: #ffffff;
     text-align: left;
 }
@@ -79,7 +79,7 @@ h1 {
 }
 
 .ModalTable tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid #85754d;
 }
 
 .ModalTable tbody tr.active-row {
