@@ -7,6 +7,7 @@ import { fetchData } from './apiService';
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const HandleSubmit = async (event) => {
@@ -46,13 +47,13 @@ const LoginPage = () => {
             if (data['status'] === 200) {
                 navigate('/register');
             } else {
-                alert("Invalid username or password. Please try again.");
+                setErrorMessage("Invalid username or password. Please try again.");
                 setEmail('');
                 setPassword('');
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            alert("There was an error logging in. Please try again later.");
+            setErrorMessage("There was an error logging in. Please try again later.");
             setEmail('');
             setPassword('');
         }
@@ -105,6 +106,16 @@ const LoginPage = () => {
                     </button>
                 </form>
             </div>
+            {errorMessage &&
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <p>{errorMessage}</p>
+                        <button className={styles.closeButton} onClick={() => setErrorMessage('')}>
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
     );
 };
