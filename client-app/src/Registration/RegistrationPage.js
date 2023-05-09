@@ -26,6 +26,10 @@ const RegistrationPage = () => {
     };
 
     const handleCloseModal = () => {
+        console.log("These are the courses that were added: " + courses);
+        if (courses == '') {
+            window.alert("No classes were added!");
+        }
         setSelectedCourses((prevSelectedCourses) => {
             const newCourses = checkedCourses.filter(
                 (course) => !prevSelectedCourses.find((c) => c.sln === course.sln)
