@@ -103,6 +103,10 @@ const RegistrationPage = () => {
         setModalIsOpen(false);
     }
 
+    const handleRemoveCourse = (courseIndex) => {
+        setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+    };
+
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
@@ -198,6 +202,7 @@ const RegistrationPage = () => {
                         <th>Class Time</th>
                         <th>Average GPA</th>
                         <th>Rating</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -234,6 +239,7 @@ const RegistrationPage = () => {
                                         isHalf={true}
                                     />
                                 </td>
+                                <td><button onClick={() => handleRemoveCourse(index)}>Remove Course</button></td>
                             </tr>
                         );
                     })}
