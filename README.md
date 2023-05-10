@@ -32,7 +32,7 @@ We are making an app that is building on top of the current registration system 
 
 ## How to build and test the system 
 
-#### Notes: This only works on a mac device. We didn't know this until one of our friends 
+#### Notes: This only works on a mac device.We found a solution on a windows but for some reason it doesn't work on all windows
 
 ### How to build the system steps:
 - 1. Make two terminals 
