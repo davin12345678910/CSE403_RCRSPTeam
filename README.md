@@ -32,6 +32,8 @@ We are making an app that is building on top of the current registration system 
 
 ## How to build and test the system 
 
+#### Notes: This only works on a mac device. We didn't know this until one of our friends 
+
 ### How to build the system steps:
 - 1. Make two terminals 
 - 2. In one terminal `cd Server`
@@ -48,4 +50,4 @@ We are making an app that is building on top of the current registration system 
 - 2. Then `cd server`
 - 3. Then `cd src`
 - 4. Download depecadies do `npm install`
-- 5. Then run `NODE_OPTIONS=--experimental-vm-modules npx jest`
+- 5. Then run if you are on a macbook `NODE_OPTIONS=--experimental-vm-modules npx jest` if you are on a windows device use `set NODE_OPTIONS=--experimental-vm-modules && npx jest`
