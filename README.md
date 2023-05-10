@@ -36,7 +36,7 @@ We are making an app that is building on top of the current registration system 
 - 1. Make two terminals 
 - 2. In one terminal `cd Server`
 - 3. Then `cd src`
-- 4. Then `npm install express`
+- 4. Then `npm install`
 - 5. run this in terminal `node server.js`
 - 6. Next in the other terminal 
 - 7. Then type `cd client-app`
