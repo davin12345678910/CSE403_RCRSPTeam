@@ -159,6 +159,7 @@ app.get('/getClasses', async (req, res) => {
   database.close()
 })
 
+
 app.get('/getProfessors', async (req, res) => {
   var database = await getDBConnection();
 

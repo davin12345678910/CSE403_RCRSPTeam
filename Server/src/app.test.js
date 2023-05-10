@@ -34,6 +34,7 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
     test("Test addClasses", async () => {
+
       const req = {
         class_id: '8910',
         credits: '4',
