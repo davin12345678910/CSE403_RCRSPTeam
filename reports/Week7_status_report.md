@@ -56,15 +56,19 @@ I have trouble on expanding the code and what the future plan should be.
 ### Ahmed Helow
 
 what I did:
+Implemented several endpoints to get data from our database and send them back to the front end for display. I also implemented a log endpoint that tracks users' activity based on when they log into our system. Worked also on testing out endpoints and our queries. 
 
 
 what I learned:
+I learned how to implement endpoints and how to send requests from the frontend to the backend and send back needed data based on the endpoint. 
 
 
 What I had trouble on:
+I had trouble learning node.js and front end frameworks since I wasn't familiar with that language. 
 
 
 What I am stuck on:
+I am having trouble implementing new features for our system, I think we need to design and plan our next feature and how we are going to implement it. 
 
 
 ### Chairnet Muche
