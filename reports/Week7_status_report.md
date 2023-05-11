@@ -42,16 +42,16 @@ we did not learn until one of our friends with a windows device wanted to try ou
 
 ### Azaan Khalfe
 what I did:
-
+I worked on the endpoints for setting up the database, connecting to the database and getting the request from the query. I also worked on the tests and the CI
 
 what I learned:
-
+I learned more about node.js and how to test javascript using jest and how important using the CI is.
 
 What I had trouble on:
-
+i had trouble debugging for node.js since I am not familiar with java script and I have to troubleshoot a lot and look a lot of the documentation and other resources 
 
 What I am stuck on:
-
+I have trouble on expanding the code and what the future plan should be.
 
 ### Ahmed Helow
 
