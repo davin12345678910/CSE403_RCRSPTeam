@@ -42,42 +42,48 @@ we did not learn until one of our friends with a windows device wanted to try ou
 
 ### Azaan Khalfe
 what I did:
-
+I worked on the endpoints for setting up the database, connecting to the database and getting the request from the query. I also worked on the tests and the CI
 
 what I learned:
-
+I learned more about node.js and how to test javascript using jest and how important using the CI is.
 
 What I had trouble on:
-
+i had trouble debugging for node.js since I am not familiar with java script and I have to troubleshoot a lot and look a lot of the documentation and other resources 
 
 What I am stuck on:
-
+I have trouble on expanding the code and what the future plan should be.
 
 ### Ahmed Helow
 
 what I did:
+Implemented several endpoints to get data from our database and send them back to the front end for display. I also implemented a log endpoint that tracks users' activity based on when they log into our system. Worked also on testing out endpoints and our queries. 
 
 
 what I learned:
+I learned how to implement endpoints and how to send requests from the frontend to the backend and send back needed data based on the endpoint. 
 
 
 What I had trouble on:
+I had trouble learning node.js and front end frameworks since I wasn't familiar with that language. 
 
 
 What I am stuck on:
+I am having trouble implementing new features for our system, I think we need to design and plan our next feature and how we are going to implement it. 
 
 
 ### Chairnet Muche
 what I did:
-
+I mostly focused on the front-end aspects of the project with creating different pages as well as preparing the registration page. Additionally, I contributed to the document, where  I help with video editing and slide preparation.
 
 what I learned:
-
+I learned that it very crucial to understand what the back-end does so that I can use it to display
+the front-end. 
 
 What I had trouble on:
-
+My front-end partner and I faced some difficulty in showing the class rating system in the registration page. However, by helping each other, we managed to get it done.
 
 What I am stuck on:
+I'm still thinking about the CSS part for the pages, because we need to make it look appealing for students or users when they log in. And so, I'm considering what to do next by researching and learning what looks good on a website.
 
 
 
