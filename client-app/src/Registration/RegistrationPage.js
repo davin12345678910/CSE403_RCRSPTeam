@@ -102,6 +102,8 @@ const RegistrationPage = () => {
 
 
     function openModal() {
+        setSearchTerm('');
+        setCourses([]);
         setModalIsOpen(true);
     }
 

@@ -83,16 +83,22 @@ What I am stuck on:
 
 ### Foad Shariat
 what I did:
+I worked on the Login and registration page. I connected the login page to use the login endpoint
+and the registration page to use the getClass endpoint. We showed the user info in the registration page
+by using the getPerson endpoint. I also populated both tables in modal and the table in the registration page
 
 
 what I learned:
-
+I learned how to get connected and use each endpoint's data in the front end. I also learned how to use
+the modal in bootstrap and how to populate the table in the modal and the registration page.
 
 What I had trouble on:
-
+First I had trouble to understand how fetching the data works in the front end. I also had trouble to
+understand how to use the modal in bootstrap and how to populate the table in the modal and the registration page.
 
 What I am stuck on:
-
+I'm stuck on how to add security to the frontend and how to prevent CORS errors from happening.
+Frontend should handle edge cases to prevent attacks.
 
 
 ### Sol Zamora
