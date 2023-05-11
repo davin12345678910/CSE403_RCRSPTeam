@@ -69,15 +69,17 @@ What I am stuck on:
 
 ### Chairnet Muche
 what I did:
-
+I mostly focused on the front-end aspects of the project with creating different pages as well as preparing the registration page. Additionally, I contributed to the document, where  I help with video editing and slide preparation.
 
 what I learned:
-
+I learned that it very crucial to understand what the back-end does so that I can use it to display
+the front-end. 
 
 What I had trouble on:
-
+My front-end partner and I faced some difficulty in showing the class rating system in the registration page. However, by helping each other, we managed to get it done.
 
 What I am stuck on:
+I'm still thinking about the CSS part for the pages, because we need to make it look appealing for students or users when they log in. And so, I'm considering what to do next by researching and learning what looks good on a website.
 
 
 
