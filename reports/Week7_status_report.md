@@ -112,7 +112,7 @@ I'm stuck on modifying the server configuration to prevent CORS errors from happ
 
 
 ## Plans for next week:
-1. We wil have compeleted all of the endpoints for the API
-2. We will have compelted all of the test that are needed for the API and the backend as needed
-3. We will have compelted the functionality of the webpages in which we will have for the website in
-   which we are working with
+1. We will have completed a majority of the use cases that we planned to complete
+2. We will add in endpoints that will be needed for our next use cases
+3. We will work on the endpoint that is required for the use cases
+4. Work on fixing the use case that Azaan made
