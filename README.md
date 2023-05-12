@@ -35,21 +35,28 @@ We are making an app that is building on top of the current registration system 
 #### Notes: This only works on a mac device.We found a solution on a windows but for some reason it doesn't work on all windows
 
 ### How to build the system steps:
-- 1. Make two terminals
-- 2. In one terminal `cd Server`
-- 3. Then `cd src`
+- 1. Install Node at: https://nodejs.org/en/download
+- 2. Make two terminals
+- 3. In one terminal `cd Server` and `cd src`
 - 4. Then `npm install`
-- 5. run this in terminal `node server.js`
+- 5. Next run this `node server.js`
+
+Once you have completed this step you should be a message in terminal saying that: 
+Server started on port 3001
+
 - 6. Next in the other terminal
 - 7. Then type `cd client-app`
 - 8. Then type `npm install`
 - 9. Then run `npm start`
 
+Once these steps are complete. In the second terminal, you should be a lot of stuff 
+beign shown on the terminal which is basically npm starting up your server. Soon 
+you should be able to see a link to our website at: http://localhost:3000/
+
 ### How to test the system
 - 1. Make a new terminal
-- 2. Then `cd server`
-- 3. Then `cd src`
-- 4. Download depecadies do `npm install`
+- 2. Then `cd server` and `cd src`
+- 4. Download dependencies by doing `npm install` [If you have already done npm install in the build the system steps, you do not need to do this again]
 - 5. Then run if you are on a macbook `NODE_OPTIONS=--experimental-vm-modules npx jest` if you are on a windows device use `set NODE_OPTIONS=--experimental-vm-modules && npx jest`
 
 
