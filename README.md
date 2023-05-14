@@ -7,7 +7,7 @@ We are making an app that is building on top of the current registration system 
 
 
 ## What does the system do?
-TODO
+This system and project are based on the current registration system at UW and will improve it by adding more features that will make it easier for students, professors, and advisers and improve the whole registration system.
 
 
 ## Goals:
@@ -69,9 +69,11 @@ you should be able to see a link to our website at: http://localhost:3000/
   difficulty of a course and the overall rating of a professor for a course they plan to take
   
 ## Work in progress
-TODO
+Working on adding add code support and also waitlist support
 
 
 ## How to report a bug
 TODO
 
+## Known bugs
+TODO
