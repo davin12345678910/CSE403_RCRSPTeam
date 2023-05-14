@@ -69,4 +69,9 @@ you should be able to see a link to our website at: http://localhost:3000/
   difficulty of a course and the overall rating of a professor for a course they plan to take
   
 ## Work in progress
+TODO
+
+
+## How to report a bug
+TODO
 
