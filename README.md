@@ -63,3 +63,6 @@ you should be able to see a link to our website at: http://localhost:3000/
 ## Use cases that have been completed
 - GPA and rating of courses in which a student wants to or possibly take is now displayed on the front end in order to inform users about the
   difficulty of a course and the overall rating of a professor for a course they plan to take
+  
+## Work in progress
+
