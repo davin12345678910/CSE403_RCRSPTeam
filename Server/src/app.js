@@ -872,18 +872,6 @@ app.post('/removeSection', async (req, res) => {
   db.close();
 })
 
-
-
-
-// TODO: We don't have a table that stores which student is registered for which class.
-// Do we want to CREATE TABLE registered(net_id TEXT REFERENCES students(net_id), class_id TEXT REFERENCES classes(class_id))
-// or do we want to add this data to the already existing STUDENTS table (would have to add several columns, some of which could be null)?
-app.post('registerClass', async(req, res) => {
-  let db = await getDBConnection()
-})
-
-
-
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
 app.post("/log", (req, res) => {
@@ -911,13 +899,14 @@ app.post('/login', async (req, res) => {
     if (err) {
       console.error("Error logging in: ", err.message);
       res.status(500).json({ message: 'Error logging in: ', error: err.message, status: 500 })
+      db.close();
       return
     }
 
     if (!result) {
       console.log("Could not log in: " + net_id + " not found in database")
       res.status(404).json({ message: 'Could not log in: Invalid net_id', status: 404 })
-      return
+      return;
     }
 
     const hash_pass = result.hash_pass;
@@ -1021,16 +1010,15 @@ app.post('/addWaitlist', async (req, res) => {
       return;
     }
 
-    if (!result) {
-      db.run(queryAddWaitlist, [net_id, class_id, 0], function (err) {
-        if (err) {
-          console.error('Error adding to waitlist: ', err.message);
-          res.status(500).json({ message: 'Error adding to waitlist', error: err.message, status: 500});
-          return;
-        }
-        res.status(200).json({ message: 'Successfully added to waitlist', status: 200});
-      })
-    }
+    let position = result ? result.position : 0;
+    db.run(queryAddWaitlist, [net_id, class_id, position], function (err) {
+      if (err) {
+        console.error('Error adding to waitlist: ', err.message);
+        res.status(500).json({ message: 'Error adding to waitlist', error: err.message, status: 500});
+        return;
+      }
+      res.status(200).json({ message: 'Successfully added to waitlist', status: 200});
+    });
   });
   db.close();
 })
