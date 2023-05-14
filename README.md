@@ -6,6 +6,10 @@ We are a team of computer science students working on a Resilient Course Registr
 We are making an app that is building on top of the current registration system of the UW that we hope will improve the experience of registrarting for classes for users. For example, we hope to make the add in code process more streamlined then the current process where you have to ask advisers, then later get the people who you can contact, then contact the person, then wait for a response where you might be asked to give more information, and possibly not end up with the code. As you can see this process is very time consuming and not that nice for the user. We hope to make a more streamlined process that is embedded into the current registration system where you can easily contact the needed people and get quicker responses as it is a one stop shop. As for those who give add codes, given that the request won't be in their emails, which may be hidden within the many thousands of other emails it makes it easier for everybody!
 
 
+## What does the system do?
+TODO
+
+
 ## Goals:
 1. Make a tool that is more accessibile for users: The current system doesn't provide all the information needed for registration in one place
 2. Make a tool that has a more streamlined add in code process: The add code is time consuming and also it might be challenging for a person who is not familiar
