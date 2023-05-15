@@ -43,9 +43,12 @@ Make sure to download the version that is compatible to your system, so if you h
 Once the download is complete, you should be able to use node 
 
 
+## How to obtain the source code
+Do `git clone 
+
 ## How to build and test the system
 
-#### Notes: This only works on a mac device.We found a solution on a windows but for some reason it doesn't work on all windows
+#### Important Notes: This only works on a mac device. We found a solution on a windows but for some reason it doesn't work on all windows
 
 ### How to build the system steps (How to run the software):
 - 1. Make two terminals
