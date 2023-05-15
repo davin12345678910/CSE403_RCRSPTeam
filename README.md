@@ -43,8 +43,13 @@ TODO Chairnet and Foad update!!!!!!!!!
 
 ### Server directory: server portion of the code
 -  `src` this is the directory that contains the main server, testing code and database 
-      - `app.js`
-      - 
+      - `app.js`: this is where we have the endpoints of our server
+      - `app.test.js`: this is where we contain the testing code for our database 
+      - `login.log`: this is where we are login in the logins that people are doing 
+      - `registration.db`: this is the database that contains all of the informtion of the people using our system 
+      - `server.js`: this is the server that runs the endpoints that we made 
+
+### `Readme`: This contains helpful information for developers and users of our system 
 
 
 
@@ -85,6 +90,29 @@ you should be able to see a link to our website at: http://localhost:3000/
 - 2. Then `cd server` and `cd src`
 - 4. Download dependencies by doing `npm install` [If you have already done npm install in the build the system steps, you do not need to do this again]
 - 5. Then run if you are on a macbook `NODE_OPTIONS=--experimental-vm-modules npx jest` if you are on a windows device use `set NODE_OPTIONS=--experimental-vm-modules && npx jest`
+
+
+
+### How to add new test into our codebase:
+Steps on how to add tests: 
+1. First make sure that you've cloned our repository
+2. Next `cd server` && `cd src`
+3. now you can find app.test.js
+4. Here you can find tests that we've written, and in here, you will want to make a test case which you will make within the describes that contains the tests
+5. First you will need to have something that looks like this:
+      - 'test("TEST_INFO", async () => {
+            // your code
+          }, TIMEOUT)`
+6. In TEST_INFO you will want to give a title for your tests
+7. in the comment //your code, you will want to add in code that will be your test
+8. TIMEOUT is where you can add a time out if a test is too long 
+
+Guidlines: 
+- make sure to follow google style conventions for javascript 
+- make sure to have clear and informative titles for your tests 
+
+## How to build a release of the software:
+- currently there is no extra steps to building the system besides the steps in the "How to build the system steps"
 
 
 ## Use cases that have been completed
