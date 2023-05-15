@@ -75,6 +75,19 @@ async function makeTables() {
   database.close();
 }
 
+
+
+async function makeAddCodeTables() {
+  var database = await getDBConnection();
+
+  let addCodeTable = 'CREATE TABLE addCode(id INTEGER PRIMARY KEY, net_id TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
+  let addCodeMessageTable = 'CREATE TABLE messages(id INTEGER PRIMARY KEY, net_id_sender TEXT, JobType_sender TEXT, net_id_reciever, JobType_reciever TEXT, message TEXT);';
+  database.run(addCodeTable);
+  database.run(addCodeMessageTable);
+}
+
+
+
 async function addStartupData() {
   // Add default class
   let db = await getDBConnection();
