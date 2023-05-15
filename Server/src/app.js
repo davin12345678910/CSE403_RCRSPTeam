@@ -25,7 +25,7 @@ function hashCode(str) {
 // This is how we will get the database that is within our system
 function getDBConnection() {
 
-  const db = new verboseSqlite.Database("./registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
+  const db = new verboseSqlite.Database("./src/registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message)
   })
   return db;
@@ -56,7 +56,12 @@ async function makeTables() {
   // 6. Sections
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
 
-  // 7. Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
+  // 7. Registered Classes
+  let queryRegisterClass = 'CREATE TABLE registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id));';
+
+  // 8. Waitlist
+  let queryWaitlist = 'CREATE TABLE waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
+  // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
   database.run(queryPeople);
   database.run(queryStudents);
@@ -64,11 +69,11 @@ async function makeTables() {
   database.run(queryAdvisers);
   database.run(queryClasses);
   database.run(querySections);
+  database.run(queryRegisterClass);
+  database.run(queryWaitlist);
 
   database.close();
 }
-
-// makeTables();
 
 async function addStartupData() {
   // Add default class
@@ -117,9 +122,19 @@ async function addStartupData() {
   // Add default section
   db = await getDBConnection();
   let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
-  db.run(addSection, ['331', 'x', 'y', '12:30-1:20', '345'], function (err) {
+  db.run(addSection, ['331', 'x', 'y', '11:30-12:20', '345'], function (err) {
     if (err) {
       console.error('Error inserting section: ', err);
+    }
+  })
+  db.close();
+
+  // Add default waitlist
+  db = await getDBConnection();
+  let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
+  db.run(addWaitlist, ['pokemon678', '345', 0], function (err) {
+    if (err) {
+      console.error('Error inserting waitlist: ', err);
     }
   })
   db.close();
@@ -743,7 +758,22 @@ app.post('/updateSection', async (req, res) => {
 async function removePerson(net_id) {
   let db = await getDBConnection()
 
+  let removeFromRegistration = 'DELETE FROM registration WHERE net_id=?;';
+  let removeFromWaitlist = 'DELETE FROM waitlist WHERE net_id=?;';
   let removePerson = 'DELETE FROM people WHERE net_id = ?';
+
+  db.run(removeFromRegistration, [net_id], function (err) {
+    if (err) {
+      console.error('Error removing person from waitlist:', err)
+    }
+  });
+
+  db.run(removeFromWaitlist, [net_id], function (err) {
+    if (err) {
+      console.error('Error removing person from waitlist:', err)
+    }
+  });
+
   db.run(removePerson, [net_id], function (err) {
     if (err) {
       console.error('Error removing person:', err)
@@ -842,18 +872,6 @@ app.post('/removeSection', async (req, res) => {
   db.close();
 })
 
-
-
-
-// TODO: We don't have a table that stores which student is registered for which class.
-// Do we want to CREATE TABLE registered(net_id TEXT REFERENCES students(net_id), class_id TEXT REFERENCES classes(class_id))
-// or do we want to add this data to the already existing STUDENTS table (would have to add several columns, some of which could be null)?
-app.post('registerClass', async(req, res) => {
-  let db = await getDBConnection()
-})
-
-
-
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
 app.post("/log", (req, res) => {
@@ -881,13 +899,14 @@ app.post('/login', async (req, res) => {
     if (err) {
       console.error("Error logging in: ", err.message);
       res.status(500).json({ message: 'Error logging in: ', error: err.message, status: 500 })
+      db.close();
       return
     }
 
     if (!result) {
-      console.error("Could not log in: " + net_id + " not found in database")
+      console.log("Could not log in: " + net_id + " not found in database")
       res.status(404).json({ message: 'Could not log in: Invalid net_id', status: 404 })
-      return
+      return;
     }
 
     const hash_pass = result.hash_pass;
@@ -905,6 +924,120 @@ app.post('/login', async (req, res) => {
   });
 
   db.close()
+})
+
+app.post('/addRegistration', async (req, res) => {
+  const db = await getDBConnection();
+  let net_id = req.body.net_id;
+  let class_id = req.body.class_id;
+  let query = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
+
+  db.run(query, [net_id, class_id], function (err) {
+    if (err) {
+      console.error('Error inserting into registration:', err.message);
+      res.status(500).json({ message: 'Error inserting into registration', error: err, status: 500});
+      return;
+    }
+    console.log('Successfully added to registration');
+    res.status(200).json({ message: 'Successfully added to registration', status: 200});
+  })
+  db.close();
+})
+
+app.post('/removeRegistration', async (req, res) => {
+  const db = await getDBConnection();
+  let net_id = req.body.net_id;
+  let class_id = req.body.class_id;
+  let removeFromRegistration = 'DELETE FROM registration WHERE net_id=? AND class_id=?;';
+  let getFromWaitlist = 'SELECT TOP 1 net_id, class_id FROM waitlist WHERE class_id=? ORDER BY position ASC;';
+  let removeFromWaitlist = 'DELETE FROM waitlist WHERE net_id=? AND class_id=?;';
+  let insertToRegistration = 'INSERT INTO registration(net_id, class) VALUES (?, ?);';
+
+  db.run(removeFromRegistration, [net_id, class_id], function (err) {
+    if (err) {
+      console.error('Error removing from registration:', err.message);
+      res.status(500).json({ message: 'Error removing from registration', error: err, status: 500});
+      return;
+    }
+    console.log('Successfully removed from registration');
+  });
+  db.run(getFromWaitlist, [class_id], function (err, result) {
+    if (err) {
+      console.error('Error getting from waitlist:', err.message);
+      res.status(500).json({ message: 'Error getting from waitlist', error: err, status: 500});
+      return;
+    }
+    console.log('Successfully got from waitlist');
+    if (!result) {
+      res.status(200).json({ message: 'Successfully removed from registration', status: 200});
+      return;
+    }
+
+    net_id = result.net_id;
+    db.run(removeFromWaitlist, [net_id, class_id], function (err) {
+      if (err) {
+        console.error('Error removing from waitlist:', err.message);
+        res.status(500).json({ message: 'Error removing from waitlist', error: err, status: 500});
+        return;
+      }
+      console.log('Successfully removed from waitlist');
+    });
+    db.run(insertToRegistration, [net_id, class_id], function (err) {
+      if (err) {
+        console.error('Error inserting into registration from waitlist:', err.message);
+        res.status(500).json({ message: 'Error inserting into registration from waitlist', error: err, status: 500});
+        return;
+      }
+      console.log('Successfully registered from waitlist');
+      res.status(200).json({ message: 'Successfully removed from registration and added from waitlist', status: 200});
+    });
+  });
+  db.close();
+})
+
+app.post('/addWaitlist', async (req, res) => {
+  const db = await getDBConnection();
+  let net_id = req.body.net_id;
+  let class_id = req.body.class_id;
+
+  let queryGetPosition = 'SELECT TOP 1 position FROM waitlist ORDER BY position DESC;';
+  let queryAddWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
+
+  db.get(queryGetPosition, [], (err, result) => {
+    if (err) {
+      console.error('Error getting from waitlist: ', err.message);
+      res.status(500).json({ message: 'Error getting from waitlist', error: err.message, status: 500});
+      return;
+    }
+
+    let position = result ? result.position : 0;
+    db.run(queryAddWaitlist, [net_id, class_id, position], function (err) {
+      if (err) {
+        console.error('Error adding to waitlist: ', err.message);
+        res.status(500).json({ message: 'Error adding to waitlist', error: err.message, status: 500});
+        return;
+      }
+      res.status(200).json({ message: 'Successfully added to waitlist', status: 200});
+    });
+  });
+  db.close();
+})
+
+app.post('/removeWaitlist', async (req, res) => {
+  const db = await getDBConnection();
+  let net_id = req.body.net_id;
+  let class_id = req.body.net_id;
+
+  let queryRemove = 'DELETE FROM waitlist WHERE net_id=? AND class_id=?;';
+  db.run(queryRemove, [net_id, class_id], function (err) {
+    if (err) {
+      console.error('Error removing from waitlist: ', err.message);
+      res.status(500).json({ message: 'Error removing from waitlist', error: err.message, status: 500});
+      return;
+    }
+    res.status(200).json({ message: 'Successfully removed from waitlist', status: 200});
+  });
+  db.close();
 })
 
 export default app
