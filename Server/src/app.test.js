@@ -221,38 +221,38 @@ describe("POST /users", () => {
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
 
-    // test("Test addRegistration", async () => {
-    //   const req = {
-    //     net_id: 'pokemon678',
-    //     class_id: 'cse331',
-    //   }
-    //   const req2 = {
-    //     net_id: 'pokemon678',
-    //     class_id: 'cse312',
-    //   }
-    //   const addResponse = await request(app).post("/addRegistration").send(req);
-    //   console.log(addResponse.body.message);
-    //   const getResponse = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
-    //   console.log(getResponse.body.message);
-    //   var classes = getResponse.body.Registration
-    //   console.log('This is the class: ' + classes)
-    //   var found = false
-    //   classes.forEach(function(element) {
-    //     if (element.class_id == 'cse331') {
-    //       found = true
-    //     }
-    //   });
-    //   expect(found).toBe(true)
+    test("Test addRegistration", async () => {
+      const req = {
+        net_id: 'pokemon678',
+        class_id: 'cse331',
+      }
+      const req2 = {
+        net_id: 'pokemon678',
+        class_id: 'cse312',
+      }
+      const addResponse = await request(app).post("/addRegistration").send(req);
+      console.log(addResponse.body.message);
+      const getResponse = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
+      console.log(getResponse.body.message);
+      var classes = getResponse.body.Registration;
+      console.log('This is the class: ' + classes);
+      var found = false
+      classes.forEach(function(element) {
+        if (element.class_id == 'cse331') {
+          found = true
+        }
+      });
+      expect(found).toBe(true)
 
-    //   // const addResponse2 = await request(app).post("/addRegistration").send(req2);
-    //   // console.log(addResponse2.body.message);
-    //   // const getResponse2 = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
-    //   // console.log(getResponse2.body.message);
-    //   // var classes2 = getResponse2.body.Registration[1].class_id
-    //   // console.log('This is the class: ' + classes2)
-    //   // var test_list = ['cse331', 'cse312']
-    //   // expect(classes2).toBe(test_list)
-    // }, TIMEOUT)
+      // const addResponse2 = await request(app).post("/addRegistration").send(req2);
+      // console.log(addResponse2.body.message);
+      // const getResponse2 = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
+      // console.log(getResponse2.body.message);
+      // var classes2 = getResponse2.body.Registration[1].class_id
+      // console.log('This is the class: ' + classes2)
+      // var test_list = ['cse331', 'cse312']
+      // expect(classes2).toBe(test_list)
+    }, TIMEOUT)
 
 
     test("Test login successful", async () => {
