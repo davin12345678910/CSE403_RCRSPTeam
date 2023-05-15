@@ -7,10 +7,12 @@ jobs:
     env:
       NODE_OPTIONS: --experimental-vm-modules
     steps:
-      # - uses: actions/checkout@v2
-      - name: Install supertest
-        run: npm install supertest
-      - name: Install cors
-        run: npm install cors
-      - name: Run tests
-        run: cd Server && npm test
+      - uses: actions/checkout@v2
+      # - name: Install supertest
+      #   run: npm install supertest
+      # - name: Install cors
+      #   run: npm install cors
+      # - name: Run tests
+      #   run: cd Server && npm test
+      - name: Install and run tests
+        run: cd Server && npm install && npm test
