@@ -73,7 +73,7 @@ Working on adding add code support and also waitlist support
 
 
 ## How to report a bug
-TODO
+When reporting a bug, create a new issue if the bug has not been reported. Then list out the steps that cause that bug and be explicit, explaining what it is and what is causing it. If a bug reoccurs, then we can update the current issue to update the information. So you must list all steps that cause the bug and the possible problems with this recent bug. Once the bug is fixed, update the issue. And if the bug comes back, go back and see the issue to deal with the bug.
 
 ## Known bugs
 TODO
