@@ -960,17 +960,19 @@ app.post('/addRegistration', async (req, res) => {
 app.post('/getRegistration', async (req, res) =>{
   const db = await getDBConnection();
   let net_id = req.body.net_id;
-  let query = 'SELECT * FROM REGISTRATION WHERE NET_ID = ?;';
-
-  db.run(query, [net_id], function(err){
+  let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE NET_ID = ?;';
+  db.all(query, [net_id], (err, rows) => {
+    var registration = [];
     if (err) {
       console.error('Error getting registartion:', err.message);
       res.status(500).json({ message: 'Error getting registration', error: err, status: 500});
       return;
     }
+    rows.forEach((row) => {
+      registration.push(row.class_id);
+    });
     console.log('Successfully got registration');
-    res.status(200).json({message: 'Successfully got registration', status: 200});
-
+    res.send({"Registration" : registration});
   })
   db.close();
 })
