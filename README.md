@@ -5,6 +5,9 @@ We are a team of computer science students working on a Resilient Course Registr
 ## Idea of our project:
 We are making an app that is building on top of the current registration system of the UW that we hope will improve the experience of registrarting for classes for users. For example, we hope to make the add in code process more streamlined then the current process where you have to ask advisers, then later get the people who you can contact, then contact the person, then wait for a response where you might be asked to give more information, and possibly not end up with the code. As you can see this process is very time consuming and not that nice for the user. We hope to make a more streamlined process that is embedded into the current registration system where you can easily contact the needed people and get quicker responses as it is a one stop shop. As for those who give add codes, given that the request won't be in their emails, which may be hidden within the many thousands of other emails it makes it easier for everybody!
 
+## High level description of our project:
+Our project is a product that will make the lives of people at the UW easier through new features such as an automated add code system, a waitlist system, an automated section system, a system that allows users to see the rating and average GPAs for courses and many more features and we'll improve the overall current features of the uw registration system. A user would like to use our system in order to have a easier to use interface. With the current add code system it takes days and even weeks to get an add code as your email could get stuck in the emails of a person that has the add code system. But even before this, you might have some trouble finding a person with the add code. Thus with this system, we find the person who has the add code and you can simply message them with our in-system messaging system for getting add-codes. 
+
 
 ## What does the system do?
 This system and project are based on the current registration system at UW and will improve it by adding more features that will make it easier for students, professors, and advisers and improve the whole registration system.
@@ -33,17 +36,22 @@ This system and project are based on the current registration system at UW and w
         style of the webpage. And we will have a javascript file where we will have all of the functionality as well as the code
         that will build up the html of the webpage
 
+## How to install the software
+For this project, you will need to download node, so if you want to use this software make sure to download the latest version of node:
+Link to node installation: https://nodejs.org/en/download
+Make sure to download the version that is compatible to your system, so if you have a macbook, do the mac installation 
+Once the download is complete, you should be able to use node 
+
 
 ## How to build and test the system
 
 #### Notes: This only works on a mac device.We found a solution on a windows but for some reason it doesn't work on all windows
 
-### How to build the system steps:
-- 1. Install Node at: https://nodejs.org/en/download
-- 2. Make two terminals
-- 3. In one terminal `cd Server` and `cd src`
-- 4. Then `npm install`
-- 5. Next run this `node server.js`
+### How to build the system steps (How to run the software):
+- 1. Make two terminals
+- 2. In one terminal `cd Server` and `cd src`
+- 3. Then `npm install`
+- 4. Next run this `node server.js`
 
 Once you have completed this step you should be a message in terminal saying that: 
 Server started on port 3001
@@ -73,7 +81,12 @@ Working on adding add code support and also waitlist support
 
 
 ## How to report a bug
-When reporting a bug, create a new issue if the bug has not been reported. Then list out the steps that cause that bug and be explicit, explaining what it is and what is causing it. If a bug reoccurs, then we can update the current issue to update the information. So you must list all steps that cause the bug and the possible problems with this recent bug. Once the bug is fixed, update the issue. And if the bug comes back, go back and see the issue to deal with the bug.
+When reporting a bug. Follow these steps:
+1. if the bug has not been reported create a new issue   
+2. Make a title for the bug that is clear 
+3. Then list out the steps that cause that bug and be explicit, explaining what it is and what is causing it. 
+4. If a bug reoccurs, then we can update the current issue to update the information.
+5. Show the expected results and the actual results of the bug
+6. Once the bug is fixed, update the issue. And if the bug comes back, go back and see the issue to deal with the bug.
 
-## Known bugs
-TODO
+
