@@ -57,7 +57,7 @@ async function makeTables() {
   let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
 
   // 7. Registered Classes
-  let queryRegisterClass = 'CREATE TABLE registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id));';
+  let queryRegisterClass = 'CREATE TABLE registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), CONSTRAINT PK_Registration PRIMARY KEY (net_id,class_id));';
 
   // 8. Waitlist
   let queryWaitlist = 'CREATE TABLE waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
@@ -144,6 +144,16 @@ async function addStartupData() {
   })
   db.close();
 
+  // Add default classRegistartion
+  db = await getDBConnection();
+  let addregistration = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
+  db.run(addregistration, ['123', '345'], function(err){
+    if (err) {
+      console.error('Error inserting to registration: ', err);
+    }
+  })
+  db.close();
+
   // Add default waitlist
   db = await getDBConnection();
   let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
@@ -156,8 +166,8 @@ async function addStartupData() {
 }
 
 /* Must uncomment and run one at a time. */
-// makeTables();
-// addStartupData();
+ //makeTables();
+ //addStartupData();
 
 app.use(express.json())
 // this is a basic test for status checking
@@ -955,6 +965,27 @@ app.post('/addRegistration', async (req, res) => {
     }
     console.log('Successfully added to registration');
     res.status(200).json({ message: 'Successfully added to registration', status: 200});
+  })
+  db.close();
+})
+
+app.post('/getRegistration', async (req, res) =>{
+  const db = await getDBConnection();
+  let net_id = req.body.net_id;
+  let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE NET_ID = ?;';
+  db.all(query, [net_id], (err, rows) => {
+    var registration = [];
+    if (err) {
+      console.error('Error getting registartion:', err.message);
+      res.status(500).json({ message: 'Error getting registration', error: err, status: 500});
+      return;
+    }
+    rows.forEach((row) => {
+      registration.push(row);
+    });
+    console.log('Successfully got registration');
+    //res.status(200).json({ message: 'Successfully got registration', status: 200});
+    res.send({"Registration" : registration});
   })
   db.close();
 })

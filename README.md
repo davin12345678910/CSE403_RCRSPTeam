@@ -87,7 +87,7 @@ you should be able to see a link to our website at: http://localhost:3000/
 
 ### How to test the system
 - 1. Make a new terminal
-- 2. Then `cd server` and `cd src`
+- 2. Then `cd Server`
 - 4. Download dependencies by doing `npm install` [If you have already done npm install in the build the system steps, you do not need to do this again]
 - 5. Then run if you are on a macbook `NODE_OPTIONS=--experimental-vm-modules npx jest` if you are on a windows device use `set NODE_OPTIONS=--experimental-vm-modules && npx jest`
 
