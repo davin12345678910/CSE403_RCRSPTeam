@@ -86,7 +86,54 @@ async function makeAddCodeTables() {
   database.run(addCodeMessageTable);
 }
 
-makeAddCodeTables();
+// makeAddCodeTables();
+
+app.post('/getAddCode', async (req, res) => {
+  var database = await getDBConnection();
+
+  var class_name = req.params.class_name
+
+  let qry2 = "SELECT* FROM addCode WHERE = ?;";
+
+  try {
+    database.all(qry2, [class_name], (err,rows) => {
+      if(err) return console.error(err.message);
+      var addCodes = []
+      rows.forEach((row) => {
+        addCodes.push(row)
+      });
+      //console.log(classes)
+      res.send({"AddCodes" : addCodes})
+    })
+
+  } catch (error) {
+    res.send({"AddCodes": "error"})
+  }
+  database.close()
+})
+
+
+/*
+app.post('/addAddCode', async (req, res) => {
+  let db = await getDBConnection()
+  let
+
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln], function (err) {
+    if (err) {
+      console.error('Error inserting class:', err);
+      res.status(500).json({ message: 'Error inserting class', error: err });
+    } else {
+      res.status(201).json({ message: 'Class added successfully', class_id: class_id });
+    }
+  });
+  db.close();
+})
+*/
+
+
+
+
 
 
 
