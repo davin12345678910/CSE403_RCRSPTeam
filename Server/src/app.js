@@ -86,6 +86,8 @@ async function makeAddCodeTables() {
   database.run(addCodeMessageTable);
 }
 
+makeAddCodeTables();
+
 
 
 async function addStartupData() {
