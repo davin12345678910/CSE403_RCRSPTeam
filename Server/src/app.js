@@ -91,7 +91,7 @@ async function makeAddCodeTables() {
 app.post('/getAddCode', async (req, res) => {
   var database = await getDBConnection();
 
-  var class_name = req.params.class_name
+  var class_name = req.body.class_name
 
   let qry2 = "SELECT* FROM addCode WHERE = ?;";
 
@@ -113,23 +113,45 @@ app.post('/getAddCode', async (req, res) => {
 })
 
 
-/*
 app.post('/addAddCode', async (req, res) => {
   let db = await getDBConnection()
-  let
+  let id = req.body.id;
+  let net_id = req.body.net_id;
+  let JobType = req.body.JobType;
+  let add_code = req.body.add_code;
+  let className = req.body.class;
 
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln], function (err) {
+  let addClass = 'INSERT INTO addCode(id, net_id, JobType, add_code, className) VALUES (?, ?, ?, ?, ?);';
+  db.run(addClass, [id, net_id, JobType, add_code, className], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting class', error: err });
+      res.status(500).json({ message: 'Error inserting AddCode', error: err });
     } else {
-      res.status(201).json({ message: 'Class added successfully', class_id: class_id });
+      res.status(201).json({ message: 'AddCode added successfully', class_id: class_id });
     }
   });
   db.close();
 })
-*/
+
+
+
+app.post('/removeAddCode', async (req, res) => {
+  let db = await getDBConnection()
+  let id = req.body.id;
+
+  let removeClass = 'DELETE FROM addCode WHERE id = ?;';
+
+  db.run(removeClass, [id], function (err) {
+    if (err) {
+      console.error('Error removing class:', err);
+      res.status(500).json({ message: 'Error removing addCode ' + class_id, error: err});
+    } else {
+      res.status(201).json({ message: 'AddCode removed successfully', class_id: class_id });
+    }
+  });
+  db.close();
+})
+
 
 
 
