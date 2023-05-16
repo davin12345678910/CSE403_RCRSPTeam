@@ -80,18 +80,23 @@ async function makeTables() {
 async function makeAddCodeTables() {
   var database = await getDBConnection();
 
-  let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, net_id TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
+  // let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, net_id TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
   // let addCodeMessageTable = 'CREATE TABLE messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
 
-  database.run(addCodeTable);
+  // database.run(addCodeTable);
   // database.run(addCodeMessageTable);
 
   //let removeMessages = 'DROP TABLE addCode;';
   //database.run(removeMessages);
+  // let dropClass = 'DROP TABLE classes;';
+  // database.run(dropClass);
+
+  // let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER, add_code_required INTEGER);';
+  // database.run(queryClasses);
   database.close();
 }
 
-// makeAddCodeTables();
+makeAddCodeTables();
 
 
 
@@ -522,9 +527,10 @@ app.post('/addClasses', async (req, res) => {
   let quarter = req.body.quarter;
   let class_name = req.body.class_name;
   let sln = req.body.sln;
+  let add_code_required = req.body.add_code_required;
 
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln], function (err) {
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ message: 'Error inserting class', error: err });
@@ -659,6 +665,7 @@ app.post('/updateClass', async (req, res) => {
   let quarter = req.body.quarter;
   let class_name = req.body.class_name;
   let sln = req.body.sln;
+  let add_code_required = req.body.add_code_required;
 
   let qry = 'SELECT* FROM classes WHERE class_id=?;';
 
@@ -677,6 +684,7 @@ app.post('/updateClass', async (req, res) => {
       let update_quarter = row.quarter;
       let update_class_name = row.class_name;
       let update_sln = row.sln;
+      let update_add_code_required = row.add_code_required;
 
 
       // update
@@ -720,14 +728,18 @@ app.post('/updateClass', async (req, res) => {
         update_quarter = quarter
       }
 
+      if (add_code_required != undefined) {
+        update_add_code_required = add_code_required
+      }
+
       // now we will update
-      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=?, class_name = ?, sln = ? WHERE class_id=?;';
-      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, class_id], function (err) {
+      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=?, class_name = ?, sln = ?, add_code_required = ? WHERE class_id=?;';
+      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, update_add_code_required, class_id], function (err) {
         if (err) {
           console.error('Error inserting class:', err);
           res.status(500).json({'class': err });
         } else {
-          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln]});
+          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, add_code_required]});
         }
       });
     }

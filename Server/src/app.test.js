@@ -45,7 +45,8 @@ describe("POST /users", () => {
         class_times: 'mon-fri',
         quarter: 'spring',
         class_name: 'gynecology',
-        sln: '789'
+        sln: '789',
+        add_code_required: '1'
       };
       const addResponse = await request(app).post("/addClasses").send(req);
       const getResponse = await request(app).get("/getClasses").send();
@@ -290,6 +291,11 @@ describe("POST /users", () => {
 
       const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 333'});
       console.log(getAddCode.body.AddCodes);
+
+      // We should probably be testing a bit more than just the job type
+      // it might be best to get something such as the addCode or the class for example,
+      // class would make sense since you would want to make sure that the class that you got
+      // is the class that you wanted
       var add_code = getAddCode.body.AddCodes[0].JobType
       expect(add_code).toBe('Adviser');
       const removeAddCode = await request(app).post("/removeAddCode").send({'add_id' : '1'});
