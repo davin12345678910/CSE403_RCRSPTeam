@@ -80,17 +80,102 @@ async function makeTables() {
 async function makeAddCodeTables() {
   var database = await getDBConnection();
 
-  // let addCodeTable = 'CREATE TABLE addCode(id INTEGER PRIMARY KEY, net_id TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
-  let addCodeMessageTable = 'CREATE TABLE messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
+  let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, net_id TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
+  // let addCodeMessageTable = 'CREATE TABLE messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
 
-  //database.run(addCodeTable);
-  database.run(addCodeMessageTable);
+  database.run(addCodeTable);
+  // database.run(addCodeMessageTable);
 
-  //let removeMessages = 'DROP TABLE messages;';
+  //let removeMessages = 'DROP TABLE addCode;';
   //database.run(removeMessages);
+  database.close();
 }
 
 // makeAddCodeTables();
+
+
+
+
+async function addStartupData() {
+  // Add default class
+  let db = await getDBConnection();
+  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+  db.run(addClass, ['345', null, null, null, 'x', null, null, null, null, null], function (err) {
+    if (err) {
+      console.error('Error inserting class: ', err);
+    }
+  });
+  db.close();
+
+  // Add default student
+  addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
+  db = await getDBConnection();
+  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
+  db.run(addStudent, ['pokemon678', 'azaan', 'electrical engineering'], function (err) {
+    if (err) {
+      console.error('Error inserting student: ', err);
+    }
+  });
+  db.close();
+
+  // Add default professor
+  addPerson('123', '123@uw.edu', 'pass123', 'professor');
+  db = await getDBConnection();
+  let addProfessor = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
+  db.run(addProfessor, ['123', 'x', 'math', '0', '4'], function (err) {
+    if (err) {
+      console.error('Error inserting professor: ', err);
+    }
+  })
+  db.close()
+
+  // Add default advisor
+  addPerson('456', '456@uw.edu', 'pass456', 'adviser');
+  db = await getDBConnection();
+  let addAdvisor = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
+  db.run(addAdvisor, ['456', 'x', 'math'], function (err) {
+    if (err) {
+      console.error('Error inserting advisor: ', err);
+    }
+  })
+  db.close();
+
+  // Add default section
+  db = await getDBConnection();
+  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
+  db.run(addSection, ['331', 'x', 'y', '11:30-12:20', '345'], function (err) {
+    if (err) {
+      console.error('Error inserting section: ', err);
+    }
+  })
+  db.close();
+
+  // Add default classRegistartion
+  db = await getDBConnection();
+  let addregistration = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
+  db.run(addregistration, ['123', '345'], function(err){
+    if (err) {
+      console.error('Error inserting to registration: ', err);
+    }
+  })
+  db.close();
+
+  // Add default waitlist
+  db = await getDBConnection();
+  let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
+  db.run(addWaitlist, ['pokemon678', '345', 0], function (err) {
+    if (err) {
+      console.error('Error inserting waitlist: ', err);
+    }
+  })
+  db.close();
+}
+
+/* Must uncomment and run one at a time. */
+ //makeTables();
+ //addStartupData();
+
+app.use(express.json())
 
 
 /**********************************
@@ -101,9 +186,9 @@ async function makeAddCodeTables() {
 app.post('/getAddCode', async (req, res) => {
   var database = await getDBConnection();
 
-  var class_name = req.body.class_name
+  var class_name = req.body.class
 
-  let qry2 = "SELECT* FROM addCode WHERE class_name = ?;";
+  let qry2 = "SELECT* FROM addCode WHERE class = ?;";
 
   try {
     database.all(qry2, [class_name], (err,rows) => {
@@ -124,15 +209,19 @@ app.post('/getAddCode', async (req, res) => {
 
 
 app.post('/addAddCode', async (req, res) => {
-  let db = await getDBConnection()
-  let id = req.body.id;
+  let db = await getDBConnection();
+
+  if (req.body == undefined) {
+    res.json({"message": "undefined req.body"});
+  }
+  let id = req.body.add_id;
   let net_id = req.body.net_id;
   let JobType = req.body.JobType;
   let add_code = req.body.add_code;
-  let className = req.body.class;
+  let class_name = req.body.class;
 
-  let addClass = 'INSERT INTO addCode(id, net_id, JobType, add_code, className) VALUES (?, ?, ?, ?, ?);';
-  db.run(addClass, [id, net_id, JobType, add_code, className], function (err) {
+  let addClass = 'INSERT INTO addCode(add_id, net_id, JobType, add_code, class) VALUES (?, ?, ?, ?, ?);';
+  db.run(addClass, [id, net_id, JobType, add_code, class_name], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ message: 'Error inserting AddCode', error: err });
@@ -142,6 +231,8 @@ app.post('/addAddCode', async (req, res) => {
   });
   db.close();
 })
+
+
 
 
 
@@ -239,89 +330,6 @@ app.post('/removeMessages', async (req, res) => {
 
 
 
-
-
-
-async function addStartupData() {
-  // Add default class
-  let db = await getDBConnection();
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, ['345', null, null, null, 'x', null, null, null, null, null], function (err) {
-    if (err) {
-      console.error('Error inserting class: ', err);
-    }
-  });
-  db.close();
-
-  // Add default student
-  addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
-  db = await getDBConnection();
-  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
-  db.run(addStudent, ['pokemon678', 'azaan', 'electrical engineering'], function (err) {
-    if (err) {
-      console.error('Error inserting student: ', err);
-    }
-  });
-  db.close();
-
-  // Add default professor
-  addPerson('123', '123@uw.edu', 'pass123', 'professor');
-  db = await getDBConnection();
-  let addProfessor = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
-  db.run(addProfessor, ['123', 'x', 'math', '0', '4'], function (err) {
-    if (err) {
-      console.error('Error inserting professor: ', err);
-    }
-  })
-  db.close()
-
-  // Add default advisor
-  addPerson('456', '456@uw.edu', 'pass456', 'adviser');
-  db = await getDBConnection();
-  let addAdvisor = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
-  db.run(addAdvisor, ['456', 'x', 'math'], function (err) {
-    if (err) {
-      console.error('Error inserting advisor: ', err);
-    }
-  })
-  db.close();
-
-  // Add default section
-  db = await getDBConnection();
-  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
-  db.run(addSection, ['331', 'x', 'y', '11:30-12:20', '345'], function (err) {
-    if (err) {
-      console.error('Error inserting section: ', err);
-    }
-  })
-  db.close();
-
-  // Add default classRegistartion
-  db = await getDBConnection();
-  let addregistration = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
-  db.run(addregistration, ['123', '345'], function(err){
-    if (err) {
-      console.error('Error inserting to registration: ', err);
-    }
-  })
-  db.close();
-
-  // Add default waitlist
-  db = await getDBConnection();
-  let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
-  db.run(addWaitlist, ['pokemon678', '345', 0], function (err) {
-    if (err) {
-      console.error('Error inserting waitlist: ', err);
-    }
-  })
-  db.close();
-}
-
-/* Must uncomment and run one at a time. */
- //makeTables();
- //addStartupData();
-
-app.use(express.json())
 // this is a basic test for status checking
 app.post('/users', async (req, res) => {
   res.send({name : "happy"})

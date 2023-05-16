@@ -272,6 +272,26 @@ describe("POST /users", () => {
       console.log(loginResponse.body.message);
       expect(loginResponse.body.message).toBe('Could not log in: Invalid net_id')
     }, TIMEOUT)
+
+
+
+    // These are the tests for the student endpoints
+    test("Test getAddCode", async () => {
+      const req = {
+        add_id: '1',
+        net_id: 'pika',
+        JobType: 'Adviser',
+        add_code: '123',
+        class: 'CSE 333'
+      };
+      console.log(req);
+      const addAddCode = await request(app).post("/addAddCode").send(req);
+      console.log(addAddCode.body.message)
+
+      const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 333'});
+      console.log(getAddCode.body.AddCodes);
+    }, TIMEOUT)
+
   })
 
   describe("Unit Testing", () => {
