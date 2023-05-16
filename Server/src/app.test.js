@@ -290,6 +290,9 @@ describe("POST /users", () => {
 
       const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 333'});
       console.log(getAddCode.body.AddCodes);
+      var add_code = getAddCode.body.AddCodes[0].JobType
+      expect(add_code).toBe('Adviser');
+      const removeAddCode = await request(app).post("/removeAddCode").send({'add_id' : '1'});
     }, TIMEOUT)
 
   })

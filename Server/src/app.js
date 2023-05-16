@@ -238,11 +238,11 @@ app.post('/addAddCode', async (req, res) => {
 
 app.post('/removeAddCode', async (req, res) => {
   let db = await getDBConnection()
-  let id = req.body.id;
+  let add_id = req.body.add_id;
 
-  let removeClass = 'DELETE FROM addCode WHERE id = ?;';
+  let removeClass = 'DELETE FROM addCode WHERE add_id = ?;';
 
-  db.run(removeClass, [id], function (err) {
+  db.run(removeClass, [add_id], function (err) {
     if (err) {
       console.error('Error removing class:', err);
       res.status(500).json({ message: 'Error removing addCode ', error: err});
