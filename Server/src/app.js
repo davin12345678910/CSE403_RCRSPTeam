@@ -203,11 +203,11 @@ app.post('/getAddCode', async (req, res) => {
         addCodes.push(row)
       });
       //console.log(classes)
-      res.send({"AddCodes" : addCodes})
+      res.send({"AddCodes" : addCodes, 'status': 500})
     })
 
   } catch (error) {
-    res.send({"AddCodes": "error"})
+    res.send({"AddCodes": "error", 'status': 201})
   }
   database.close()
 })
@@ -229,9 +229,9 @@ app.post('/addAddCode', async (req, res) => {
   db.run(addClass, [id, net_id, JobType, add_code, class_name], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting AddCode', error: err });
+      res.status(500).json({ message: 'Error inserting AddCode', error: err, 'status': 500});
     } else {
-      res.status(201).json({ message: 'AddCode added successfully'});
+      res.status(201).json({ message: 'AddCode added successfully', 'status': 201});
     }
   });
   db.close();
@@ -250,9 +250,9 @@ app.post('/removeAddCode', async (req, res) => {
   db.run(removeClass, [add_id], function (err) {
     if (err) {
       console.error('Error removing class:', err);
-      res.status(500).json({ message: 'Error removing addCode ', error: err});
+      res.status(500).json({ message: 'Error removing addCode ', error: err, 'status': 500});
     } else {
-      res.status(201).json({ message: 'AddCode removed successfully'});
+      res.status(201).json({ message: 'AddCode removed successfully', 'status': 201});
     }
   });
   db.close();
@@ -282,11 +282,11 @@ app.post('/getMessages', async (req, res) => {
         messages.push(row)
       });
       //console.log(classes)
-      res.send({"Messages" : messages})
+      res.send({"Messages" : messages, 'status': 500})
     })
 
   } catch (error) {
-    res.send({"Messages": "error"})
+    res.send({"Messages": "error", 'status': 201})
   }
   database.close()
 })
@@ -304,9 +304,9 @@ app.post('/addMessages', async (req, res) => {
   db.run(addMessage, [net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message], function (err) {
     if (err) {
       console.error('Error inserting messages:', err);
-      res.status(500).json({ message: 'Error inserting messages', error: err });
+      res.status(500).json({ message: 'Error inserting messages', error: err, 'status': 500});
     } else {
-      res.status(201).json({ message: 'Message added successfully'});
+      res.status(201).json({ message: 'Message added successfully', 'status': 201});
     }
   });
   db.close();
@@ -324,9 +324,9 @@ app.post('/removeMessages', async (req, res) => {
   db.run(removeMessages, [sender, reciever], function (err) {
     if (err) {
       console.error('Error removing messages:', err);
-      res.status(500).json({ message: 'Error removing messages', error: err});
+      res.status(500).json({ message: 'Error removing messages', error: err, 'status': 500});
     } else {
-      res.status(201).json({ message: 'Messages removed successfully'});
+      res.status(201).json({ message: 'Messages removed successfully', 'status': 201});
     }
   });
   db.close();

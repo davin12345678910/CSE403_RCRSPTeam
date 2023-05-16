@@ -301,7 +301,79 @@ describe("POST /users", () => {
       const removeAddCode = await request(app).post("/removeAddCode").send({'add_id' : '1'});
     }, TIMEOUT)
 
-  })
+    // These are the tests for the student endpoints
+    test("Test addAddCode", async () => {
+      const req = {
+        add_id: '2',
+        net_id: 'pika',
+        JobType: 'Adviser',
+        add_code: '123',
+        class: 'CSE 403'
+      };
+      console.log(req);
+      const addAddCode = await request(app).post("/addAddCode").send(req);
+      console.log(addAddCode.body.message)
+
+      const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 403'});
+
+      var found = false
+      getAddCode.body.AddCodes.forEach(element => {
+        if (element.add_id == '2') {
+          found = true
+        }
+      })
+      expect(found).toBe(true);
+      await request(app).post("/removeAddCode").send({'add_id' : '2'});
+    }, TIMEOUT)
+
+    // Here we will be adding test for the messaging servies in which users can use
+    test("Test getMessages", async () => {
+      const req = {
+        net_id_sender: 'sender',
+        JobType_sender: 'professor',
+        net_id_reciever: 'reciever',
+        JobType_reciever: 'student',
+        message: 'Add code is 12345'
+      };
+      console.log(req);
+      const addAddCode = await request(app).post("/addMessages").send(req);
+      console.log(addAddCode.body.message)
+
+      const getAddCode = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
+      console.log(getAddCode.body.Messages);
+
+      expect(getAddCode.body.Messages[0].net_id_sender).toBe('sender');
+    }, TIMEOUT);
+
+
+    // Here we will be adding test for the messaging servies in which users can use
+    test("Test addMessages", async () => {
+      const req = {
+        net_id_sender: 'sender',
+        JobType_sender: 'professor',
+        net_id_reciever: 'reciever',
+        JobType_reciever: 'student',
+        message: 'Add code is 12345'
+      };
+      console.log(req);
+      const addAddCode = await request(app).post("/addMessages").send(req);
+      console.log(addAddCode.body.message)
+
+      const getAddCode = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
+      console.log(getAddCode.body.Messages);
+
+      let found = false;
+      getAddCode.body.Messages.forEach(element => {
+        if (element.message == 'Add code is 12345') {
+          found = true
+        }
+      })
+
+      expect(found).toBe(true);
+
+      const removeAddCode = await request(app).post("/removeMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
+    }, TIMEOUT);
+  });
 
   describe("Unit Testing", () => {
     describe("Database works", () => {
