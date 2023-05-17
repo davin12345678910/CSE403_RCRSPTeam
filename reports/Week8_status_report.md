@@ -109,18 +109,16 @@ Frontend should handle edge cases to prevent attacks.
 
 ### Sol Zamora
 what I did:
-I worked more on the backend. I created a new data table that includes people, emails, passwords, and salts I then had to refactor all of the backend code to account for this new data table. I also implemented code to sign in new users into the databases as well as code for checking their credentials and logging them in.
-Lastly, I fixed some bugs in the test suite and added some new ones to check the correctness of the newly implemented functions.
+I designed and implemented a waitlist system for courses. Students can add themselves to a course waitlist queue if the course is full. Once a spot opens up, the top queued student is automatically added to the course.
 
 what I learned:
-I learned more of the syntax of JavaScript, which I'm still very unfamiliar with. I also learned how to implement a hashing and salting function to secure the privacy of passwords.
+I learned you can make PRIMARY KEYS of column tuples in SQL. This way, each individual column of a table can have repeats of the same entry, but no row can have the same pair of entries as another.
 
 What I had trouble on:
-I had trouble refactoring all of the code after changing the structure of the SQL database. I had to modify every function we had already implemented to work with the new data tables.
+I had trouble figuring out the most efficient way to implement a queue in SQL. Further, I'm also having trouble implementing a system that checks for scheduling conflicts when a student attempts to register for courses that have conflicting time schedules.
 
 What I am stuck on:
-I'm stuck on modifying the server configuration to prevent CORS errors from happening. The frontend and backend are both working correctly independently, but are failing when working together. This error is proving difficult to debug.
-
+I'm stuck on handling the edge cases for the waitlist. Instances such as removing a student from the database should also remove the student from all classes, triggering a waitlist event to add another student to a course. Implementing this will require a refactorization of the backend code.
 
 
 ## Plans for next week:
