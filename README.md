@@ -105,8 +105,8 @@ Steps on how to add tests:
 3. now you can find app.test.js
 4. Here you can find tests that we've written, and in here, you will want to make a test case which you will make within the describes that contains the tests
 5. First you will need to have something that looks like this:
-      - `test("TEST_INFO", async () => { <br />
-            // your code <br />
+      - `test("TEST_INFO", async () => { 
+            // your code 
           }, TIMEOUT)`
 6. In TEST_INFO you will want to give a title for your tests
 7. in the comment //your code, you will want to add in code that will be your test
