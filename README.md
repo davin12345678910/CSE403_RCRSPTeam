@@ -27,12 +27,12 @@ This system and project are based on the current registration system at UW and w
 - `learn-gtihub-actions.yml` : this is the yml file where you will be able to do automated testing of the codebase 
 
 ### client-app: client portion of the code
-- public: this folder contains all of the images and icons that we will be using for our website 
-- src: this is the folder that contains the main code that we will be using for the front end 
-      - app: this folder contains the code for the the parent component in our code (React is the framework we are using, and you make componenets in React)
-      - assets: this contains the images that we will be using for our website
-      - login: this contains the code for the login page
-      - registration: this contains the code for the registration page we are making 
+- `public`: this folder contains all of the images and icons that we will be using for our website 
+- `src`: this is the folder that contains the main code that we will be using for the front end 
+      - `app`: this folder contains the code for the the parent component in our code (React is the framework we are using, and you make componenets in React)
+      - `assets`: this contains the images that we will be using for our website
+      - `login`: this contains the code for the login page
+      - `registration`: this contains the code for the registration page we are making 
       - Note: there are many more files, but much of the files are either in progress or are there just in case if we need it, we will most likely remove a good portion of them in the final release of our project
         
 ### reports
