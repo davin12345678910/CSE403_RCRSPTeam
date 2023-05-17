@@ -31,20 +31,67 @@ const RegistrationPage = () => {
         }
     };
 
-    const handleCloseModal = () => {
+    const handleCloseModal = async () => {
         console.log("These are the courses that were added: " + courses);
-        if (courses == '') {
+        if (courses.length === 0) {
             window.alert("No classes were added!");
         }
-        setSelectedCourses((prevSelectedCourses) => {
-            const newCourses = checkedCourses.filter(
-                (course) => !prevSelectedCourses.find((c) => c.sln === course.sln)
-            );
-            return [...prevSelectedCourses, ...newCourses];
-        });
+
+        const newCourses = checkedCourses.filter(
+            (course) => !selectedCourses.find((c) => c.sln === course.sln)
+        );
+
+        // Add each new course to the backend
+        for (const course of newCourses) {
+            await addCourse(course);
+        }
+
+        setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, ...newCourses]);
         setCheckedCourses([]);
         setModalIsOpen(false);
     };
+
+    const addCourse = async (course) => {
+        const addRegistrationEndpoint = "/addRegistration";
+        const addRegistrationOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
+        }
+        try {
+            const response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
+            if (!response.ok) {
+                throw new Error('Error adding course');
+            }
+            console.log("Course added: ", course);
+        } catch (error) {
+            console.error('Error adding course:', error);
+        }
+    }
+
+    const removeCourse = async (course) => {
+        const removeRegistrationEndpoint = "/removeRegistration";
+        const removeRegistrationOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
+        }
+        try {
+            const response = await fetch(removeRegistrationEndpoint, removeRegistrationOptions);
+            if (!response.ok) {
+                throw new Error('Error removing course');
+            }
+            console.log("Course removed: ", course);
+        } catch (error) {
+            console.error('Error removing course:', error);
+        }
+    }
+
+
 
 
     // React use effect
@@ -112,7 +159,9 @@ const RegistrationPage = () => {
         setModalIsOpen(false);
     }
 
-    const handleRemoveCourse = (courseIndex) => {
+    const handleRemoveCourse = async (courseIndex) => {
+        const courseToRemove = selectedCourses[courseIndex];
+        await removeCourse(courseToRemove);
         setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
     };
 
