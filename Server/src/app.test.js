@@ -280,7 +280,7 @@ describe("POST /users", () => {
     test("Test getAddCode", async () => {
       const req = {
         add_id: '1',
-        net_id: 'pika',
+        add_code_status: '0',
         JobType: 'Adviser',
         add_code: '123',
         class: 'CSE 333'
@@ -305,7 +305,7 @@ describe("POST /users", () => {
     test("Test addAddCode", async () => {
       const req = {
         add_id: '2',
-        net_id: 'pika',
+        add_code_status: '0',
         JobType: 'Adviser',
         add_code: '123',
         class: 'CSE 403'
