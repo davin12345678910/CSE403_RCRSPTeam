@@ -222,7 +222,7 @@ describe("POST /users", () => {
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
 
-    test("Test addRegistration", async () => {
+    test("Test addStudentRegistration", async () => {
       const req = {
         net_id: 'pokemon678',
         class_id: 'cse331',
@@ -233,7 +233,7 @@ describe("POST /users", () => {
       }
       const addResponse = await request(app).post("/addRegistration").send(req);
       console.log(addResponse.body.message);
-      const getResponse = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
+      const getResponse = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
       console.log(getResponse.body.message);
       var classes = getResponse.body.Registration;
       console.log('This is the class: ' + classes);

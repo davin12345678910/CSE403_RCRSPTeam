@@ -1141,7 +1141,7 @@ app.post('/addRegistration', async (req, res) => {
   db.close();
 })
 
-app.post('/getRegistration', async (req, res) =>{
+app.post('/getStudentRegistration', async (req, res) =>{
   const db = await getDBConnection();
   let net_id = req.body.net_id;
   let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE NET_ID = ?;';
@@ -1156,7 +1156,28 @@ app.post('/getRegistration', async (req, res) =>{
       registration.push(row);
     });
     console.log('Successfully got registration');
-    //res.status(200).json({ message: 'Successfully got registration', status: 200});
+    //res.status(200).json({ message: 'Successfully got student registration', status: 200});
+    res.send({"Registration" : registration});
+  })
+  db.close();
+})
+
+app.post('/getClassRegistration', async (req, res) =>{
+  const db = await getDBConnection();
+  let class_id = req.body.class_id;
+  let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE class_id = ?;';
+  db.all(query, [class_id], (err, rows) => {
+    var registration = [];
+    if (err) {
+      console.error('Error getting registartion:', err.message);
+      res.status(500).json({ message: 'Error getting registration', error: err, status: 500});
+      return;
+    }
+    rows.forEach((row) => {
+      registration.push(row);
+    });
+    console.log('Successfully got registration');
+    //res.status(200).json({ message: 'Successfully got class registration', status: 200});
     res.send({"Registration" : registration});
   })
   db.close();
