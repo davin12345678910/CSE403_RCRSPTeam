@@ -54,7 +54,7 @@ This system and project are based on the current registration system at UW and w
 For this project, you will need to download node, so if you want to use this software make sure to download the latest version of node:
 Link to node installation: https://nodejs.org/en/download
 Make sure to download the version that is compatible to your system, so if you have a macbook, do the mac installation 
-Once the download is complete, you should be able to use node 
+Once the download is complete, you should be able to use node which is needed for our system in order to make endpoints and the server for the backend 
 
 
 ## How to obtain the source code

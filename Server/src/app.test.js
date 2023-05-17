@@ -278,7 +278,7 @@ describe("POST /users", () => {
 
     // These are the tests for the student endpoints
     test("Test getAddCode", async () => {
-      const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 333'});
+      const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 403'});
       console.log(getAddCode.body.AddCodes);
 
       // We should probably be testing a bit more than just the job type
@@ -296,7 +296,8 @@ describe("POST /users", () => {
         add_code_status: '0',
         JobType: 'Adviser',
         add_code: '123',
-        class: 'CSE 403'
+        class: 'CSE 403',
+        net_id: '123'
       };
       console.log(req);
       const addAddCode = await request(app).post("/addAddCode").send(req);
