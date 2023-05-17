@@ -80,7 +80,7 @@ async function makeTables() {
 async function makeAddCodeTables() {
   var database = await getDBConnection();
 
-  let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT);';
+  let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
   // let addCodeMessageTable = 'CREATE TABLE messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
 
   database.run(addCodeTable);
@@ -224,9 +224,10 @@ app.post('/addAddCode', async (req, res) => {
   let JobType = req.body.JobType;
   let add_code = req.body.add_code;
   let class_name = req.body.class;
+  let net_id = req.body.net_id;
 
-  let addClass = 'INSERT INTO addCode(add_id, add_code_status, JobType, add_code, class) VALUES (?, ?, ?, ?, ?);';
-  db.run(addClass, [id, add_code_status, JobType, add_code, class_name], function (err) {
+  let addClass = 'INSERT INTO addCode(add_id, add_code_status, JobType, add_code, class, net_id) VALUES (?, ?, ?, ?, ?, ?);';
+  db.run(addClass, [id, add_code_status, JobType, add_code, class_name, net_id], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
       res.status(500).json({ message: 'Error inserting AddCode', error: err, 'status': 500});
