@@ -15,6 +15,7 @@ const RegistrationPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [checkedCourses, setCheckedCourses] = useState([]);
+    const [requestedAddCodes, setRequestedAddCodes] = useState([]);
 
     const handleCheckboxChange = (course) => {
         if (course === undefined) {
@@ -115,6 +116,41 @@ const RegistrationPage = () => {
         setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
     };
 
+    const handleAddCodeRequest = async (course) => {
+        const endpoint = requestedAddCodes.includes(course.sln) ? '/removeAddCode' : '/addAddCode';
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                add_id: course.sln, // Assuming the SLN is used as the add_id
+                net_id: uwId,
+                JobType: 'student', // Assuming the JobType is 'student'
+                add_code: '1234', // You need to replace this with the actual add code
+                class: course.class_id,
+            })
+        };
+
+        try {
+            const response = await fetchData(endpoint, options);
+            console.log("Response: ", response);
+
+            if (response.status === 201) {
+                setRequestedAddCodes((prevRequestedAddCodes) => {
+                    if (prevRequestedAddCodes.includes(course.sln)) {
+                        return prevRequestedAddCodes.filter((sln) => sln !== course.sln);
+                    } else {
+                        return [...prevRequestedAddCodes, course.sln];
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
@@ -149,8 +185,8 @@ const RegistrationPage = () => {
                     <button onClick={searchCourse}>Search</button>
 
                     {courses.length > 0 && (
-                    <table className={styles.ModalTable}>
-                        <thead>
+                        <table className={styles.ModalTable}>
+                            <thead>
                             <tr>
                                 <th></th>
                                 <th>SLN</th>
@@ -159,6 +195,7 @@ const RegistrationPage = () => {
                                 <th>Title</th>
                                 <th>Professor</th>
                                 <th>Class Time</th>
+                                <th>Add Code Required</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -171,6 +208,13 @@ const RegistrationPage = () => {
                                     <td>{course.class_name}</td>
                                     <td>{course.professor}</td>
                                     <td>{course.class_times}</td>
+                                    <td>
+                                        {course.add_code_required === 1 && (
+                                            <button onClick={() => handleAddCodeRequest(course)}>
+                                                {requestedAddCodes.includes(course.sln) ? 'Remove Add Code Request' : 'Request Add Code'}
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>
