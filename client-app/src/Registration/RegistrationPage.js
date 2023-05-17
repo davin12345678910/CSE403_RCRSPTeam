@@ -81,7 +81,7 @@ const RegistrationPage = () => {
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
         try {
-            const response = await fetch(removeRegistrationEndpoint, removeRegistrationOptions);
+            const response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
             if (!response.ok) {
                 throw new Error('Error removing course');
             }
