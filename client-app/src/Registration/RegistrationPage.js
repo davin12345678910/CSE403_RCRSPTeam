@@ -105,7 +105,7 @@ const RegistrationPage = () => {
     }, [location, location.state]);
 
     const getRegistrationData = async (uwId) => {
-        const getRegistrationEndpoint = "/getRegistration";
+        const getRegistrationEndpoint = "/getStudentRegistration";
         const getRegistrationOptions = {
             method: "POST",
             headers: {
