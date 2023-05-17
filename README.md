@@ -27,16 +27,13 @@ This system and project are based on the current registration system at UW and w
 - `learn-gtihub-actions.yml` : this is the yml file where you will be able to do automated testing of the codebase 
 
 ### client-app: client portion of the code
-TODO Chairnet and Foad update!!!!!!!!!
--  `index.js`: This is file which boostraps the whole application and because it's a react application all the components will be loaded inside this file
-###    Webpages: this is the place where we will have the layout of each of the pages
--  **Class Webpage** : this is the place where we will have all of the code for the layout of the class webpage <br/>
--  **MainPage Webpage** : this is the place where we will have all of the code for the layout of the MainPage webpage <br/>
--  **SearchEngine Webpage** : this is the place where we will have all of the code for the layout of the SearchEngine webpage <br/>
--  **Submission Webpage** : this is the place where we will have all of the code for the layout of the Submission webpage <br/>
-      Note: for each of these Webpages you want to have a css file where you will have all of the code for the formatting and the
-        style of the webpage. And we will have a javascript file where we will have all of the functionality as well as the code
-        that will build up the html of the webpage
+- public: this folder contains all of the images and icons that we will be using for our website 
+- src: this is the folder that contains the main code that we will be using for the front end 
+      - app: this folder contains the code for the the parent component in our code (React is the framework we are using, and you make componenets in React)
+      - assets: this contains the images that we will be using for our website
+      - login: this contains the code for the login page
+      - registration: this contains the code for the registration page we are making 
+      - Note: there are many more files, but much of the files are either in progress or are there just in case if we need it, we will most likely remove a good portion of them in the final release of our project
         
 ### reports
 - in the reports directory we have stauts_report documentation that contains the overall tasks that team members have done, the overall tasks that we have or will complete, agenda meetings, and status reports  
@@ -53,7 +50,7 @@ TODO Chairnet and Foad update!!!!!!!!!
 
 
 
-## How to install the software
+## How to install the software needed for our website 
 For this project, you will need to download node, so if you want to use this software make sure to download the latest version of node:
 Link to node installation: https://nodejs.org/en/download
 Make sure to download the version that is compatible to your system, so if you have a macbook, do the mac installation 
@@ -62,6 +59,7 @@ Once the download is complete, you should be able to use node
 
 ## How to obtain the source code
 Do `git clone https://github.com/davin12345678910/CSE403_RCRSPTeam.git`
+
 
 ## How to build and test the system
 
@@ -85,12 +83,19 @@ Once these steps are complete. In the second terminal, you should be a lot of st
 beign shown on the terminal which is basically npm starting up your server. Soon 
 you should be able to see a link to our website at: http://localhost:3000/
 
+
+### How to use our system:
+- overall out system is compatible with major browsers such as google chrome and microsoft edge, please message us if there are any browser limitations 
+- currently we have some work that currently is in progress, some of the functionality that is still in progress are...
+      - a queueing system to register for courses 
+      - a upcoming feature (which we are going to discuss and finalize this week May 15 - May 19)
+
+
 ### How to test the system
 - 1. Make a new terminal
 - 2. Then `cd Server`
 - 4. Download dependencies by doing `npm install` [If you have already done npm install in the build the system steps, you do not need to do this again]
 - 5. Then run if you are on a macbook `NODE_OPTIONS=--experimental-vm-modules npx jest` if you are on a windows device use `set NODE_OPTIONS=--experimental-vm-modules && npx jest`
-
 
 
 ### How to add new test into our codebase:
@@ -111,13 +116,19 @@ Guidlines:
 - make sure to follow google style conventions for javascript 
 - make sure to have clear and informative titles for your tests 
 
+
 ## How to build a release of the software:
-- currently there is no extra steps to building the system besides the steps in the "How to build the system steps"
+- There is a public link in which we are currently working on, and will be releasing this week!
+      - thing that we hope to do to get the link released
+            - Get a public hosting service where we can host our code 
+            - Make sure that we can run the server and the front end with the link we are given from the hosting service 
+            - check how the latency is, and adjust the code base as needed 
 
 
 ## Use cases that have been completed
 - GPA and rating of courses in which a student wants to or possibly take is now displayed on the front end in order to inform users about the
   difficulty of a course and the overall rating of a professor for a course they plan to take
+  
   
 ## Work in progress
 Working on adding add code support and also waitlist support
@@ -131,5 +142,8 @@ When reporting a bug. Follow these steps:
 4. If a bug reoccurs, then we can update the current issue to update the information.
 5. Show the expected results and the actual results of the bug
 6. Once the bug is fixed, update the issue. And if the bug comes back, go back and see the issue to deal with the bug.
+
+## Known bugs:
+1. Currently there is not a specific bug that has arised, we have resolved all current bugs, and are working on new features as of the moment. 
 
 
