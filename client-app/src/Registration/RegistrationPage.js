@@ -100,8 +100,44 @@ const RegistrationPage = () => {
             const uwId = location.state.uwid;
             setUwId(uwId);
             getStudentInfo(uwId);
+            getRegistrationData(uwId);
         }
     }, [location, location.state]);
+
+    const getRegistrationData = async (uwId) => {
+        const getRegistrationEndpoint = "/getRegistration";
+        const getRegistrationOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({'net_id': uwId})
+        }
+        try {
+            const data = await fetchData(getRegistrationEndpoint, getRegistrationOptions);
+            console.log("Registration data fetched: ", data);
+
+            // Fetch class data for each registered class
+            const registeredClasses = data.Registration;
+            const classDataPromises = registeredClasses.map(async (registeredClass) => {
+                const getClassEndpoint = "/getClass";
+                const getClassOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({'class_id': registeredClass.class_id})
+                };
+                const classData = await fetchData(getClassEndpoint, getClassOptions);
+                return classData.class;
+            });
+            const classData = await Promise.all(classDataPromises);
+            setSelectedCourses(classData);
+        } catch (error) {
+            console.error('Error fetching registration data:', error);
+        }
+    }
+
 
     // This is the get the student info
     const getStudentInfo = async (uwId) => {
