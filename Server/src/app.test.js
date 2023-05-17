@@ -278,17 +278,6 @@ describe("POST /users", () => {
 
     // These are the tests for the student endpoints
     test("Test getAddCode", async () => {
-      const req = {
-        add_id: '1',
-        add_code_status: '0',
-        JobType: 'Adviser',
-        add_code: '123',
-        class: 'CSE 333'
-      };
-      console.log(req);
-      const addAddCode = await request(app).post("/addAddCode").send(req);
-      console.log(addAddCode.body.message)
-
       const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 333'});
       console.log(getAddCode.body.AddCodes);
 
@@ -298,7 +287,6 @@ describe("POST /users", () => {
       // is the class that you wanted
       var add_code = getAddCode.body.AddCodes[0].JobType
       expect(add_code).toBe('Adviser');
-      const removeAddCode = await request(app).post("/removeAddCode").send({'add_id' : '1'});
     }, TIMEOUT)
 
     // These are the tests for the student endpoints
