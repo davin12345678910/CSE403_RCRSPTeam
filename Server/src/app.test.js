@@ -314,24 +314,23 @@ describe("POST /users", () => {
       await request(app).post("/removeAddCode").send({'add_id' : '2'});
     }, TIMEOUT)
 
-    /*
     // Here we will be adding test for the messaging servies in which users can use
     test("Test getMessages", async () => {
       const req = {
         net_id_sender: 'sender',
         JobType_sender: 'professor',
-        net_id_receiver: 'receiver',
-        JobType_receiver: 'student',
+        net_id_reciever: 'reciever',
+        JobType_reciever: 'student',
         message: 'Add code is 12345'
       };
       console.log(req);
       const addMessages = await request(app).post("/addMessages").send(req);
       console.log(addMessages.body.message)
 
-      const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
+      const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
       console.log(getMessages.body.Messages);
 
-      await request(app).post('/removeMessages').send({ net_id_sender: 'sender', net_id_receiver: 'receiver' });
+      await request(app).post('/removeMessages').send({ net_id_sender: 'sender', net_id_reciever: 'reciever' });
 
       expect(getMessages.body.Messages[0].net_id_sender).toBe('sender');
       expect(getMessages.body.Messages[0].message).toBe('Add code is 12345');
@@ -343,18 +342,18 @@ describe("POST /users", () => {
       const req = {
         net_id_sender: 'sender',
         JobType_sender: 'professor',
-        net_id_receiver: 'receiver',
-        JobType_receiver: 'student',
+        net_id_reciever: 'reciever',
+        JobType_reciever: 'student',
         message: 'Add code is 12345'
       };
       console.log(req);
       const addMessage = await request(app).post("/addMessages").send(req);
       console.log(addMessage.body.message)
 
-      const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
+      const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
       console.log(getMessages.body.Messages);
 
-      await request(app).post("/removeMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
+      await request(app).post("/removeMessages").send({'net_id_sender' : 'sender', 'net_id_reciever': 'reciever'});
 
       let found = false;
       getMessages.body.Messages.forEach(element => {
@@ -364,7 +363,6 @@ describe("POST /users", () => {
       })
       expect(found).toBe(true);
     }, TIMEOUT);
-    */
   });
 
   describe("Unit Testing", () => {

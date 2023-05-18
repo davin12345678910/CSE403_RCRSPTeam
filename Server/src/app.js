@@ -56,12 +56,12 @@ async function makeTables(db) {
 
   // 8. Waitlist
   let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
-  
+
   // 9. Addcode
   let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
 
   // 10. Messages
-  let queryMessages = 'CREATE TABLE IF NOT EXISTS messages(net_id_sender TEXT, JobType_sender TEXT, net_id_receiver TEXT, JobType_receiver TEXT, message TEXT);';
+  let queryMessages = 'CREATE TABLE IF NOT EXISTS messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
 
   // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
@@ -274,7 +274,7 @@ app.post('/addClass', async (req, res) => {
   let class_name = req.body.class_name;
   let sln = req.body.sln;
   let add_code_required = req.body.add_code_required;
-  let success = await addClass(db, class_id, credits, rating, average_gpa, professor, 
+  let success = await addClass(db, class_id, credits, rating, average_gpa, professor,
     assistant_professor, class_times, quarter, class_name, sln, add_code_required);
   db.close();
 
@@ -659,9 +659,9 @@ app.post('/removeAddCode', async (req, res) => {
 
 app.post('/getMessages', async (req, res) => {
   let db = getDBConnection();
-  let net_id_receiver = req.body.net_id_receiver;
+  let net_id_reciever = req.body.net_id_reciever;
   let net_id_sender = req.body.net_id_sender;
-  let messages = await getMessages(db, net_id_receiver, net_id_sender);
+  let messages = await getMessages(db, net_id_reciever, net_id_sender);
   db.close();
 
   let status = messages ? SUCCESS : ERROR;
@@ -674,10 +674,10 @@ app.post('/addMessages', async (req, res) => {
   let db = getDBConnection()
   let net_id_sender = req.body.net_id_sender;
   let JobType_sender = req.body.JobType_sender;
-  let net_id_receiver = req.body.net_id_receiver;
-  let JobType_receiver = req.body.JobType_receiver;
+  let net_id_reciever = req.body.net_id_reciever;
+  let JobType_reciever = req.body.JobType_reciever;
   let message = req.body.message;
-  let success = await addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message);
+  let success = await addMessage(db, net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message);
   db.close();
 
   let status = success ? SUCCESS : ERROR;
@@ -688,8 +688,8 @@ app.post('/addMessages', async (req, res) => {
 app.post('/removeMessages', async (req, res) => {
   let db = getDBConnection()
   let sender = req.body.net_id_sender;
-  let receiver = req.body.net_id_receiver;
-  let success = await removeMessages(db, sender, receiver);
+  let reciever = req.body.net_id_reciever;
+  let success = await removeMessages(db, sender, reciever);
   db.close();
 
   let status = success ? SUCCESS : ERROR;
@@ -807,13 +807,13 @@ function addPerson(db, net_id, email, password, role) {
   return dbRun(db, query, [net_id, email, hash_pass, salt, role]);
 }
 
-function addClass(db, class_id, credits, rating, average_gpa, professor, 
+function addClass(db, class_id, credits, rating, average_gpa, professor,
   assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
-    let query = "INSERT INTO classes(class_id, credits, rating, " + 
-      "average_gpa, professor, assistant_professor, class_times, " + 
-      "quarter, class_name, sln, add_code_required) VALUES " + 
+    let query = "INSERT INTO classes(class_id, credits, rating, " +
+      "average_gpa, professor, assistant_professor, class_times, " +
+      "quarter, class_name, sln, add_code_required) VALUES " +
       "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor, 
+      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
         assistant_professor, class_times, quarter, class_name, sln, add_code_required]);
 }
 
@@ -847,7 +847,7 @@ function updatePerson(db, net_id, email, password, role) {
   return dbRun(db, query, [email, hash_pass, salt, role, net_id]);
 }
 
-async function updateClass(db, class_id, credits, rating, average_gpa, professor, 
+async function updateClass(db, class_id, credits, rating, average_gpa, professor,
   assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
   let query = "SELECT * FROM classes WHERE class_id=?;";
   let class_ = await dbGet(db, query, [class_id]);
@@ -1078,19 +1078,19 @@ function removeAddCode(db, add_id) {
   return dbRun(db, query, [add_id]);
 }
 
-function getMessages(db, net_id_receiver, net_id_sender) {
-  let query = "SELECT * FROM messages WHERE net_id_receiver = ? AND net_id_sender = ?;"
-  return dbAll(db, query, [net_id_receiver, net_id_sender]);
+function getMessages(db, net_id_reciever, net_id_sender) {
+  let query = "SELECT * FROM messages WHERE net_id_reciever = ? AND net_id_sender = ?;"
+  return dbAll(db, query, [net_id_reciever, net_id_sender]);
 }
 
-function addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) {
-  let query = "INSERT INTO messages(net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) VALUES (?, ?, ?, ?, ?);";
-  return dbRun(db, query, [net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message]);
+function addMessage(db, net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message) {
+  let query = "INSERT INTO messages(net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message) VALUES (?, ?, ?, ?, ?);";
+  return dbRun(db, query, [net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message]);
 }
 
-function removeMessages(db, sender, receiver) {
-  let query = "DELETE FROM messages WHERE net_id_sender = ? AND net_id_receiver = ?;";
-  return dbRun(db, query, [sender, receiver]);
+function removeMessages(db, sender, reciever) {
+  let query = "DELETE FROM messages WHERE net_id_sender = ? AND net_id_reciever = ?;";
+  return dbRun(db, query, [sender, reciever]);
 }
 
 // Constructs a basic object to be passed into res.send()
