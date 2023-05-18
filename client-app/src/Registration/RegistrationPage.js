@@ -32,7 +32,6 @@ const RegistrationPage = () => {
     };
 
     const handleCloseModal = async () => {
-        console.log("These are the courses that were added: " + courses);
         if (courses.length === 0) {
             window.alert("No classes were added!");
         }
@@ -65,7 +64,6 @@ const RegistrationPage = () => {
             if (!response.ok) {
                 throw new Error('Error adding course');
             }
-            console.log("Course added: ", course);
         } catch (error) {
             console.error('Error adding course:', error);
         }
@@ -85,16 +83,11 @@ const RegistrationPage = () => {
             if (!response.ok) {
                 throw new Error('Error removing course');
             }
-            console.log("Course removed: ", course);
         } catch (error) {
             console.error('Error removing course:', error);
         }
     }
 
-
-
-
-    // React use effect
     useEffect(() => {
         if (location.state && location.state.uwid) {
             const uwId = location.state.uwid;
@@ -102,7 +95,7 @@ const RegistrationPage = () => {
             getStudentInfo(uwId);
             getRegistrationData(uwId);
         }
-    }, [location, location.state]);
+    }, [location, location.state, requestedAddCodes, courses]);
 
     const getRegistrationData = async (uwId) => {
         const getRegistrationEndpoint = "/getStudentRegistration";
@@ -115,9 +108,7 @@ const RegistrationPage = () => {
         }
         try {
             const data = await fetchData(getRegistrationEndpoint, getRegistrationOptions);
-            console.log("Registration data fetched: ", data);
 
-            // Fetch class data for each registered class
             const registeredClasses = data.Registration;
             const classDataPromises = registeredClasses.map(async (registeredClass) => {
                 const getClassEndpoint = "/getClass";
@@ -138,8 +129,6 @@ const RegistrationPage = () => {
         }
     }
 
-
-    // This is the get the student info
     const getStudentInfo = async (uwId) => {
         const getStudentEndpoint = "/getStudent";
         const getStudentOptions = {
@@ -151,7 +140,6 @@ const RegistrationPage = () => {
         }
         try {
             const data = await fetchData(getStudentEndpoint, getStudentOptions);
-            console.log("data fetched: ", data);
             setStudentInfo(data);
             return data;
         } catch (error) {
@@ -160,7 +148,6 @@ const RegistrationPage = () => {
         }
     }
 
-    // This will allow us to search for a course that we are intrested in
     const searchCourse = async () => {
         const getClassEndpoint = "/getClass";
         const getClassOptions = {
@@ -172,18 +159,34 @@ const RegistrationPage = () => {
         };
         try {
             const data = await fetchData(getClassEndpoint, getClassOptions);
-            console.log("Class data fetched: ", data);
 
             if (data.class === undefined) {
                 window.alert("No class found!");
                 return;
             }
-            setCourses([data.class]);
+
+            const getAddCodeEndpoint = "/getAddCode";
+            const getAddCodeOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({'class': data.class.class_id})
+            };
+            const addCodeData = await fetchData(getAddCodeEndpoint, getAddCodeOptions);
+
+            const addCodeStatus = addCodeData.AddCodes.find((addCode) => addCode.net_id === uwId);
+            const updatedCourse = {
+                ...data.class,
+                add_code_status: (addCodeStatus && addCodeStatus.add_code_status) ? addCodeStatus.add_code_status : "-1",
+                add_id: addCodeStatus ? addCodeStatus.add_id : null
+            };
+
+            setCourses(prevCourses => [...prevCourses, updatedCourse]);
         } catch (error) {
             console.error('Error fetching class data:', error);
         }
     }
-
 
     function openModal() {
         setSearchTerm('');
@@ -202,24 +205,25 @@ const RegistrationPage = () => {
     };
 
     const handleAddCodeRequest = async (course) => {
-        const endpoint = requestedAddCodes.includes(course.sln) ? '/removeAddCode' : '/addAddCode';
+        const endpoint = course.add_code_status === "0" ? '/removeAddCode' : '/addAddCode';
+        const add_id = course.add_code_status === "0" ? course.add_id : generateGUID();
         const options = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                add_id: course.sln, // Assuming the SLN is used as the add_id
+                add_id: add_id,
                 net_id: uwId,
-                JobType: 'student', // Assuming the JobType is 'student'
-                add_code: '1234', // You need to replace this with the actual add code
+                JobType: 'student',
+                add_code: '1234',
+                add_code_status: course.add_code_status === "0" ? "1" : "0",
                 class: course.class_id,
             })
         };
 
         try {
             const response = await fetchData(endpoint, options);
-            console.log("Response: ", response);
 
             if (response.status === 201) {
                 setRequestedAddCodes((prevRequestedAddCodes) => {
@@ -229,12 +233,34 @@ const RegistrationPage = () => {
                         return [...prevRequestedAddCodes, course.sln];
                     }
                 });
+
+                // Update the courses state
+                setCourses((prevCourses) => {
+                    return prevCourses.map((prevCourse) => {
+                        if (prevCourse.sln === course.sln) {
+                            return {
+                                ...prevCourse,
+                                add_code_status: course.add_code_status === "0" ? "-1" : "0",
+                                add_id: course.add_code_status === "0" ? null : add_id,  // Update the add_id in the course
+                            };
+                        } else {
+                            return prevCourse;
+                        }
+                    });
+                });
             }
         } catch (error) {
             console.error('Error:', error);
         }
     };
 
+
+    function generateGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 
     return (
         <div className={styles.RegistrationPage}>
@@ -286,7 +312,11 @@ const RegistrationPage = () => {
                             <tbody>
                             {courses.map((course, index) => (
                                 <tr key={index}>
-                                    <td><input type="checkbox" onChange={() => handleCheckboxChange(course)} /></td>
+                                    <td>
+                                        <input type="checkbox"
+                                               onChange={() => handleCheckboxChange(course)}
+                                               disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                    </td>
                                     <td>{course.sln}</td>
                                     <td>{course.class_id}</td>
                                     <td>{course.credits}</td>
@@ -295,17 +325,25 @@ const RegistrationPage = () => {
                                     <td>{course.class_times}</td>
                                     <td>
                                         {course.add_code_required === 1 && (
-                                            <button onClick={() => handleAddCodeRequest(course)}>
-                                                {requestedAddCodes.includes(course.sln) ? 'Remove Add Code Request' : 'Request Add Code'}
-                                            </button>
+                                            <>
+                                                {course.add_code_status === "-1" && (
+                                                    <button onClick={() => handleAddCodeRequest(course)}>Request Add Code</button>
+                                                )}
+                                                {course.add_code_status === "0" && (
+                                                    <span onClick={() => handleAddCodeRequest(course)} className={styles.InProgressLabel}>Add code in progress</span>
+                                                )}
+                                                {course.add_code_status === "1" && (
+                                                    <span style={{color: 'green'}}>Add code added</span>
+                                                )}
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                             ))}
+
                             </tbody>
                         </table>
                     )}
-
                     <button onClick={handleCloseModal}>Add Course</button>
                 </Modal>
             </div>
@@ -387,10 +425,8 @@ const RegistrationPage = () => {
                     </tbody>
                 </table>
             )}
-
         </div>
     )
-
 }
 
 export default RegistrationPage;
