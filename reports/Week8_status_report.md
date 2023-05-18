@@ -73,13 +73,16 @@ I am not stuck on everything at the moment, but I am planning on helping the fro
 
 ### Chairnet Muche
 what I did:
+I mostly focused on the front-end aspects of the project with styling and implementing other aspects of the front-end.
 
 what I learned:
+I learned that it will be very challenging to do the waitlist system in the front-end. And so, the best choice is to do it in the backend.
 
 What I had trouble on:
+sometimes it's sort of challenging when you call the API, and it does not work. It takes a while to figure out what the back end is doing in order to implement the front-end.
 
 What I am stuck on:
-
+I'm still thinking about the CSS part for the pages, and going to put some styles when the waitlist is ready.
 
 
 ### Foad Shariat
