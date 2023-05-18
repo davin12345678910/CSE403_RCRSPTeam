@@ -18,6 +18,7 @@ const RegistrationPage = () => {
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [checkedCourses, setCheckedCourses] = useState([]);
     const [requestedAddCodes, setRequestedAddCodes] = useState([]);
+    const [waitlisted, setWaitlisted] = useState(false);
 
     const handleCheckboxChange = (course) => {
         if (course === undefined) {
@@ -151,6 +152,8 @@ const RegistrationPage = () => {
     }
 
     const searchCourse = async () => {
+        setCourses([]);
+
         const getClassEndpoint = "/getClass";
         const getClassOptions = {
             method: "POST",
@@ -264,6 +267,70 @@ const RegistrationPage = () => {
         });
     }
 
+    const handleWaitlistClick = async (course) => {
+        // If the course is waitlisted, we want to remove it
+        if (course.waitlisted) {
+            const removeWaitlistEndpoint = "/removeStudentFromWaitlist";
+            const removeWaitlistOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({net_id: studentInfo.student.net_id})
+            };
+
+            try {
+                const data = await fetchData(removeWaitlistEndpoint, removeWaitlistOptions);
+
+                if (data.status !== 200) {
+                    window.alert("Could not remove from waitlist!");
+                } else {
+                    setCourses(courses.map(c =>
+                        c.class_id === course.class_id
+                            ? {...c, waitlisted: false}
+                            : c
+                    ));
+                }
+
+            } catch (error) {
+                console.error('Error removing from waitlist:', error);
+            }
+
+            // If the course is not waitlisted, we want to add it
+        } else {
+            const addWaitlistEndpoint = "/addWaitlist";
+            const addWaitlistOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    net_id: studentInfo.student.net_id,
+                    class_id: course.class_id
+                })
+            };
+
+            try {
+                const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
+                console.log(data);
+                if (data.status !== 200) {
+                    window.alert("Could not add to waitlist!");
+                } else {
+                    setCourses(courses.map(c =>
+                        c.class_id === course.class_id
+                            ? {...c, waitlisted: true}
+                            : c
+                    ));
+                }
+
+            } catch (error) {
+                console.error('Error adding to waitlist:', error);
+            }
+        }
+    };
+
+
+
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
@@ -317,7 +384,14 @@ const RegistrationPage = () => {
                                     <td>
                                      {
                                         course.class_id === "333"
-                                            ? <img style={{cursor: 'pointer'}} src={waitlistNotSelected} alt="333" width="50" height="50" />
+                                            ? <img
+                                                style={{cursor: 'pointer'}}
+                                                src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
+                                                alt="Waitlist Status"
+                                                width="50"
+                                                height="50"
+                                                onClick={() => handleWaitlistClick(course)}
+                                            />
                                             : <>
                                                 <input type="checkbox"
                                                 onChange={() => handleCheckboxChange(course)}
