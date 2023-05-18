@@ -725,55 +725,15 @@ app.post('/getClassRegistration', async (req, res) =>{
 })
 
 app.post('/removeRegistration', async (req, res) => {
-  let db = await getDBConnection();
+  let db = getDBConnection();
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
   let success = await removeRegistration(db, net_id, class_id);
-  let removeFromRegistration = 'DELETE FROM registration WHERE net_id=? AND class_id=?;';
-  let getFromWaitlist = 'SELECT TOP 1 net_id, class_id FROM waitlist WHERE class_id=? ORDER BY position ASC;';
-  let removeFromWaitlist = 'DELETE FROM waitlist WHERE net_id=? AND class_id=?;';
-  let insertToRegistration = 'INSERT INTO registration(net_id, class) VALUES (?, ?);';
-
-  db.run(removeFromRegistration, [net_id, class_id], function (err) {
-    if (err) {
-      console.error('Error removing from registration:', err.message);
-      res.status(ERROR).json({ message: 'Error removing from registration', error: err, status: ERROR});
-      return;
-    }
-    console.log('Successfully removed from registration');
-  });
-  db.run(getFromWaitlist, [class_id], function (err, result) {
-    if (err) {
-      console.error('Error getting from waitlist:', err.message);
-      res.status(ERROR).json({ message: 'Error getting from waitlist', error: err, status: ERROR});
-      return;
-    }
-    console.log('Successfully got from waitlist');
-    if (!result) {
-      res.status(SUCCESS).json({ message: 'Successfully removed from registration', status: SUCCESS});
-      return;
-    }
-
-    net_id = result.net_id;
-    db.run(removeFromWaitlist, [net_id, class_id], function (err) {
-      if (err) {
-        console.error('Error removing from waitlist:', err.message);
-        res.status(ERROR).json({ message: 'Error removing from waitlist', error: err, status: ERROR});
-        return;
-      }
-      console.log('Successfully removed from waitlist');
-    });
-    db.run(insertToRegistration, [net_id, class_id], function (err) {
-      if (err) {
-        console.error('Error inserting into registration from waitlist:', err.message);
-        res.status(ERROR).json({ message: 'Error inserting into registration from waitlist', error: err, status: ERROR});
-        return;
-      }
-      console.log('Successfully registered from waitlist');
-      res.status(SUCCESS).json({ message: 'Successfully removed from registration and added from waitlist', status: SUCCESS});
-    });
-  });
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeRegistration', status);
+  res.send(result);
 })
 
 app.post('/addWaitlist', async (req, res) => {
