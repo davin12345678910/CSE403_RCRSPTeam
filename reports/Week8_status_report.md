@@ -42,26 +42,33 @@ Currently, we are stuck on what we should do for Azaan's use case, but will be d
 
 ### Azaan Khalfe
 what I did:
+I worked on the add code endpoint and the registration endpoint.
+I also worked the debugging and the documentation and the README which includes documentation.
+
 
 what I learned:
+I learned more js style and how write documentation.
+
 
 What I had trouble on:
+I had trouble setting up the endpoint and testing which took some time to debug but once it was done it worked.
+
 
 What I am stuck on:
-
-
-### Ahmed Helow
+I'm stuck on updating my use case which is our goal to work on.
 
 what I did:
-
+I implemented several endpoints that is required by our frontend team, POST endpoints such as getting and adding registrated classes by students to display them on the webpage. 
 
 what I learned:
-
+I learned the importance of communicatting with the frontend team to understand their needs and what endpoints is needed for their work. 
 
 What I had trouble on:
+I had trouble testing my endpoints mainly because changing data from one table may effect data from other tables that depend on each other. 
 
 
 What I am stuck on:
+I am not stuck on everything at the moment, but I am planning on helping the frontend team top fetch data from the backend.
 
 
 ### Chairnet Muche
