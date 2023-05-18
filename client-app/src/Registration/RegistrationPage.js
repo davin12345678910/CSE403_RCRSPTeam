@@ -375,7 +375,7 @@ const RegistrationPage = () => {
                                 <th>Title</th>
                                 <th>Professor</th>
                                 <th>Class Time</th>
-                                <th>Add Code Required</th>
+                                {courses.some(course => course.add_code_required === 1) && <th>Add Code Required</th>}
                             </tr>
                             </thead>
                             <tbody>
@@ -407,7 +407,7 @@ const RegistrationPage = () => {
                                     <td>{course.class_name}</td>
                                     <td>{course.professor}</td>
                                     <td>{course.class_times}</td>
-                                    <td>
+                                    <td hidden={course.add_code_required !== 1}>
                                         {course.add_code_required === 1 && (
                                             <>
                                                 {course.add_code_status === "-1" && (
