@@ -5,6 +5,7 @@ import express, { query } from 'express';
 import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import cors from 'cors';
+import { get } from 'http';
 
 /*
 * GLOBAL VARIABLES
@@ -60,7 +61,7 @@ async function makeTables(db) {
   let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
 
   // 10. Messages
-  let queryMessages = 'CREATE TABLE IF NOT EXISTS messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
+  let queryMessages = 'CREATE TABLE IF NOT EXISTS messages(net_id_sender TEXT, JobType_sender TEXT, net_id_receiver TEXT, JobType_receiver TEXT, message TEXT);';
 
   // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
@@ -138,102 +139,23 @@ app.use(express.json())
 
 async function init() {
   let db = getDBConnection();
-  let query = "SELECT name FROM sqlite_master WHERE type = ? AND name = ?;"
-  let exists = await dbGet(db, query, ['table', 'person']);
-
-  if (!exists) {
-    await makeTables(db);
-    await addStartupData(db);
-  }
-
+  await makeTables(db);
+  await addStartupData(db);
   db.close();
 }
 init();
-
-/**********************************
- *
- * Message endpoints
- *
- **********************************/
-app.post('/getMessages', async (req, res) => {
-  var database = await getDBConnection();
-
-  var net_id_reciever = req.body.net_id_reciever;
-  var net_id_sender = req.body.net_id_sender;
-
-  let qry2 = "SELECT* FROM messages WHERE net_id_reciever = ? AND net_id_sender = ?;";
-
-  try {
-    database.all(qry2, [net_id_reciever, net_id_sender], (err,rows) => {
-      if(err) return console.error(err.message);
-      var messages = []
-      rows.forEach((row) => {
-        messages.push(row)
-      });
-      //console.log(classes)
-      res.send({"Messages" : messages, 'status': ERROR})
-    })
-
-  } catch (error) {
-    res.send({"Messages": "error", 'status': 201})
-  }
-  database.close()
-})
-
-
-app.post('/addMessages', async (req, res) => {
-  let db = await getDBConnection()
-  let net_id_sender = req.body.net_id_sender;
-  let JobType_sender = req.body.JobType_sender;
-  let net_id_reciever = req.body.net_id_reciever;
-  let JobType_reciever = req.body.JobType_reciever;
-  let message = req.body.message;
-
-  let addMessage = 'INSERT INTO messages(net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message) VALUES (?, ?, ?, ?, ?);';
-  db.run(addMessage, [net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message], function (err) {
-    if (err) {
-      console.error('Error inserting messages:', err);
-      res.status(ERROR).json({ message: 'Error inserting messages', error: err, 'status': ERROR});
-    } else {
-      res.status(201).json({ message: 'Message added successfully', 'status': 201});
-    }
-  });
-  db.close();
-})
-
-
-
-app.post('/removeMessages', async (req, res) => {
-  let db = await getDBConnection()
-  let sender = req.body.net_id_sender;
-  let reciever = req.body.net_id_reciever;
-
-  let removeMessages = 'DELETE FROM messages WHERE net_id_sender = ? AND net_id_reciever = ?;';
-
-  db.run(removeMessages, [sender, reciever], function (err) {
-    if (err) {
-      console.error('Error removing messages:', err);
-      res.status(ERROR).json({ message: 'Error removing messages', error: err, 'status': ERROR});
-    } else {
-      res.status(201).json({ message: 'Messages removed successfully', 'status': 201});
-    }
-  });
-  db.close();
-})
-
-
-
-
-// this is a basic test for status checking
-app.post('/users', async (req, res) => {
-  res.send({name : "happy"})
-})
 
 /* ######################################
 *
 *               ENDPOINTS
 *
 *  ###################################### */
+
+// This is a basic test for status checking
+app.post('/users', async (req, res) => {
+  let result = setResDefaults('/users', 200);
+  res.send(result);
+})
 
 app.get('/getClasses', async (req, res) => {
   let db = getDBConnection();
@@ -711,6 +633,46 @@ app.post('/removeAddCode', async (req, res) => {
   res.send(result);
 })
 
+app.post('/getMessages', async (req, res) => {
+  let db = getDBConnection();
+  let net_id_receiver = req.body.net_id_receiver;
+  let net_id_sender = req.body.net_id_sender;
+  let messages = await getMessages(db, net_id_receiver, net_id_sender);
+  db.close();
+
+  let status = messages ? SUCCESS : ERROR;
+  let result = setResDefaults('/getMessages', status);
+  result.Messages = messages;
+  res.send(result);
+})
+
+app.post('/addMessages', async (req, res) => {
+  let db = getDBConnection()
+  let net_id_sender = req.body.net_id_sender;
+  let JobType_sender = req.body.JobType_sender;
+  let net_id_receiver = req.body.net_id_receiver;
+  let JobType_receiver = req.body.JobType_receiver;
+  let message = req.body.message;
+  let success = await addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addMessages', status);
+  res.send(result);
+})
+
+app.post('/removeMessages', async (req, res) => {
+  let db = getDBConnection()
+  let sender = req.body.net_id_sender;
+  let receiver = req.body.net_id_receiver;
+  let success = await removeMessages(db, sender, receiver);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeMessages', status);
+  res.send(result);
+})
+
 /* ######################################
 *
 *           UTILITY FUNCTIONS
@@ -1090,6 +1052,21 @@ function addAddCode(db, add_id, add_code_status, JobType, add_code, class_name, 
 function removeAddCode(db, add_id) {
   let query = "DELETE FROM addCode WHERE add_id = ?;";
   return dbRun(db, query, [add_id]);
+}
+
+function getMessages(db, net_id_receiver, net_id_sender) {
+  let query = "SELECT * FROM messages WHERE net_id_receiver = ? AND net_id_sender = ?;"
+  return dbAll(db, query, [net_id_receiver, net_id_sender]);
+}
+
+function addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) {
+  let query = "INSERT INTO messages(net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) VALUES (?, ?, ?, ?, ?);";
+  return dbRun(db, query, [net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message]);
+}
+
+function removeMessages(db, sender, receiver) {
+  let query = "DELETE FROM messages WHERE net_id_sender = ? AND net_id_receiver = ?;";
+  return dbRun(db, query, [sender, receiver]);
 }
 
 // Constructs a basic object to be passed into res.send()
