@@ -44,10 +44,16 @@ Currently, we are stuck on what we should do for Azaan's use case, but will be d
 what I did:
 I worked on the add code endpoint and the registration endpoint.
 I also worked the debugging and the documentation and the README which includes documentation.
+
+
 what I learned:
 I learned more js style and how write documentation.
+
+
 What I had trouble on:
 I had trouble setting up the endpoint and testing which took some time to debug but once it was done it worked.
+
+
 What I am stuck on:
 I'm stuck on updating my use case which is our goal to work on.
 
