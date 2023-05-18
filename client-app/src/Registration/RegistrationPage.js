@@ -4,6 +4,8 @@ import styles from './RegistrationPage.module.css';
 import { useLocation } from 'react-router-dom';
 import {fetchData} from "../apiService";
 import ReactStars from "react-rating-stars-component";
+import waitlistSelected from '../assets/waitlistselected1.png';
+import waitlistNotSelected from '../assets/waitlistnotselected.png';
 
 const RegistrationPage = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
@@ -203,7 +205,7 @@ const RegistrationPage = () => {
         await removeCourse(courseToRemove);
         setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
     };
-
+    
     const handleAddCodeRequest = async (course) => {
         const endpoint = course.add_code_status === "0" ? '/removeAddCode' : '/addAddCode';
         const add_id = course.add_code_status === "0" ? course.add_id : generateGUID();
@@ -313,9 +315,17 @@ const RegistrationPage = () => {
                             {courses.map((course, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <input type="checkbox"
-                                               onChange={() => handleCheckboxChange(course)}
-                                               disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                     {
+                                        course.class_id === "333"
+                                            ? <img style={{cursor: 'pointer'}} src={waitlistNotSelected} alt="333" width="50" height="50" />
+                                            : <>
+                                                <input type="checkbox"
+                                                onChange={() => handleCheckboxChange(course)}
+                                                disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                               </>
+
+                                     }   
+                                        
                                     </td>
                                     <td>{course.sln}</td>
                                     <td>{course.class_id}</td>
