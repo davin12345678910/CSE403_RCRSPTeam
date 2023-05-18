@@ -46,7 +46,7 @@ async function makeTables(db) {
   let queryAdvisers = 'CREATE TABLE IF NOT EXISTS advisers(net_id TEXT PRIMARY KEY REFERENCES people(net_id), adviser_name TEXT, department TEXT);';
 
   // 5. Classes
-  let queryClasses = 'CREATE TABLE IF NOT EXISTS classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER, add_code_required INTEGER);';
+  let queryClasses = 'CREATE TABLE IF NOT EXISTS classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, quarter TEXT, class_name TEXT, sln INTEGER, add_code_required INTEGER, enrolled INTEGER, capacity INTEGER, startM INTEGER, endM INTEGER, startT INTEGER, endT INTEGER, startW INTEGER, endW INTEGER, startTH INTEGER, endTH INTEGER, startF INTEGER, endF INTEGER, startSAT INTEGER, endSAT INTEGER, startSUN INTEGER, endSUN INTEGER);';
 
   // 6. Sections
   let querySections = 'CREATE TABLE IF NOT EXISTS sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
@@ -83,7 +83,10 @@ async function addStartupData(db) {
   // Add default class
   let hasDefaultClass = await getClass(db, '345');
   if (!hasDefaultClass) {
-    await addClass(db, '345', null, null, null, 'x', null, null, null, null, null, null);
+    await addClass(db, '345', null, null, null, 'x', 
+      null, null, null, null, null, null, 
+      0, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
+      1030, 1120, null, null, null, null);
   }
 
   // Add default student
@@ -269,13 +272,30 @@ app.post('/addClass', async (req, res) => {
   let average_gpa = req.body.average_gpa;
   let professor = req.body.professor;
   let assistant_professor = req.body.assistant_professor;
-  let class_times = req.body.class_times;
   let quarter = req.body.quarter;
   let class_name = req.body.class_name;
   let sln = req.body.sln;
   let add_code_required = req.body.add_code_required;
+  let enrolled = req.body.enrolled;
+  let capacity = req.body.capacity;
+  let startM = req.body.startM;
+  let endM = req.body.endM;
+  let startT = req.body.startT;
+  let endT = req.body.endT;
+  let startW = req.body.startW;
+  let endW = req.body.endW;
+  let startTH = req.body.startTH;
+  let endTH = req.body.endTH;
+  let startF = req.body.startF;
+  let endF = req.body.endF;
+  let startSAT = req.body.startSAT;
+  let endSAT = req.body.endSAT;
+  let startSUN = req.body.startSUN;
+  let endSUN = req.body.endSUN;
   let success = await addClass(db, class_id, credits, rating, average_gpa, professor, 
-    assistant_professor, class_times, quarter, class_name, sln, add_code_required);
+    assistant_professor, quarter, class_name, sln, add_code_required, enrolled, capacity,
+    startM, endM, startT, endT, startW, endW, startTH, endTH, startF, endF, startSAT, endSAT,
+    startSUN, endSUN);
   db.close();
 
   let status = success ? SUCCESS : ERROR;
@@ -358,7 +378,26 @@ app.post('/updateClass', async (req, res) => {
   let class_name = req.body.class_name;
   let sln = req.body.sln;
   let add_code_required = req.body.add_code_required;
-  let success = await updateClass(db, class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required);
+  let enrolled = req.body.enrolled;
+  let capacity = req.body.capacity;
+  let startM = req.body.startM;
+  let endM = req.body.endM;
+  let startT = req.body.startT;
+  let endT = req.body.endT;
+  let startW = req.body.startW;
+  let endW = req.body.endW;
+  let startTH = req.body.startTH;
+  let endTH = req.body.endTH;
+  let startF = req.body.startF;
+  let endF = req.body.endF;
+  let startSAT = req.body.startSAT;
+  let endSAT = req.body.endSAT;
+  let startSUN = req.body.startSUN;
+  let endSUN = req.body.endSUN;
+  let success = await updateClass(db, class_id, credits, rating, average_gpa, professor, 
+    assistant_professor, quarter, class_name, sln, add_code_required, 
+    enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
+    startF, endF, startSAT, endSAT, startSUN, endSUN);
   db.close();
 
   let status = success ? SUCCESS : ERROR;
@@ -557,6 +596,52 @@ app.post('/removeRegistration', async (req, res) => {
 
   let status = success ? SUCCESS : ERROR;
   let result = setResDefaults('/removeRegistration', status);
+  res.send(result);
+})
+
+app.post('/removeStudentFromRegistration', async (req, res) => {
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let success = await removeStudentFromRegistration(db, net_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeStudentFromRegistration', status);
+  res.send(result);
+})
+
+app.post('/removeClassFromRegistration', async (req, res) => {
+  let db = getDBConnection();
+  let class_id = req.body.class_id;
+  let success = await removeClassFromRegistration(db, class_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeClassFromRegistration', status);
+  res.send(result);
+})
+
+app.post('/getWaitlist', async (req, res) => {
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let class_id = req.body.class_id;
+  let waitlist = await getWaitlist(db, net_id, class_id);
+  db.close();
+
+  let status = waitlist ? SUCCESS : ERROR;
+  let result = setResDefaults('/getWaitlist', status);
+  result.waitlist = waitlist;
+  res.send(result);
+})
+
+app.post('/getFullWaitlist', async (req, res) => {
+  let db = getDBConnection();
+  let fullWaitlist = await getFullWaitlist(db);
+  db.close();
+
+  let status = fullWaitlist ? SUCCESS : ERROR;
+  let result = setResDefaults('/getFullWaitlist', status);
+  result.waitlist = fullWaitlist;
   res.send(result);
 })
 
@@ -784,13 +869,18 @@ function addPerson(db, net_id, email, password, role) {
 }
 
 function addClass(db, class_id, credits, rating, average_gpa, professor, 
-  assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
-    let query = "INSERT INTO classes(class_id, credits, rating, " + 
-      "average_gpa, professor, assistant_professor, class_times, " + 
-      "quarter, class_name, sln, add_code_required) VALUES " + 
-      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+  assistant_professor, quarter, class_name, sln, add_code_required, 
+  enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
+  startF, endF, startSAT, endSAT, startSUN, endSUN) {
+    let query = "INSERT INTO classes(class_id, credits, rating, average_gpa, professor, " +
+      "assistant_professor, quarter, class_name, sln, add_code_required, " +
+      "enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH, " +
+      "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " + 
+      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
       return dbRun(db, query, [class_id, credits, rating, average_gpa, professor, 
-        assistant_professor, class_times, quarter, class_name, sln, add_code_required]);
+        assistant_professor, quarter, class_name, sln, add_code_required, 
+        enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
+        startF, endF, startSAT, endSAT, startSUN, endSUN]);
 }
 
 function addStudent(db, net_id, email, password, student_name, major) {
@@ -824,8 +914,10 @@ function updatePerson(db, net_id, email, password, role) {
 }
 
 async function updateClass(db, class_id, credits, rating, average_gpa, professor, 
-  assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
-  let query = "SELECT * FROM classes WHERE class_id=?;";
+  assistant_professor, quarter, class_name, sln, add_code_required, 
+  enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
+  startF, endF, startSAT, endSAT, startSUN, endSUN) {
+  let query = "SELECT * FROM classes WHERE class_id = ?;";
   let class_ = await dbGet(db, query, [class_id]);
   if (!class_) {
     return false;
@@ -836,13 +928,32 @@ async function updateClass(db, class_id, credits, rating, average_gpa, professor
   let update_average_gpa = average_gpa ? average_gpa : class_.average_gpa;
   let update_professor = professor ? professor : class_.professor;
   let update_assistant_professor = assistant_professor ? assistant_professor : class_.assistant_professor;
-  let update_class_times = class_times ? class_times : class_.class_times;
   let update_quarter = quarter ? quarter : class_.quarter;
   let update_class_name = class_name ? class_name : class_.class_name;
   let update_sln = sln ? sln : class_.sln;
   let update_add_code_required = add_code_required ? add_code_required : class_.add_code_required;
-  query = "UPDATE classes SET credits = ?, rating = ?, average_gpa = ?, professor = ?, assistant_professor = ?, class_times = ?, quarter = ?, class_name = ?, sln = ?, add_code_required = ? WHERE class_id = ?;";
-  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, update_add_code_required, class_id])
+  let update_enrolled = enrolled ? enrolled : class_.enrolled;
+  let update_capacity = capacity ? capacity : class_.capacity;
+  let update_startM = startM ? startM : class_.startM;
+  let update_endM = endM ? endM : class_.endM;
+  let update_startT = startT ? startT : class_.startT;
+  let update_endT = endT ? endT : class_.endT;
+  let update_startW = startW ? startW : class_.startW;
+  let update_endW = endW ? endW : class_.endW;
+  let update_startTH = startTH ? startTH : class_.startTH;
+  let update_endTH = endTH ? endTH : class_.endTH;
+  let update_startF = startF ? startF : class_.startF;
+  let update_endF = endF ? endF : class_.endF;
+  let update_startSAT = startSAT ? startSAT : class_.startSAT;
+  let update_endSAT = endSAT ? endSAT : class_.endSAT;
+  let update_startSUN = startSUN ? startSUN : class_.startSUN;
+  let update_endSUN = endSUN ? endSUN : class_.endSUN;
+  query = "UPDATE classes SET credits = ?, rating = ?, average_gpa = ?, professor = ?, assistant_professor = ?, quarter = ?, class_name = ?, sln = ?, add_code_required = ?, enrolled = ?, capacity = ?, startM = ?, endM = ?, startT = ?, endT = ?, startW = ?, endW = ?, startTH = ?, endTH = ?, startF = ?, endF = ?, startSAT = ?, endSAT =?, startSUN = ?, endSUN = ? WHERE class_id = ?;";
+  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor, 
+    update_assistant_professor, update_quarter, update_class_name, update_sln, 
+    update_add_code_required, update_enrolled, update_capacity, update_startM, update_endM,
+    update_startT, update_endT, update_startW, update_endW, update_startTH, update_endTH,
+    update_startF, update_endF, update_startSAT, update_endSAT, update_startSUN, update_endSUN, class_id])
 }
 
 async function updateProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
@@ -1003,6 +1114,11 @@ function getWaitlist(db, net_id, class_id) {
   return dbGet(db, query, [net_id, class_id]);
 }
 
+function getFullWaitlist(db) {
+  let query = "SELECT * FROM waitlist;";
+  return dbAll(db, query, []);
+}
+
 async function addWaitlist(db, net_id, class_id) {
   let query = "SELECT position FROM waitlist ORDER BY position DESC LIMIT 1;";
   let result = await dbGet(db, query, []);
@@ -1098,6 +1214,39 @@ function hashStr(str) {
 // Returns a random integer from 0 to MAX_SALT.
 function generateSalt() {
   return Math.floor(Math.random() * MAX_SALT);
+}
+
+// Returns true iff class1 and class2 have a scheduling conflict.
+function classesConflict(class1, class2) {
+  if ((class1.startM < class2.startM && class2.startM < class1.endM) ||
+      (class1.startM < class2.endM && class2.endM < class1.endM)) {
+        return true;
+  }
+  if ((class1.startT < class2.startT && class2.startT < class1.endT) ||
+      (class1.startT < class2.endT && class2.endT < class1.endT)) {
+        return true;
+  }
+  if ((class1.startW < class2.startW && class2.startW < class1.endW) ||
+      (class1.startW < class2.endW && class2.endW < class1.endW)) {
+        return true;
+  }
+  if ((class1.startTH < class2.startTH && class2.startTH < class1.endTH) ||
+      (class1.startTH < class2.endTH && class2.endTH < class1.endTH)) {
+        return true;
+  }
+  if ((class1.startF < class2.startF && class2.startF < class1.endF) ||
+      (class1.startF < class2.endF && class2.endF < class1.endF)) {
+        return true;
+  }
+  if ((class1.startSAT < class2.startSAT && class2.startSAT < class1.endSAT) ||
+      (class1.startSAT < class2.endSAT && class2.endSAT < class1.endSAT)) {
+        return true;
+  }
+  if ((class1.startSUN < class2.startSUN && class2.startSUN < class1.endSUN) ||
+      (class1.startSUN < class2.endSUN && class2.endSUN < class1.endSUN)) {
+        return true;
+  }
+  return false;
 }
 
 export default app
