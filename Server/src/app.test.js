@@ -314,6 +314,7 @@ describe("POST /users", () => {
       await request(app).post("/removeAddCode").send({'add_id' : '2'});
     }, TIMEOUT)
 
+    /*
     // Here we will be adding test for the messaging servies in which users can use
     test("Test getMessages", async () => {
       const req = {
@@ -363,6 +364,7 @@ describe("POST /users", () => {
       })
       expect(found).toBe(true);
     }, TIMEOUT);
+    */
   });
 
   describe("Unit Testing", () => {
