@@ -56,7 +56,7 @@ async function makeTables(db) {
 
   // 8. Waitlist
   let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
-  
+
   // 9. Addcode
   let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
 
@@ -717,6 +717,30 @@ app.post('/removeAddCode', async (req, res) => {
   let result = setResDefaults('/removeAddCode', status);
   res.send(result);
 })
+
+// app.get('/updateAddCode', async (req, res) => {
+//   let db = await getDBConnection()
+//
+//   let add_id = req.query.add_id;
+//   let add_code_status = 1;
+//
+//   if(!add_id) {
+//     return res.status(400).json({ message: 'Missing parameter add_id.', 'status': 400});
+//   }
+//
+//   let updateClass = 'UPDATE addCode SET add_code_status = ? WHERE add_id = ?;';
+//
+//   db.run(updateClass, [add_code_status, add_id], function (err) {
+//     if (err) {
+//       console.error('Error updating AddCode:', err);
+//       res.status(500).json({ message: 'Error updating AddCode', error: err, 'status': 500});
+//     } else {
+//       res.status(200).json({ message: 'AddCode updated successfully', 'status': 200});
+//     }
+//   });
+//
+//   db.close();
+// })
 
 app.post('/getMessages', async (req, res) => {
   let db = getDBConnection();

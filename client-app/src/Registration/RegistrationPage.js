@@ -4,6 +4,8 @@ import styles from './RegistrationPage.module.css';
 import { useLocation } from 'react-router-dom';
 import {fetchData} from "../apiService";
 import ReactStars from "react-rating-stars-component";
+import waitlistSelected from '../assets/waitlistselected1.png';
+import waitlistNotSelected from '../assets/waitlistnotselected.png';
 
 const RegistrationPage = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
@@ -16,6 +18,7 @@ const RegistrationPage = () => {
     const [selectedCourses, setSelectedCourses] = useState([]);
     const [checkedCourses, setCheckedCourses] = useState([]);
     const [requestedAddCodes, setRequestedAddCodes] = useState([]);
+    const [waitlisted, setWaitlisted] = useState(false);
 
     const handleCheckboxChange = (course) => {
         if (course === undefined) {
@@ -149,6 +152,8 @@ const RegistrationPage = () => {
     }
 
     const searchCourse = async () => {
+        setCourses([]);
+
         const getClassEndpoint = "/getClass";
         const getClassOptions = {
             method: "POST",
@@ -203,7 +208,7 @@ const RegistrationPage = () => {
         await removeCourse(courseToRemove);
         setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
     };
-
+    
     const handleAddCodeRequest = async (course) => {
         const endpoint = course.add_code_status === "0" ? '/removeAddCode' : '/addAddCode';
         const add_id = course.add_code_status === "0" ? course.add_id : generateGUID();
@@ -262,6 +267,70 @@ const RegistrationPage = () => {
         });
     }
 
+    const handleWaitlistClick = async (course) => {
+        // If the course is waitlisted, we want to remove it
+        if (course.waitlisted) {
+            const removeWaitlistEndpoint = "/removeStudentFromWaitlist";
+            const removeWaitlistOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({net_id: studentInfo.student.net_id})
+            };
+
+            try {
+                const data = await fetchData(removeWaitlistEndpoint, removeWaitlistOptions);
+
+                if (data.status !== 200) {
+                    window.alert("Could not remove from waitlist!");
+                } else {
+                    setCourses(courses.map(c =>
+                        c.class_id === course.class_id
+                            ? {...c, waitlisted: false}
+                            : c
+                    ));
+                }
+
+            } catch (error) {
+                console.error('Error removing from waitlist:', error);
+            }
+
+            // If the course is not waitlisted, we want to add it
+        } else {
+            const addWaitlistEndpoint = "/addWaitlist";
+            const addWaitlistOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    net_id: studentInfo.student.net_id,
+                    class_id: course.class_id
+                })
+            };
+
+            try {
+                const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
+                console.log(data);
+                if (data.status !== 200) {
+                    window.alert("Could not add to waitlist!");
+                } else {
+                    setCourses(courses.map(c =>
+                        c.class_id === course.class_id
+                            ? {...c, waitlisted: true}
+                            : c
+                    ));
+                }
+
+            } catch (error) {
+                console.error('Error adding to waitlist:', error);
+            }
+        }
+    };
+
+
+
     return (
         <div className={styles.RegistrationPage}>
             <h1 className={styles.TextStroke}>Registration - Autumn 2023</h1>
@@ -306,16 +375,31 @@ const RegistrationPage = () => {
                                 <th>Title</th>
                                 <th>Professor</th>
                                 <th>Class Time</th>
-                                <th>Add Code Required</th>
+                                {courses.some(course => course.add_code_required === 1) && <th>Add Code Required</th>}
                             </tr>
                             </thead>
                             <tbody>
                             {courses.map((course, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <input type="checkbox"
-                                               onChange={() => handleCheckboxChange(course)}
-                                               disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                     {
+                                        course.class_id === "333"
+                                            ? <img
+                                                style={{cursor: 'pointer'}}
+                                                src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
+                                                alt="Waitlist Status"
+                                                width="50"
+                                                height="50"
+                                                onClick={() => handleWaitlistClick(course)}
+                                            />
+                                            : <>
+                                                <input type="checkbox"
+                                                onChange={() => handleCheckboxChange(course)}
+                                                disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                               </>
+
+                                     }   
+                                        
                                     </td>
                                     <td>{course.sln}</td>
                                     <td>{course.class_id}</td>
@@ -323,7 +407,7 @@ const RegistrationPage = () => {
                                     <td>{course.class_name}</td>
                                     <td>{course.professor}</td>
                                     <td>{course.class_times}</td>
-                                    <td>
+                                    <td hidden={course.add_code_required !== 1}>
                                         {course.add_code_required === 1 && (
                                             <>
                                                 {course.add_code_status === "-1" && (

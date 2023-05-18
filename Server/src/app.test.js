@@ -60,16 +60,15 @@ describe("POST /users", () => {
       expect(found).toBe(true)
 
       // remove the class once we are done testing
-      var removeResponse = await request(app).post("/removeClass").send({'class_id' : req.class_id});
+      await request(app).post("/removeClass").send({'class_id' : req.class_id});
     }, TIMEOUT)
 
     test("Test updateClass", async () => {
-      const updateResponse = await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
-      console.log(updateResponse.body.class);
+      await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
       var professor = addResponse.body.class.professor
-      console.log(professor)
 
+      // check to see if the change happened
       expect(professor).toBe('cat')
 
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'x'});
@@ -80,7 +79,6 @@ describe("POST /users", () => {
     test("Test getStudent", async () => {
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
       var net_id = getStudent.body.student.net_id
-      console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon678')
     }, TIMEOUT)
 
@@ -93,11 +91,9 @@ describe("POST /users", () => {
         email: 'pika@uw.edu',
         password: '123',
       };
-      const addResponse = await request(app).post("/addStudent").send(req);
-      console.log(addResponse.body.message)
+      await request(app).post("/addStudent").send(req);
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
       var net_id = getStudent.body.student.net_id
-      console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon8910')
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, TIMEOUT)
@@ -105,12 +101,10 @@ describe("POST /users", () => {
 
 
     test("Test updateStudent", async () => {
-      const updateResponse = await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
-      console.log("This is the student:  " + updateResponse.body.Student);
+      await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
 
       const addResponse = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
       var major = addResponse.body.student.major
-      console.log(major)
 
       expect(major).toBe('computer engineering')
 
@@ -130,6 +124,7 @@ describe("POST /users", () => {
         email: 'z',
         rating: '10'
       };
+
       const addResponse = await request(app).post("/addProfessor").send(req);
       console.log(addResponse.body.message)
       const getResponse = await request(app).post("/getProfessor").send({'net_id' : '678'});
