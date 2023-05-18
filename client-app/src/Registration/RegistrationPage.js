@@ -277,9 +277,9 @@ const RegistrationPage = () => {
 
                 {studentInfo && (
                     <>
-                        <p>Prepared for: {studentInfo.Student.student_name}</p>
+                        <p>Prepared for: {studentInfo.student.student_name}</p>
                         <p>Prepared on: {new Date().toLocaleString('en-US', options)}</p>
-                        <p>Major: {studentInfo.Student.major}</p>
+                        <p>Major: {studentInfo.student.major}</p>
                     </>
                 )}
 
@@ -327,10 +327,13 @@ const RegistrationPage = () => {
                                         {course.add_code_required === 1 && (
                                             <>
                                                 {course.add_code_status === "-1" && (
-                                                    <button onClick={() => handleAddCodeRequest(course)}>Request Add Code</button>
+                                                    <button className={styles.RequestButton} onClick={() => handleAddCodeRequest(course)}>Request Add Code</button>
                                                 )}
                                                 {course.add_code_status === "0" && (
-                                                    <span onClick={() => handleAddCodeRequest(course)} className={styles.InProgressLabel}>Add code in progress</span>
+                                                    <span onClick={() => handleAddCodeRequest(course)} className={styles.InProgressLabel}>
+                                                        Add code in progress
+                                                        <span className={styles.SecondLineYellow}>(click to remove add code request)</span>
+                                                    </span>
                                                 )}
                                                 {course.add_code_status === "1" && (
                                                     <span style={{color: 'green'}}>Add code added</span>
@@ -344,7 +347,7 @@ const RegistrationPage = () => {
                             </tbody>
                         </table>
                     )}
-                    <button onClick={handleCloseModal}>Add Course</button>
+                    <button hidden={courses.length <= 0} onClick={handleCloseModal}>Add Course</button>
                 </Modal>
             </div>
             {selectedCourses.length > 0 && (
