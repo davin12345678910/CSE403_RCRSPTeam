@@ -222,7 +222,7 @@ describe("POST /users", () => {
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
 
-    test("Test addStudentRegistration", async () => {
+    test("Test addRegistration", async () => {
       const req = {
         net_id: 'pokemon678',
         class_id: 'cse331',
@@ -233,9 +233,12 @@ describe("POST /users", () => {
       }
       const addResponse = await request(app).post("/addRegistration").send(req);
       console.log(addResponse.body.message);
-      const getResponse = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
-      console.log(getResponse.body.message);
-      var classes = getResponse.body.Registration;
+      const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
+      const getResponseClass = await request(app).post("/getClassRegistration").send({'class_id' : 'cse331'});
+      console.log(getResponseStudent.body.message);
+      console.log(getResponseClass.body.message);
+      var classes = getResponseStudent.body.registration;
+      var students = getResponseClass.body.registration;
       console.log('This is the class: ' + classes);
       var found = false
       classes.forEach(function(element) {
@@ -244,6 +247,15 @@ describe("POST /users", () => {
         }
       });
       expect(found).toBe(true)
+
+      console.log('This is the student: ' + students);
+      found = false;
+      students.forEach(function(element) {
+        if (element.net_id == 'pokemon678') {
+          found = true
+        }
+      });
+      expect(found).toBe(true);
 
       // const addResponse2 = await request(app).post("/addRegistration").send(req2);
       // console.log(addResponse2.body.message);

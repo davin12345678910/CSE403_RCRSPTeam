@@ -689,69 +689,46 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/addRegistration', async (req, res) => {
-  const db = await getDBConnection();
+  let db = getDBConnection();
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
-  let query = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
-
-  db.run(query, [net_id, class_id], function (err) {
-    if (err) {
-      console.error('Error inserting into registration:', err.message);
-      res.status(ERROR).json({ message: 'Error inserting into registration', error: err, status: ERROR});
-      return;
-    }
-    console.log('Successfully added to registration');
-    res.status(SUCCESS).json({ message: 'Successfully added to registration', status: SUCCESS});
-  })
+  let success = await addRegistration(db, net_id, class_id)
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addRegistration', status);
+  res.send(result);
 })
 
 app.post('/getStudentRegistration', async (req, res) =>{
-  const db = await getDBConnection();
+  let db = getDBConnection();
   let net_id = req.body.net_id;
-  let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE NET_ID = ?;';
-  db.all(query, [net_id], (err, rows) => {
-    var registration = [];
-    if (err) {
-      console.error('Error getting registartion:', err.message);
-      res.status(ERROR).json({ message: 'Error getting registration', error: err, status: ERROR});
-      return;
-    }
-    rows.forEach((row) => {
-      registration.push(row);
-    });
-    console.log('Successfully got registration');
-    //res.status(SUCCESS).json({ message: 'Successfully got student registration', status: SUCCESS});
-    res.send({"Registration" : registration});
-  })
+  let registration = await getStudentRegistration(db, net_id);
   db.close();
+
+  let status = registration ? SUCCESS : ERROR;
+  let result = setResDefaults('/getStudentRegistration', status);
+  result.registration = registration;
+  res.send(result);
 })
 
 app.post('/getClassRegistration', async (req, res) =>{
-  const db = await getDBConnection();
+  let db = getDBConnection();
   let class_id = req.body.class_id;
-  let query = 'SELECT CLASS_ID FROM REGISTRATION WHERE class_id = ?;';
-  db.all(query, [class_id], (err, rows) => {
-    var registration = [];
-    if (err) {
-      console.error('Error getting registartion:', err.message);
-      res.status(ERROR).json({ message: 'Error getting registration', error: err, status: ERROR});
-      return;
-    }
-    rows.forEach((row) => {
-      registration.push(row);
-    });
-    console.log('Successfully got registration');
-    //res.status(SUCCESS).json({ message: 'Successfully got class registration', status: SUCCESS});
-    res.send({"Registration" : registration});
-  })
+  let registration = await getClassRegistration(db, class_id);
   db.close();
+
+  let status = registration ? SUCCESS : ERROR;
+  let result = setResDefaults('/getClassRegistration', status);
+  result.registration = registration;
+  res.send(result);
 })
 
 app.post('/removeRegistration', async (req, res) => {
-  const db = await getDBConnection();
+  let db = await getDBConnection();
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
+  let success = await removeRegistration(db, net_id, class_id);
   let removeFromRegistration = 'DELETE FROM registration WHERE net_id=? AND class_id=?;';
   let getFromWaitlist = 'SELECT TOP 1 net_id, class_id FROM waitlist WHERE class_id=? ORDER BY position ASC;';
   let removeFromWaitlist = 'DELETE FROM waitlist WHERE net_id=? AND class_id=?;';
@@ -800,48 +777,37 @@ app.post('/removeRegistration', async (req, res) => {
 })
 
 app.post('/addWaitlist', async (req, res) => {
-  const db = await getDBConnection();
+  let db = getDBConnection();
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
-
-  let queryGetPosition = 'SELECT TOP 1 position FROM waitlist ORDER BY position DESC;';
-  let queryAddWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
-
-  db.get(queryGetPosition, [], (err, result) => {
-    if (err) {
-      console.error('Error getting from waitlist: ', err.message);
-      res.status(ERROR).json({ message: 'Error getting from waitlist', error: err.message, status: ERROR});
-      return;
-    }
-
-    let position = result ? result.position + 1 : 0;
-    db.run(queryAddWaitlist, [net_id, class_id, position], function (err) {
-      if (err) {
-        console.error('Error adding to waitlist: ', err.message);
-        res.status(ERROR).json({ message: 'Error adding to waitlist', error: err.message, status: ERROR});
-        return;
-      }
-      res.status(SUCCESS).json({ message: 'Successfully added to waitlist', status: SUCCESS});
-    });
-  });
+  let success = await addWaitlist(db, net_id, class_id);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addWaitlist', status);
+  res.send(result);
 })
 
-app.post('/removeWaitlist', async (req, res) => {
-  const db = await getDBConnection();
+app.post('/removeStudentFromWaitlist', async (req, res) => {
+  let db = getDBConnection();
   let net_id = req.body.net_id;
-  let class_id = req.body.net_id;
-
-  let queryRemove = 'DELETE FROM waitlist WHERE net_id=? AND class_id=?;';
-  db.run(queryRemove, [net_id, class_id], function (err) {
-    if (err) {
-      console.error('Error removing from waitlist: ', err.message);
-      res.status(ERROR).json({ message: 'Error removing from waitlist', error: err.message, status: ERROR});
-      return;
-    }
-    res.status(SUCCESS).json({ message: 'Successfully removed from waitlist', status: SUCCESS});
-  });
+  let success = await removeStudentFromWaitlist(db, net_id);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeStudentFromWaitlist', status);
+  res.send(result);
+})
+
+app.post('/removeClassFromWaitlist', async (req, res) => {
+  let db = getDBConnection();
+  let class_id = req.body.class_id;
+  let success = await removeClassFromWaitlist(db, class_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeClassFromWaitlist', status);
+  res.send(result);
 })
 
 /* ######################################
@@ -935,6 +901,16 @@ function getAdviser(db, net_id) {
 function getSection(db, section_id) {
   let query = "SELECT * FROM sections WHERE section_id = ?;";
   return dbGet(db, query, [section_id]);
+}
+
+function getStudentRegistration(db, net_id) {
+  let query = "SELECT class_id FROM registration WHERE net_id = ?;";
+  return dbAll(db, query, [net_id]);
+}
+
+function getClassRegistration(db, class_id) {
+  let query = "SELECT net_id FROM registration WHERE class_id = ?;";
+  return dbAll(db, query, [class_id]);
 }
 
 function addPerson(db, net_id, email, password, role) {
@@ -1117,14 +1093,54 @@ async function login(db, net_id, password) {
   return 200;
 }
 
-function removeStudentFromRegistration(db, net_id) {
-  let query = "DELETE FROM registration WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+function addRegistration(db, net_id, class_id) {
+  let query = "INSERT INTO registration(net_id, class_id) VALUES (?, ?);";
+  return dbRun(db, query, [net_id, class_id]);
+}
+
+async function removeRegistration(db, net_id, class_id) {
+  let query = "DELETE FROM registration WHERE net_id = ? AND class_id = ?;";
+  let success = await dbRun(db, query, [net_id, class_id]);
+  if (!success) {
+    return false;
+  }
+
+  return popWaitlist(db, [class_id]);
+}
+
+async function removeStudentFromRegistration(db, net_id) {
+  let query = "SELECT class_id FROM registration WHERE net_id = ?;";
+  let classes = await dbAll(db, query, [net_id]);
+
+  query = "DELETE FROM registration WHERE net_id = ?;";
+  let success = await dbRun(db, query, [net_id]);
+  if (!success) {
+    return false;
+  }
+
+  success = true;
+  classes.forEach((class_id) => {
+    success = success && popWaitlist(class_id);
+  })
+  return success;
 }
 
 function removeClassFromRegistration(db, class_id) {
   let query = "DELETE FROM registration WHERE class_id = ?;";
   return dbRun(db, query, [class_id]);
+}
+
+async function addWaitlist(db, net_id, class_id) {
+  let query = "SELECT TOP 1 position FROM waitlist ORDER BY position DESC;";
+  let result = await dbGet(db, query, []);
+  let position = result ? result.position + 1 : 0;
+  query = "INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);";
+  return dbRun(db, query, [net_id, class_id, position]);
+}
+
+function removeWaitlist(db, net_id, class_id) {
+  let query = "DELETE FROM waitlist WHERE net_id = ? AND class_id = ?;";
+  return dbRun(db, query, [net_id, class_id]);
 }
 
 function removeStudentFromWaitlist(db, net_id) {
@@ -1137,6 +1153,21 @@ function removeClassFromWaitlist(db, class_id) {
   return dbRun(db, query, [class_id]);
 }
 
+async function popWaitlist(db, class_id) {
+  let query = "SELECT TOP 1 net_id FROM waitlist WHERE class_id = ? ORDER BY position ASC;";
+  let net_id = await dbGet(db, query, [class_id]);
+  if (!net_id) {
+    return false;
+  }
+
+  if (!addRegistration(db, net_id, class_id)) {
+    return false;
+  }
+  return removeWaitlist(db, net_id, class_id);
+}
+
+// Constructs a basic object to be passed into res.send()
+// Clients can append more headers/values to object before sending.
 function setResDefaults(endpoint, status) {
   let message;
   if (Math.floor(status / 100) == ERROR / 100) {
