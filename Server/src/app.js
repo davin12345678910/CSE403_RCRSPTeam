@@ -9,7 +9,6 @@ import cors from 'cors';
 /*
 * GLOBAL VARIABLES
 */
-const INITIALIZE = 0;
 const MAX_HASH = 10 ** 14;
 const MAX_SALT = 10 ** 6;
 const SUCCESS = 200;
@@ -23,7 +22,6 @@ app.use(cors());
 
 // This is how we will get the database that is within our system
 function getDBConnection() {
-
   const db = new verboseSqlite.Database("./registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message)
   })
@@ -33,126 +31,101 @@ function getDBConnection() {
 /*
 We only need this function when we need to first initialize the database with the tables we need
 */
-function makeTables(db) {
+async function makeTables(db) {
   // 1. People
-  let queryPeople = "CREATE TABLE people(net_id TEXT PRIMARY KEY, email TEXT, hash_pass TEXT, salt TEXT, role TEXT)"
+  let queryPeople = "CREATE TABLE IF NOT EXISTS people(net_id TEXT PRIMARY KEY, email TEXT, hash_pass TEXT, salt TEXT, role TEXT)"
 
   // 2. Students
-  let queryStudents = 'CREATE TABLE students(net_id TEXT PRIMARY KEY REFERENCES people(net_id), student_name TEXT, major TEXT);';
+  let queryStudents = 'CREATE TABLE IF NOT EXISTS students(net_id TEXT PRIMARY KEY REFERENCES people(net_id), student_name TEXT, major TEXT);';
 
   // 3. Professor
-  let queryProfessors = 'CREATE TABLE professors(net_id TEXT PRIMARY KEY REFERENCES people(net_id), professor_name TEXT, department TEXT, tenure INTEGER, rating INT);';
+  let queryProfessors = 'CREATE TABLE IF NOT EXISTS professors(net_id TEXT PRIMARY KEY REFERENCES people(net_id), professor_name TEXT, department TEXT, tenure INTEGER, rating INT);';
 
   // 4. Advisers
-  let queryAdvisers = 'CREATE TABLE advisers(net_id TEXT PRIMARY KEY REFERENCES people(net_id), adviser_name TEXT, department TEXT);';
+  let queryAdvisers = 'CREATE TABLE IF NOT EXISTS advisers(net_id TEXT PRIMARY KEY REFERENCES people(net_id), adviser_name TEXT, department TEXT);';
 
   // 5. Classes
-  let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER);';
+  let queryClasses = 'CREATE TABLE IF NOT EXISTS classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER, add_code_required INTEGER);';
 
   // 6. Sections
-  let querySections = 'CREATE TABLE sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
+  let querySections = 'CREATE TABLE IF NOT EXISTS sections(section_id TEXT PRIMARY KEY, ta TEXT, co_ta TEXT, section_times TEXT, class_id TEXT REFERENCES classes(class_id));';
 
   // 7. Registered Classes
-  let queryRegisterClass = 'CREATE TABLE registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), CONSTRAINT PK_Registration PRIMARY KEY (net_id,class_id));';
+  let queryRegisterClass = 'CREATE TABLE IF NOT EXISTS registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), CONSTRAINT PK_Registration PRIMARY KEY (net_id,class_id));';
 
   // 8. Waitlist
-  let queryWaitlist = 'CREATE TABLE waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
+  let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
+  
+  // 9. Addcode
+  let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
+
+  // 10. Messages
+  let queryMessages = 'CREATE TABLE IF NOT EXISTS messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
+
   // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
-  db.run(queryPeople);
-  db.run(queryStudents);
-  db.run(queryProfessors);
-  db.run(queryAdvisers);
-  db.run(queryClasses);
-  db.run(querySections);
-  db.run(queryRegisterClass);
-  db.run(queryWaitlist);
+  await dbRun(db, queryPeople, []);
+  await dbRun(db, queryStudents, []);
+  await dbRun(db, queryProfessors, []);
+  await dbRun(db, queryAdvisers, []);
+  await dbRun(db, queryClasses, []);
+  await dbRun(db, querySections, []);
+  await dbRun(db, queryRegisterClass, []);
+  await dbRun(db, queryWaitlist, []);
+  await dbRun(db, queryAddcode, []);
+  await dbRun(db, queryMessages, []);
 
-  db.close();
+  return true;
 }
 
-
-
-async function makeAddCodeTables() {
-  var database = await getDBConnection();
-
-  let addCodeTable = 'CREATE TABLE addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
-  // let addCodeMessageTable = 'CREATE TABLE messages(net_id_sender TEXT, JobType_sender TEXT, net_id_reciever TEXT, JobType_reciever TEXT, message TEXT);';
-
-  database.run(addCodeTable);
-  // database.run(addCodeMessageTable);
-
-  // let removeMessages = 'DROP TABLE addCode;';
-  // database.run(removeMessages);
-  // let dropClass = 'DROP TABLE classes;';
-  // database.run(dropClass);
-
-  // let queryClasses = 'CREATE TABLE classes(class_id TEXT PRIMARY KEY, credits INTEGER, rating NUMBER, average_gpa NUMBER, professor TEXT, assistant_professor TEXT, class_times TEXT, quarter TEXT, class_name TEXT, sln INTEGER, add_code_required INTEGER);';
-  // database.run(queryClasses);
-  database.close();
-}
-
-// makeAddCodeTables();
-
-function addStartupData(db) {
+async function addStartupData(db) {
   // Add default class
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, ['345', null, null, null, 'x', null, null, null, null, null], function (err) {
-    if (err) {
-      console.error('Error inserting class: ', err);
-    }
-  });
+  let hasDefaultClass = await getClass(db, '345');
+  if (!hasDefaultClass) {
+    await addClass(db, '345', null, null, null, 'x', null, null, null, null, null, null);
+  }
 
   // Add default student
-  addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
-  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
-  db.run(addStudent, ['pokemon678', 'azaan', 'electrical engineering'], function (err) {
-    if (err) {
-      console.error('Error inserting student: ', err);
-    }
-  });
+  let hasDefaultStudent = await getStudent(db, 'pokemon678');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'pokemon678', 'pokemon678@uw.edu', '123', 'azaan', 'electrical engineering');
+  }
 
   // Add default professor
-  addPerson('123', '123@uw.edu', 'pass123', 'professor');
-  let addProfessor = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
-  db.run(addProfessor, ['123', 'x', 'math', '0', '4'], function (err) {
-    if (err) {
-      console.error('Error inserting professor: ', err);
-    }
-  })
+  let hasDefaultProfessor = await getProfessor(db, '123');
+  if (!hasDefaultProfessor) {
+    await addProfessor(db, '123', '123@uw.edu', 'pass123', 'x', 'math', '0', '4');
+  }
 
-  // Add default advisor
-  addPerson('456', '456@uw.edu', 'pass456', 'adviser');
-  let addAdvisor = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
-  db.run(addAdvisor, ['456', 'x', 'math'], function (err) {
-    if (err) {
-      console.error('Error inserting advisor: ', err);
-    }
-  })
+  // Add default adviser
+  let hasDefaultAdviser = await getAdviser(db, '456');
+  if (!hasDefaultAdviser) {
+    await addAdviser(db, '456', '456@uw.edu', 'pass456', 'x', 'math');
+  }
 
   // Add default section
-  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
-  db.run(addSection, ['331', 'x', 'y', '11:30-12:20', '345'], function (err) {
-    if (err) {
-      console.error('Error inserting section: ', err);
-    }
-  })
+  let hasDefaultSection = await getSection(db, '331');
+  if (!hasDefaultSection) {
+    await addSection(db, '331', 'x', 'y', '11:30-12:20', '345');
+  }
 
-  // Add default classRegistartion
-  let addregistration = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
-  db.run(addregistration, ['123', '345'], function(err){
-    if (err) {
-      console.error('Error inserting to registration: ', err);
-    }
-  })
+  // Add default registration
+  let hasDefaultRegistration = await getRegistration(db, '123', '345');
+  if (!hasDefaultRegistration) {
+    await addRegistration(db, '123', '345');
+  }
 
   // Add default waitlist
-  let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
-  db.run(addWaitlist, ['pokemon678', '345', 0], function (err) {
-    if (err) {
-      console.error('Error inserting waitlist: ', err);
-    }
-  })
+  let hasDefaultWaitlist = await getWaitlist(db, 'pokemon678', '345');
+  if (!hasDefaultWaitlist) {
+    await addWaitlist(db, 'pokemon678', '345')
+  }
+
+  // Add default addcode
+  let hasDefaultAddcode = await getAddCodes(db, 'CSE 403');
+  if (!hasDefaultAddcode[0]) {
+    await addAddCode(db, '1', '0', 'Adviser', '123', 'CSE 403', 'pokemon678');
+  }
 }
 
 app.use(express.json())
@@ -163,90 +136,19 @@ app.use(express.json())
 *
 *  ###################################### */
 
-if (INITIALIZE) {
+async function init() {
   let db = getDBConnection();
-  makeTables(db);
-  addStartupData(db);
+  let query = "SELECT name FROM sqlite_master WHERE type = ? AND name = ?;"
+  let exists = await dbGet(db, query, ['table', 'person']);
+
+  if (!exists) {
+    await makeTables(db);
+    await addStartupData(db);
+  }
+
   db.close();
 }
-
-/**********************************
- *
- * Add code endpoints
- *
- **********************************/
-app.post('/getAddCode', async (req, res) => {
-  let db = await getDBConnection();
-
-  let class_name = req.body.class
-
-  let query = "SELECT* FROM addCode WHERE class = ?;";
-
-  try {
-    db.all(query, [class_name], (err,rows) => {
-      if(err) return console.error(err.message);
-      let addCodes = []
-      rows.forEach((row) => {
-        addCodes.push(row)
-      });
-      res.send({"AddCodes" : addCodes, 'status': ERROR})
-    })
-
-  } catch (error) {
-    res.send({"AddCodes": "error", 'status': 201})
-  }
-  db.close()
-})
-
-
-app.post('/addAddCode', async (req, res) => {
-  let db = await getDBConnection();
-
-  if (req.body == undefined) {
-    res.json({"message": "undefined req.body"});
-  }
-  let id = req.body.add_id;
-  let add_code_status = req.body.add_code_status;
-  let JobType = req.body.JobType;
-  let add_code = req.body.add_code;
-  let class_name = req.body.class;
-  let net_id = req.body.net_id;
-
-  let addClass = 'INSERT INTO addCode(add_id, add_code_status, JobType, add_code, class, net_id) VALUES (?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [id, add_code_status, JobType, add_code, class_name, net_id], function (err) {
-    if (err) {
-      console.error('Error inserting class:', err);
-      res.status(ERROR).json({ message: 'Error inserting AddCode', error: err, 'status': ERROR});
-    } else {
-      res.status(201).json({ message: 'AddCode added successfully', 'status': 201});
-    }
-  });
-  db.close();
-})
-
-
-
-
-
-app.post('/removeAddCode', async (req, res) => {
-  let db = await getDBConnection()
-  let add_id = req.body.add_id;
-
-  let removeClass = 'DELETE FROM addCode WHERE add_id = ?;';
-
-  db.run(removeClass, [add_id], function (err) {
-    if (err) {
-      console.error('Error removing class:', err);
-      res.status(ERROR).json({ message: 'Error removing addCode ', error: err, 'status': ERROR});
-    } else {
-      res.status(201).json({ message: 'AddCode removed successfully', 'status': 201});
-    }
-  });
-  db.close();
-})
-
-
-
+init();
 
 /**********************************
  *
@@ -770,6 +672,45 @@ app.post('/removeClassFromWaitlist', async (req, res) => {
   res.send(result);
 })
 
+app.post('/getAddCode', async (req, res) => {
+  let db = getDBConnection();
+  let class_name = req.body.class
+  let addCodes = await getAddCodes(db, class_name);
+  db.close();
+
+  let status = addCodes ? SUCCESS : ERROR;
+  let result = setResDefaults('/getAddCode', status);
+  result.AddCodes = addCodes;
+  res.send(result);
+})
+
+app.post('/addAddCode', async (req, res) => {
+  let db = getDBConnection();
+  let id = req.body.add_id;
+  let add_code_status = req.body.add_code_status;
+  let JobType = req.body.JobType;
+  let add_code = req.body.add_code;
+  let class_name = req.body.class;
+  let net_id = req.body.net_id;
+  let success = await addAddCode(db, id, add_code_status, JobType, add_code, class_name, net_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addAddCode', status);
+  res.send(result);
+})
+
+app.post('/removeAddCode', async (req, res) => {
+  let db = getDBConnection()
+  let add_id = req.body.add_id;
+  let success = await removeAddCode(db, add_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeAddCode', status);
+  res.send(result);
+})
+
 /* ######################################
 *
 *           UTILITY FUNCTIONS
@@ -1053,6 +994,11 @@ async function login(db, net_id, password) {
   return 200;
 }
 
+function getRegistration(db, net_id, class_id) {
+  let query = "SELECT * FROM registration WHERE net_id = ? AND class_id = ?;";
+  return dbGet(db, query, [net_id, class_id]);
+}
+
 function addRegistration(db, net_id, class_id) {
   let query = "INSERT INTO registration(net_id, class_id) VALUES (?, ?);";
   return dbRun(db, query, [net_id, class_id]);
@@ -1090,8 +1036,13 @@ function removeClassFromRegistration(db, class_id) {
   return dbRun(db, query, [class_id]);
 }
 
+function getWaitlist(db, net_id, class_id) {
+  let query = "SELECT * FROM waitlist WHERE net_id = ? AND class_id = ?;";
+  return dbGet(db, query, [net_id, class_id]);
+}
+
 async function addWaitlist(db, net_id, class_id) {
-  let query = "SELECT TOP 1 position FROM waitlist ORDER BY position DESC;";
+  let query = "SELECT position FROM waitlist ORDER BY position DESC LIMIT 1;";
   let result = await dbGet(db, query, []);
   let position = result ? result.position + 1 : 0;
   query = "INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);";
@@ -1114,7 +1065,7 @@ function removeClassFromWaitlist(db, class_id) {
 }
 
 async function popWaitlist(db, class_id) {
-  let query = "SELECT TOP 1 net_id FROM waitlist WHERE class_id = ? ORDER BY position ASC;";
+  let query = "SELECT net_id FROM waitlist WHERE class_id = ? ORDER BY position ASC LIMIT 1;";
   let net_id = await dbGet(db, query, [class_id]);
   if (!net_id) {
     return false;
@@ -1124,6 +1075,21 @@ async function popWaitlist(db, class_id) {
     return false;
   }
   return removeWaitlist(db, net_id, class_id);
+}
+
+function getAddCodes(db, class_name) {
+  let query = "SELECT * FROM addCode WHERE class = ?;";
+  return dbAll(db, query, [class_name]);
+}
+
+function addAddCode(db, add_id, add_code_status, JobType, add_code, class_name, net_id) {
+  let query = "INSERT INTO addCode(add_id, add_code_status, JobType, add_code, class, net_id) VALUES (?, ?, ?, ?, ?, ?);";
+  return dbRun(db, query, [add_id, add_code_status, JobType, add_code, class_name, net_id]);
+}
+
+function removeAddCode(db, add_id) {
+  let query = "DELETE FROM addCode WHERE add_id = ?;";
+  return dbRun(db, query, [add_id]);
 }
 
 // Constructs a basic object to be passed into res.send()

@@ -235,6 +235,7 @@ describe("POST /users", () => {
       console.log(addResponse.body.message);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
       const getResponseClass = await request(app).post("/getClassRegistration").send({'class_id' : 'cse331'});
+      await request(app).post('/removeRegistration').send({ net_id: 'pokemon678', class_id: 'cse331' });
       console.log(getResponseStudent.body.message);
       console.log(getResponseClass.body.message);
       var classes = getResponseStudent.body.registration;
@@ -256,15 +257,6 @@ describe("POST /users", () => {
         }
       });
       expect(found).toBe(true);
-
-      // const addResponse2 = await request(app).post("/addRegistration").send(req2);
-      // console.log(addResponse2.body.message);
-      // const getResponse2 = await request(app).post("/getRegistration").send({'net_id' : 'pokemon678'});
-      // console.log(getResponse2.body.message);
-      // var classes2 = getResponse2.body.Registration[1].class_id
-      // console.log('This is the class: ' + classes2)
-      // var test_list = ['cse331', 'cse312']
-      // expect(classes2).toBe(test_list)
     }, TIMEOUT)
 
 
