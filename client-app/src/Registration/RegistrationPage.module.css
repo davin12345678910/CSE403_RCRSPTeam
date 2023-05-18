@@ -175,8 +175,17 @@ h1 {
     opacity: 1;
     background-image: repeating-radial-gradient( circle at 0 0, transparent 0, #e8e3d3 6px ), repeating-linear-gradient( #85754d55, #85754d );
     cursor: pointer;
+    text-align: center;
 }
 
+.SecondLineYellow {
+    display: block;
+    color: purple;
+}
+
+.RequestButton {
+    padding: 1rem;
+}
 
 @media screen and (max-width: 600px) {
     .Modal {
