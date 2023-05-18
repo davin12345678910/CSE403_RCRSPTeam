@@ -25,7 +25,7 @@ function hashCode(str) {
 // This is how we will get the database that is within our system
 function getDBConnection() {
 
-  const db = new verboseSqlite.Database("./src/registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
+  const db = new verboseSqlite.Database("./registration.db", verboseSqlite.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message)
   })
   return db;
