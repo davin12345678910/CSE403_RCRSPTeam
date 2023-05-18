@@ -1,26 +1,25 @@
 'use strict';
 
 // These are the imports that we will require
-import express from 'express';
+import express, { query } from 'express';
 import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import cors from 'cors';
 
+/*
+* GLOBAL VARIABLES
+*/
+const INITIALIZE = 0;
+const MAX_HASH = 10 ** 14;
+const MAX_SALT = 10 ** 6;
+const SUCCESS = 200;
+const FAILURE = 400;
+const ERROR   = 500;
 
 // we need these
 const verboseSqlite = sqlite3.verbose();
 const app = express();
 app.use(cors());
-
-// Hashing function for passwords
-function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-      let chr = str.charCodeAt(i);
-      hash = (hash * 31) + ((chr | 0) * 37); // bit-wise OR with 0 to convert to integer
-  }
-  return hash % (10 ** 14);
-}
 
 // This is how we will get the database that is within our system
 function getDBConnection() {
@@ -34,10 +33,7 @@ function getDBConnection() {
 /*
 We only need this function when we need to first initialize the database with the tables we need
 */
-async function makeTables() {
-  var database = await getDBConnection();
-
-  // here we will be inputting the tables we need into the database
+function makeTables(db) {
   // 1. People
   let queryPeople = "CREATE TABLE people(net_id TEXT PRIMARY KEY, email TEXT, hash_pass TEXT, salt TEXT, role TEXT)"
 
@@ -63,16 +59,16 @@ async function makeTables() {
   let queryWaitlist = 'CREATE TABLE waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
   // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
-  database.run(queryPeople);
-  database.run(queryStudents);
-  database.run(queryProfessors);
-  database.run(queryAdvisers);
-  database.run(queryClasses);
-  database.run(querySections);
-  database.run(queryRegisterClass);
-  database.run(queryWaitlist);
+  db.run(queryPeople);
+  db.run(queryStudents);
+  db.run(queryProfessors);
+  db.run(queryAdvisers);
+  db.run(queryClasses);
+  db.run(querySections);
+  db.run(queryRegisterClass);
+  db.run(queryWaitlist);
 
-  database.close();
+  db.close();
 }
 
 
@@ -98,90 +94,81 @@ async function makeAddCodeTables() {
 
 // makeAddCodeTables();
 
-
-
-
-async function addStartupData() {
+function addStartupData(db) {
   // Add default class
-  let db = await getDBConnection();
   let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
   db.run(addClass, ['345', null, null, null, 'x', null, null, null, null, null], function (err) {
     if (err) {
       console.error('Error inserting class: ', err);
     }
   });
-  db.close();
 
   // Add default student
   addPerson('pokemon678', 'pokemon678@uw.edu', '123', 'student');
-  db = await getDBConnection();
   let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
   db.run(addStudent, ['pokemon678', 'azaan', 'electrical engineering'], function (err) {
     if (err) {
       console.error('Error inserting student: ', err);
     }
   });
-  db.close();
 
   // Add default professor
   addPerson('123', '123@uw.edu', 'pass123', 'professor');
-  db = await getDBConnection();
   let addProfessor = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
   db.run(addProfessor, ['123', 'x', 'math', '0', '4'], function (err) {
     if (err) {
       console.error('Error inserting professor: ', err);
     }
   })
-  db.close()
 
   // Add default advisor
   addPerson('456', '456@uw.edu', 'pass456', 'adviser');
-  db = await getDBConnection();
   let addAdvisor = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
   db.run(addAdvisor, ['456', 'x', 'math'], function (err) {
     if (err) {
       console.error('Error inserting advisor: ', err);
     }
   })
-  db.close();
 
   // Add default section
-  db = await getDBConnection();
   let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
   db.run(addSection, ['331', 'x', 'y', '11:30-12:20', '345'], function (err) {
     if (err) {
       console.error('Error inserting section: ', err);
     }
   })
-  db.close();
 
   // Add default classRegistartion
-  db = await getDBConnection();
   let addregistration = 'INSERT INTO registration(net_id, class_id) VALUES (?, ?);';
   db.run(addregistration, ['123', '345'], function(err){
     if (err) {
       console.error('Error inserting to registration: ', err);
     }
   })
-  db.close();
 
   // Add default waitlist
-  db = await getDBConnection();
   let addWaitlist = 'INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);';
   db.run(addWaitlist, ['pokemon678', '345', 0], function (err) {
     if (err) {
       console.error('Error inserting waitlist: ', err);
     }
   })
-  db.close();
 }
-
-/* Must uncomment and run one at a time. */
- //makeTables();
- //addStartupData();
 
 app.use(express.json())
 
+/* ######################################
+*
+*           INITIALIZE DATABASE
+*
+*  ###################################### */
+
+if (INITIALIZE) {
+  let db = getDBConnection();
+  makeTables(db);
+  addStartupData(db);
+  db.close();
+}
 
 /**********************************
  *
@@ -189,27 +176,26 @@ app.use(express.json())
  *
  **********************************/
 app.post('/getAddCode', async (req, res) => {
-  var database = await getDBConnection();
+  let db = await getDBConnection();
 
-  var class_name = req.body.class
+  let class_name = req.body.class
 
-  let qry2 = "SELECT* FROM addCode WHERE class = ?;";
+  let query = "SELECT* FROM addCode WHERE class = ?;";
 
   try {
-    database.all(qry2, [class_name], (err,rows) => {
+    db.all(query, [class_name], (err,rows) => {
       if(err) return console.error(err.message);
-      var addCodes = []
+      let addCodes = []
       rows.forEach((row) => {
         addCodes.push(row)
       });
-      //console.log(classes)
-      res.send({"AddCodes" : addCodes, 'status': 500})
+      res.send({"AddCodes" : addCodes, 'status': ERROR})
     })
 
   } catch (error) {
     res.send({"AddCodes": "error", 'status': 201})
   }
-  database.close()
+  db.close()
 })
 
 
@@ -230,7 +216,7 @@ app.post('/addAddCode', async (req, res) => {
   db.run(addClass, [id, add_code_status, JobType, add_code, class_name, net_id], function (err) {
     if (err) {
       console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting AddCode', error: err, 'status': 500});
+      res.status(ERROR).json({ message: 'Error inserting AddCode', error: err, 'status': ERROR});
     } else {
       res.status(201).json({ message: 'AddCode added successfully', 'status': 201});
     }
@@ -251,7 +237,7 @@ app.post('/removeAddCode', async (req, res) => {
   db.run(removeClass, [add_id], function (err) {
     if (err) {
       console.error('Error removing class:', err);
-      res.status(500).json({ message: 'Error removing addCode ', error: err, 'status': 500});
+      res.status(ERROR).json({ message: 'Error removing addCode ', error: err, 'status': ERROR});
     } else {
       res.status(201).json({ message: 'AddCode removed successfully', 'status': 201});
     }
@@ -283,7 +269,7 @@ app.post('/getMessages', async (req, res) => {
         messages.push(row)
       });
       //console.log(classes)
-      res.send({"Messages" : messages, 'status': 500})
+      res.send({"Messages" : messages, 'status': ERROR})
     })
 
   } catch (error) {
@@ -305,7 +291,7 @@ app.post('/addMessages', async (req, res) => {
   db.run(addMessage, [net_id_sender, JobType_sender, net_id_reciever, JobType_reciever, message], function (err) {
     if (err) {
       console.error('Error inserting messages:', err);
-      res.status(500).json({ message: 'Error inserting messages', error: err, 'status': 500});
+      res.status(ERROR).json({ message: 'Error inserting messages', error: err, 'status': ERROR});
     } else {
       res.status(201).json({ message: 'Message added successfully', 'status': 201});
     }
@@ -325,7 +311,7 @@ app.post('/removeMessages', async (req, res) => {
   db.run(removeMessages, [sender, reciever], function (err) {
     if (err) {
       console.error('Error removing messages:', err);
-      res.status(500).json({ message: 'Error removing messages', error: err, 'status': 500});
+      res.status(ERROR).json({ message: 'Error removing messages', error: err, 'status': ERROR});
     } else {
       res.status(201).json({ message: 'Messages removed successfully', 'status': 201});
     }
@@ -341,185 +327,118 @@ app.post('/users', async (req, res) => {
   res.send({name : "happy"})
 })
 
-
+/* ######################################
+*
+*               ENDPOINTS
+*
+*  ###################################### */
 
 app.get('/getClasses', async (req, res) => {
-  var database = await getDBConnection();
+  let db = getDBConnection();
+  let classes = await getClasses(db);
+  db.close();
 
-  let qry2 = "SELECT* FROM classes;";
-
-  try {
-    database.all(qry2, [], (err,rows) => {
-      if(err) return console.error(err.message);
-      var classes = []
-      rows.forEach((row) => {
-        classes.push(row)
-      });
-      //console.log(classes)
-      res.send({"class" : classes})
-    })
-
-  } catch (error) {
-    res.send({"class": "error"})
-  }
-  database.close()
+  let status = classes ? SUCCESS : ERROR;
+  let result = setResDefaults('/getClasses', status);
+  result.class = classes;
+  res.send(result);
 })
 
-
 app.get('/getProfessors', async (req, res) => {
-  var database = await getDBConnection();
+  let db = getDBConnection();
+  let professors = await getProfessors(db);
+  db.close()
 
-  let qry2 = "SELECT* FROM professors;";
-
-  try {
-    database.all(qry2, [], (err,rows) => {
-      if(err) return console.error(err.message);
-      var professors = []
-      rows.forEach((row) => {
-        professors.push(row)
-      });
-      //console.log(professors)
-      res.send({"professor" : professors})
-    })
-
-  } catch (error) {
-    res.send({"professor": "error"})
-  }
-  database.close()
+  let status = professors ? SUCCESS : ERROR;
+  let result = setResDefaults('/getProfessors', status);
+  result.professors = professors;
+  res.send(result);
 })
 
 app.get('/getStudents', async (req, res) => {
-  var database = await getDBConnection();
+  let db = getDBConnection();
+  let students = await getStudents(db);
+  db.close();
 
-  let qry2 = "SELECT* FROM students;";
-
-  try {
-    database.all(qry2, [], (err,rows) => {
-      if(err) return console.error(err.message);
-      var classes = []
-      rows.forEach((row) => {
-        classes.push(row)
-      });
-      //console.log(classes)
-      res.send({"students" : classes})
-    })
-
-  } catch (error) {
-    res.send({"students": "error"})
-  }
-  database.close()
+  let status = students ? SUCCESS : ERROR;
+  let result = setResDefaults('/getStudents', status);
+  result.students = students;
+  res.send(result);
 })
 
 app.get('/getAdvisers', async (req, res) => {
-  var database = await getDBConnection();
+  let db = getDBConnection();
+  let advisers = await getAdvisers(db);
+  db.close();
 
-  let qry2 = "SELECT* FROM advisers;";
-
-  try {
-    database.all(qry2, [], (err,rows) => {
-      if(err) return console.error(err.message);
-      var classes = []
-      rows.forEach((row) => {
-        classes.push(row)
-      });
-      //console.log(classes)
-      res.send({"advisers" : classes})
-    })
-
-  } catch (error) {
-    res.send({"advisers": "error"})
-  }
-  database.close()
+  let status = advisers ? SUCCESS : ERROR;
+  let result = setResDefaults('/getAdvisers', status);
+  result.advisers = advisers;
+  res.send(result);
 })
 
+app.post('/getClass', async (req, res) => {
+  let db = getDBConnection();
+  let class_id = req.body.class_id;
+  let class_ = await getClass(db, class_id);
+  db.close();
 
-app.post('/getClass', async (req,res) => {
-  let db = await getDBConnection();
-  let qry = 'SELECT* FROM classes WHERE class_id=?;';
-  db.get(qry, [req.body.class_id], (err, row) => {
-    if (err) {
-      console.log(err)
-    } else {
-      res.send({'class' : row});
-    }
-  })
+  let status = class_ ? SUCCESS : ERROR;
+  let result = setResDefaults('/getClass', status);
+  result.class = class_;
+  res.send(result);
 })
-
 
 app.post('/getProfessor', async (req,res) => {
-  let db = await getDBConnection();
-  let qry = 'SELECT* FROM professors WHERE net_id=?;';
-  db.get(qry, [req.body.net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.send({'Professor' : 'error'});
-    } else {
-      res.send({'Professor' : row});
-    }
-  })
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let professor = await getProfessor(db, net_id);
+  db.close();
+
+  let status = professor ? SUCCESS : ERROR;
+  let result = setResDefaults('/getProfessor', status);
+  result.professor = professor;
+  res.send(result);
 })
 
 app.post('/getStudent', async (req,res) => {
-  let db = await getDBConnection();
-  let qry = 'SELECT * FROM students WHERE net_id=?;';
-  db.get(qry, [req.body.net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.send({'Student' : 'error'});
-    } else {
-      res.send({'Student' : row});
-    }
-  })
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let student = await getStudent(db, net_id);
+  db.close();
+
+  let status = student ? SUCCESS : ERROR;
+  let result = setResDefaults('/getStudent', status);
+  result.student = student;
+  res.send(result);
 })
 
-
 app.post('/getAdviser', async (req,res) => {
-  let db = await getDBConnection();
-  let qry = 'SELECT* FROM advisers WHERE net_id=?;';
-  db.get(qry, [req.body.net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.send({'Adviser' : 'error'});
-    } else {
-      res.send({'Adviser' : row});
-    }
-  })
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let adviser = await getAdviser(db, net_id);
+  db.close();
+
+  let status = adviser ? SUCCESS : ERROR;
+  let result = setResDefaults('/getAdviser', status);
+  result.adviser = adviser;
+  res.send(result);
 })
 
 app.post('/getSection', async (req,res) => {
-  let db = await getDBConnection();
-  let qry = 'SELECT* FROM sections WHERE section_id=?;';
-  db.get(qry, [req.body.section_id], (err, row) => {
-    if (err) {
-      console.log(err)
-    } else {
-      res.send({'Section' : row});
-    }
-  })
+  let db = getDBConnection();
+  let section_id = req.body.section_id;
+  let section = await getSection(db, section_id);
+  db.close();
+
+  let status = section ? SUCCESS : ERROR;
+  let result = setResDefaults('/getSection', status);
+  result.section = section;
+  res.send(result);
 })
 
-async function addPerson(net_id, email, password, role) {
-  let db = await getDBConnection()
-
-  let salt = Math.floor(Math.random() * 999999);
-  let hash_pass = hashCode(password + salt);
-
-  let addPerson = 'INSERT INTO people(net_id, email, hash_pass, salt, role) VALUES (?, ?, ?, ?, ?);';
-  db.run(addPerson, [net_id, email, hash_pass, salt, role], function (err) {
-    if (err) {
-      console.error('Error adding person:', err);
-    }
-  })
-  db.close();
-}
-
-
-
-
-//addPerson('567', '123@uw.edu', 'pass123', 'student');
-
-app.post('/addClasses', async (req, res) => {
-  let db = await getDBConnection()
+app.post('/addClass', async (req, res) => {
+  let db = getDBConnection()
   let class_id = req.body.class_id;
   let credits = req.body.credits;
   let rating = req.body.rating;
@@ -531,133 +450,79 @@ app.post('/addClasses', async (req, res) => {
   let class_name = req.body.class_name;
   let sln = req.body.sln;
   let add_code_required = req.body.add_code_required;
-
-  let addClass = 'INSERT INTO classes(class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
-  db.run(addClass, [class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required], function (err) {
-    if (err) {
-      console.error('Error inserting class:', err);
-      res.status(500).json({ message: 'Error inserting class', error: err });
-    } else {
-      res.status(201).json({ message: 'Class added successfully', class_id: class_id });
-    }
-  });
+  let success = await addClass(db, class_id, credits, rating, average_gpa, professor, 
+    assistant_professor, class_times, quarter, class_name, sln, add_code_required);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addClass', status);
+  res.send(result);
 })
 
 app.post('/addProfessor', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
+  let email = req.body.email;
+  let password = req.body.password;
   let professor_name = req.body.professor_name;
   let department = req.body.department;
   let tenure = req.body.tenure;
-  let email = req.body.email;
-  let password = req.body.password;
   let rating = req.body.rating;
-  addPerson(net_id, email, password);
-  let db = await getDBConnection()
-
-  let addProfessor = 'INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);';
-  db.run(addProfessor, [net_id, professor_name, department, tenure, rating], function (err) {
-    if (err) {
-      console.error('Error inserting Professor:', err);
-      res.status(500).json({ message: 'Error inserting Professor', error: err });
-    } else {
-      res.status(201).json({ message: 'Professor added successfully'});
-    }
-  });
+  let success = await addProfessor(db, net_id, email, password, professor_name, department, tenure, rating);
   db.close();
-})
 
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addProfessor', status);
+  res.send(result);
+})
 
 app.post('/addStudent', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
+  let email = req.body.email;
+  let password = req.body.password;
   let student_name = req.body.student_name;
   let major = req.body.major;
-  let email = req.body.email;
-  let password = req.body.password;
-  addPerson(net_id, email, password);
-  let db = await getDBConnection()
-
-  let addStudent = 'INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);';
-  db.run(addStudent, [net_id, student_name, major], function (err) {
-    if (err) {
-      console.error('Error inserting student:', err);
-      res.status(500).json({ message: 'Error inserting student', error: err });
-    } else {
-      res.status(201).json({ message: 'Student added successfully', net_id: student_name });
-    }
-  });
+  let success = await addStudent(db, net_id, email, password, student_name, major);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addStudent', status);
+  res.send(result);
 })
 
-
 app.post('/addAdviser', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
-  let adviser_name = req.body.adviser_name;
-  let department = req.body.department;
   let email = req.body.email;
   let password = req.body.password;
-  addPerson(net_id, email, password);
-  let db = await getDBConnection()
-
-  let addAdviser = 'INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);';
-  db.run(addAdviser, [net_id, adviser_name, department], function (err) {
-    if (err) {
-      console.error('Error inserting Adviser:', err);
-      res.status(500).json({ message: 'Error inserting Adviser', error: err });
-    } else {
-      res.status(201).json({ message: 'Adviser added successfully', net_id: adviser_name });
-    }
-  });
+  let adviser_name = req.body.adviser_name;
+  let department = req.body.department;
+  let success = await addAdviser(db, net_id, email, password, adviser_name, department);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addAdviser', status);
+  res.send(result);
 })
 
 app.post('/addSection', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let section_id = req.body.section_id;
   let ta = req.body.ta;
   let co_ta = req.body.co_ta;
   let section_times = req.body.section_times;
   let class_id = req.body.class_id
-
-  let addSection = 'INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);';
-  db.run(addSection, [section_id, ta, co_ta, section_times, class_id ], function (err) {
-    if (err) {
-      console.error('Error inserting Section:', err);
-      res.status(500).json({ message: 'Error inserting Section', error: err });
-    } else {
-      res.status(201).json({ message: 'Section added successfully', section_id: ta });
-    }
-  });
+  let success = await addSection(db, section_id, ta, co_ta, section_times, class_id);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/addSection', status);
+  res.send(result);
 })
 
-async function updatePerson(net_id, new_email, new_password, new_role) {
-  let db = await getDBConnection()
-
-  let query = 'SELECT * FROM people WHERE net_id = ?'
-  db.get(query, [net_id], (err, res) => {
-    if (err) {
-      console.log(err)
-      res.json({ 'people' : 'error'})
-    } else {
-      let new_salt = Math.floor(Math.random() * 999999);
-      let new_hash_pass = hashCode(new_password + new_salt);
-
-      let updatePerson = 'UPDATE people SET net_id = ?, email = ?, hash_pass = ?, salt = ?, role = ? WHERE net_id = ?';
-      db.run(updatePerson, [net_id, new_email, new_hash_pass, new_salt, new_role, net_id], function (err) {
-        if (err) {
-          console.error('Error inserting person')
-        }
-      })
-    }
-  })
-  db.close();
-}
-
-
-// This is the update endpoint for classes
 app.post('/updateClass', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let class_id = req.body.class_id;
   let credits = req.body.credits;
   let rating = req.body.rating;
@@ -669,407 +534,129 @@ app.post('/updateClass', async (req, res) => {
   let class_name = req.body.class_name;
   let sln = req.body.sln;
   let add_code_required = req.body.add_code_required;
+  let success = await updateClass(db, class_id, credits, rating, average_gpa, professor, assistant_professor, class_times, quarter, class_name, sln, add_code_required);
+  db.close();
 
-  let qry = 'SELECT* FROM classes WHERE class_id=?;';
-
-  db.get(qry, [req.body.class_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.json({'class' : 'error'})
-    } else {
-      var update_class_id = row.class_id;
-      var update_credits = row.credits;
-      var update_rating = row.rating;
-      let update_average_gpa = row.average_gpa;
-      let update_professor = row.professor;
-      let update_assistant_professor = row.assistant_professor;
-      let update_class_times = row.class_times;
-      let update_quarter = row.quarter;
-      let update_class_name = row.class_name;
-      let update_sln = row.sln;
-      let update_add_code_required = row.add_code_required;
-
-
-      // update
-      if (class_id != undefined) {
-        update_class_id = class_id
-      }
-
-      if (credits != undefined) {
-        update_credits = credits
-      }
-
-      if (rating != undefined) {
-        update_rating = rating
-      }
-
-      if (average_gpa != undefined) {
-        update_average_gpa = average_gpa
-      }
-
-      if (professor != undefined) {
-        update_professor = professor
-      }
-
-      if (assistant_professor != undefined) {
-        update_assistant_professor = assistant_professor
-      }
-
-      if (class_times != undefined) {
-        update_class_times = class_times
-      }
-
-      if (quarter != undefined) {
-        update_quarter = quarter
-      }
-
-      if (class_name != undefined) {
-        update_class_name = class_name
-      }
-
-      if (quarter != undefined) {
-        update_quarter = quarter
-      }
-
-      if (add_code_required != undefined) {
-        update_add_code_required = add_code_required
-      }
-
-      // now we will update
-      let updateClass = 'UPDATE classes SET class_id=?, credits=?, rating=?, average_gpa=?, professor=?, assistant_professor=?, class_times=?, quarter=?, class_name = ?, sln = ?, add_code_required = ? WHERE class_id=?;';
-      db.run(updateClass, [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, update_add_code_required, class_id], function (err) {
-        if (err) {
-          console.error('Error inserting class:', err);
-          res.status(500).json({'class': err });
-        } else {
-          res.status(201).json({'class' : [update_class_id, update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, add_code_required]});
-        }
-      });
-    }
-  })
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/updateClass', status);
+  res.send(result);
 })
 
-// This is the update endpoint for professor
 app.post('/updateProfessor', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
+  let email = req.body.email;
+  let password = req.body.password;
   let professor_name = req.body.professor_name;
   let department = req.body.department;
   let tenure = req.body.tenure;
   let rating = req.body.rating;
-  let email = req.body.email;
-  let password = req.body.password;
-  updatePerson(net_id, email, password, 'professor');
-  let db = await getDBConnection()
+  let success = await updateProfessor(db, net_id, email, password, professor_name, department, tenure, rating);
+  db.close();
 
-  let qry = 'SELECT* FROM professors WHERE net_id = ?;';
-
-  db.get(qry, [net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.json({'Professor' : 'error'})
-    } else {
-      var update_professor_name = row.professor_name;
-      var update_department = row.department;
-      let update_tenure = row.tenure;
-      let update_rating = row.rating;
-
-
-      // update
-      if (professor_name != undefined) {
-        update_professor_name = professor_name
-      }
-
-      if (department != undefined) {
-        update_department = department
-      }
-
-      if (tenure != undefined) {
-        update_tenure = tenure
-      }
-
-      if (rating != undefined) {
-        update_rating = rating
-      }
-
-      // now we will update
-      let updateProf = 'UPDATE professors SET net_id=?, professor_name=?, department=?, tenure=?, rating=? WHERE net_id=?;';
-      db.run(updateProf, [net_id, update_professor_name, update_department, update_tenure, update_rating, net_id], function (err) {
-        if (err) {
-          console.error('Error inserting professor:', err);
-          res.status(500).json({'Professor': err });
-        } else {
-          res.status(201).json({'Professor' : [net_id, update_professor_name, update_department, update_tenure, update_rating]});
-        }
-      });
-    }
-  })
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/updateProfessor', status);
+  res.send(result);
 })
 
-
-
-// This is the update endpoint for classes
 app.post('/updateStudent', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
+  let email = req.body.email;
+  let password = req.body.password;
   let student_name = req.body.student_name;
   let major = req.body.major;
-  let email = req.body.email;
-  let password = req.body.password;
-  updatePerson(net_id, email, password, 'student');
-  let db = await getDBConnection()
+  let success = await updateStudent(db, net_id, email, password, student_name, major);
+  db.close();
 
-  let qry = 'SELECT* FROM students WHERE net_id=?;';
-
-  db.get(qry, [net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.json({'Student' : 'error'})
-    } else {
-
-      let update_net_id = row.net_id;
-      let update_student_name = row.student_name;
-      let update_major = row.major;
-
-
-      // update
-      if (student_name != undefined) {
-        update_student_name = student_name
-      }
-
-      if (major != undefined) {
-        update_major = major
-      }
-
-      // now we will update
-      let updateStudent = 'UPDATE students SET net_id=?, student_name=?, major=? WHERE net_id=?;';
-      db.run(updateStudent, [net_id, update_student_name, update_major, net_id], function (err) {
-        if (err) {
-          console.error('Error updating Student:', err);
-          res.status(500).json({'Student': err });
-        } else {
-          res.status(201).json({'Student' : [net_id, update_major, update_net_id]});
-        }
-      });
-
-    }
-  })
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/updateStudent', status);
+  res.send(result);
 })
 
-
 app.post('/updateAdviser', async (req, res) => {
+  let db = getDBConnection()
   let net_id = req.body.net_id;
-  let adviser_name = req.body.adviser_name;
-  let department = req.body.department;
   let email = req.body.email;
   let password = req.body.password;
-  updatePerson(net_id, email, password, 'adviser');
-  let db = await getDBConnection()
+  let adviser_name = req.body.adviser_name;
+  let department = req.body.department;
+  let success = await updateAdviser(db, net_id, email, password, adviser_name, department);
+  db.close();
 
-  let qry = 'SELECT* FROM advisers WHERE net_id = ?;';
-
-  db.get(qry, [net_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.json({'Adviser' : 'error'})
-    } else {
-      var update_adviser_name = row.adviser_name;
-      var update_department = row.department;
-
-
-      // update
-      if (adviser_name != undefined) {
-        update_adviser_name = adviser_name
-      }
-
-      if (department != undefined) {
-        update_department = department
-      }
-
-      // now we will update
-      let updateAdviser = 'UPDATE advisers SET net_id=?, adviser_name=?, department=? WHERE net_id=?;';
-      db.run(updateAdviser, [net_id, update_adviser_name, update_department, net_id], function (err) {
-        if (err) {
-          console.error('Error inserting adviser:', err);
-          res.status(500).json({'Adviser': err });
-        } else {
-          res.status(201).json({'Adviser' : [net_id, update_adviser_name, update_department]});
-        }
-      });
-    }
-  })
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/updateAdviser', status);
+  res.send(result);
 })
 
 app.post('/updateSection', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let section_id = req.body.section_id;
   let ta = req.body.ta;
   let co_ta = req.body.co_ta;
   let section_times = req.body.section_times;
   let class_id = req.body.class_id;
+  let success = await updateSection(db, section_id, ta, co_ta, section_times, class_id);
+  db.close();
 
-  let qry = 'SELECT* FROM sections WHERE section_id = ?;';
-
-  db.get(qry, [req.body.section_id], (err, row) => {
-    if (err) {
-      console.log(err)
-      res.json({'Section' : 'error'})
-    } else {
-      var update_section_id = row.section_id;
-      var update_ta = row.ta;
-      var update_co_ta = row.co_ta;
-      let update_section_times = row.section_times;
-      let update_class_id = row.class_id;
-
-
-      // update
-      if (section_id != undefined) {
-        update_section_id = section_id
-      }
-
-      if (ta != undefined) {
-        update_ta = ta
-      }
-
-      if (co_ta != undefined) {
-        update_co_ta = co_ta
-      }
-
-      if (section_times != undefined) {
-        update_section_times = section_times
-      }
-
-      if (class_id != undefined) {
-        update_class_id = class_id
-      }
-
-      // now we will update
-      let updateSection = 'UPDATE sections SET section_id=?, ta=?, co_ta=?, section_times=?, class_id=? WHERE section_id=?;';
-      db.run(updateSection, [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id, section_id], function (err) {
-        if (err) {
-          console.error('Error inserting section:', err);
-          res.status(500).json({'Section': err });
-        } else {
-          res.status(201).json({'Section' : [update_section_id, update_ta, update_co_ta, update_section_times, update_class_id]});
-        }
-      });
-    }
-  })
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/updateSection', status);
+  res.send(result);
 })
 
-async function removePerson(net_id) {
-  let db = await getDBConnection()
-
-  let removeFromRegistration = 'DELETE FROM registration WHERE net_id=?;';
-  let removeFromWaitlist = 'DELETE FROM waitlist WHERE net_id=?;';
-  let removePerson = 'DELETE FROM people WHERE net_id = ?';
-
-  db.run(removeFromRegistration, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing person from waitlist:', err)
-    }
-  });
-
-  db.run(removeFromWaitlist, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing person from waitlist:', err)
-    }
-  });
-
-  db.run(removePerson, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing person:', err)
-    }
-  });
-  db.close();
-}
-
-app.post('/removeClasses', async (req, res) => {
-  let db = await getDBConnection()
+app.post('/removeClass', async (req, res) => {
+  let db = getDBConnection()
   let class_id = req.body.class_id;
-
-  let removeClass = 'DELETE FROM classes WHERE class_id =?;';
-
-  db.run(removeClass, [class_id], function (err) {
-    if (err) {
-      console.error('Error removing class:', err);
-      res.status(500).json({ message: 'Error removing class ' + class_id, error: err});
-    } else {
-      res.status(201).json({ message: 'Class removed successfully', class_id: class_id });
-    }
-  });
+  let success = await removeClass(db, class_id);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeClass', status);
+  res.send(result);
 })
 
 app.post('/removeProfessor', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let net_id = req.body.net_id;
-
-  let removeClass = 'DELETE FROM professors WHERE net_id =?;';
-
-  db.run(removeClass, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing class:', err);
-      res.status(500).json({ message: 'Error removing class ' + net_id, error: err});
-    } else {
-      res.status(201).json({ message: 'Class removed successfully', net_id : net_id });
-    }
-  });
+  let success = await removeProfessor(db, net_id);
   db.close();
-  removePerson(net_id);
-})
 
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeProfessor', status);
+  res.send(result);
+})
 
 app.post('/removeStudent', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let net_id = req.body.net_id;
-
-  let removeStudent = 'DELETE FROM students WHERE net_id =?;';
-
-  db.run(removeStudent, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing student:', err);
-      res.status(500).json({ message: 'Error removing student ' + net_id, error: err});
-    } else {
-      res.status(201).json({ message: 'Student removed successfully', net_id : net_id });
-    }
-  });
+  let success = await removeStudent(db, net_id);
   db.close();
-  removePerson(net_id);
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeStudent', status);
+  res.send(result);
 })
 
-
 app.post('/removeAdviser', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let net_id = req.body.net_id;
-
-  let removeAdviser = 'DELETE FROM advisers WHERE net_id =?;';
-
-  db.run(removeAdviser, [net_id], function (err) {
-    if (err) {
-      console.error('Error removing adviser:', err);
-      res.status(500).json({ message: 'Error removing adviser ' + net_id, error: err});
-    } else {
-      res.status(201).json({ message: 'Adviser removed successfully', net_id : net_id });
-    }
-  });
+  let success = await removeAdviser(db, net_id);
   db.close();
-  removePerson(net_id);
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeAdviser', status);
+  res.send(result);
 })
 
 app.post('/removeSection', async (req, res) => {
-  let db = await getDBConnection()
+  let db = getDBConnection()
   let section_id = req.body.section_id;
-
-  let removeSection= 'DELETE FROM sections WHERE section_id =?;';
-
-  db.run(removeSection, [section_id], function (err) {
-    if (err) {
-      console.error('Error removing section:', err);
-      res.status(500).json({ message: 'Error removing section ' + section_id, error: err});
-    } else {
-      res.status(201).json({ message: 'Section removed successfully', section_id : section_id });
-    }
-  });
+  let success = await removeSection(db, section_id);
   db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeSection', status);
+  res.send(result);
 })
 
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
@@ -1082,48 +669,23 @@ app.post("/log", (req, res) => {
 
   logStream.write(logEntry);
 
-  res.status(200).json({ message: "Login successful" });
-});
-
-
-
+  res.status(SUCCESS).json({ message: "Login successful" });
+})
 
 app.post('/login', async (req, res) => {
-  const db = await getDBConnection();
-  let query = 'SELECT hash_pass, salt FROM people WHERE net_id = ?';
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let password = req.body.password;
+  let status = await login(db, net_id, password);
+  db.close();
 
-  const net_id = req.body.net_id;
-  const password = req.body.password;
-
-  db.get(query, [net_id], (err, result) => {
-    if (err) {
-      console.error("Error logging in: ", err.message);
-      res.status(500).json({ message: 'Error logging in: ', error: err.message, status: 500 })
-      db.close();
-      return
-    }
-
-    if (!result) {
-      console.log("Could not log in: " + net_id + " not found in database")
-      res.status(404).json({ message: 'Could not log in: Invalid net_id', status: 404 })
-      return;
-    }
-
-    const hash_pass = result.hash_pass;
-    const salt = result.salt;
-    if (hashCode(password + salt) == hash_pass) {
-      console.log('Signed in with net_id ' + net_id)
-      const timestamp = new Date().toLocaleString();
-      const logEntry = `${timestamp}: ${net_id} logged in\n`;
-      logStream.write(logEntry);
-      res.status(200).json({ message: 'Logged in successfully', status: 200 })
-    } else {
-      console.log('Invalid password')
-      res.status(404).json({ message: 'Could not log in: Invalid password', status: 404});
-    }
-  });
-
-  db.close()
+  let result = setResDefaults('/login', status);
+  if (status == 403) {
+    result.message = "Could not log in: Invalid password"
+  } else if (status == 404) {
+    result.message = "Could not log in: Invalid net_id"
+  }
+  res.send(result);
 })
 
 app.post('/addRegistration', async (req, res) => {
@@ -1135,11 +697,11 @@ app.post('/addRegistration', async (req, res) => {
   db.run(query, [net_id, class_id], function (err) {
     if (err) {
       console.error('Error inserting into registration:', err.message);
-      res.status(500).json({ message: 'Error inserting into registration', error: err, status: 500});
+      res.status(ERROR).json({ message: 'Error inserting into registration', error: err, status: ERROR});
       return;
     }
     console.log('Successfully added to registration');
-    res.status(200).json({ message: 'Successfully added to registration', status: 200});
+    res.status(SUCCESS).json({ message: 'Successfully added to registration', status: SUCCESS});
   })
   db.close();
 })
@@ -1152,14 +714,14 @@ app.post('/getStudentRegistration', async (req, res) =>{
     var registration = [];
     if (err) {
       console.error('Error getting registartion:', err.message);
-      res.status(500).json({ message: 'Error getting registration', error: err, status: 500});
+      res.status(ERROR).json({ message: 'Error getting registration', error: err, status: ERROR});
       return;
     }
     rows.forEach((row) => {
       registration.push(row);
     });
     console.log('Successfully got registration');
-    //res.status(200).json({ message: 'Successfully got student registration', status: 200});
+    //res.status(SUCCESS).json({ message: 'Successfully got student registration', status: SUCCESS});
     res.send({"Registration" : registration});
   })
   db.close();
@@ -1173,14 +735,14 @@ app.post('/getClassRegistration', async (req, res) =>{
     var registration = [];
     if (err) {
       console.error('Error getting registartion:', err.message);
-      res.status(500).json({ message: 'Error getting registration', error: err, status: 500});
+      res.status(ERROR).json({ message: 'Error getting registration', error: err, status: ERROR});
       return;
     }
     rows.forEach((row) => {
       registration.push(row);
     });
     console.log('Successfully got registration');
-    //res.status(200).json({ message: 'Successfully got class registration', status: 200});
+    //res.status(SUCCESS).json({ message: 'Successfully got class registration', status: SUCCESS});
     res.send({"Registration" : registration});
   })
   db.close();
@@ -1198,7 +760,7 @@ app.post('/removeRegistration', async (req, res) => {
   db.run(removeFromRegistration, [net_id, class_id], function (err) {
     if (err) {
       console.error('Error removing from registration:', err.message);
-      res.status(500).json({ message: 'Error removing from registration', error: err, status: 500});
+      res.status(ERROR).json({ message: 'Error removing from registration', error: err, status: ERROR});
       return;
     }
     console.log('Successfully removed from registration');
@@ -1206,12 +768,12 @@ app.post('/removeRegistration', async (req, res) => {
   db.run(getFromWaitlist, [class_id], function (err, result) {
     if (err) {
       console.error('Error getting from waitlist:', err.message);
-      res.status(500).json({ message: 'Error getting from waitlist', error: err, status: 500});
+      res.status(ERROR).json({ message: 'Error getting from waitlist', error: err, status: ERROR});
       return;
     }
     console.log('Successfully got from waitlist');
     if (!result) {
-      res.status(200).json({ message: 'Successfully removed from registration', status: 200});
+      res.status(SUCCESS).json({ message: 'Successfully removed from registration', status: SUCCESS});
       return;
     }
 
@@ -1219,7 +781,7 @@ app.post('/removeRegistration', async (req, res) => {
     db.run(removeFromWaitlist, [net_id, class_id], function (err) {
       if (err) {
         console.error('Error removing from waitlist:', err.message);
-        res.status(500).json({ message: 'Error removing from waitlist', error: err, status: 500});
+        res.status(ERROR).json({ message: 'Error removing from waitlist', error: err, status: ERROR});
         return;
       }
       console.log('Successfully removed from waitlist');
@@ -1227,11 +789,11 @@ app.post('/removeRegistration', async (req, res) => {
     db.run(insertToRegistration, [net_id, class_id], function (err) {
       if (err) {
         console.error('Error inserting into registration from waitlist:', err.message);
-        res.status(500).json({ message: 'Error inserting into registration from waitlist', error: err, status: 500});
+        res.status(ERROR).json({ message: 'Error inserting into registration from waitlist', error: err, status: ERROR});
         return;
       }
       console.log('Successfully registered from waitlist');
-      res.status(200).json({ message: 'Successfully removed from registration and added from waitlist', status: 200});
+      res.status(SUCCESS).json({ message: 'Successfully removed from registration and added from waitlist', status: SUCCESS});
     });
   });
   db.close();
@@ -1248,18 +810,18 @@ app.post('/addWaitlist', async (req, res) => {
   db.get(queryGetPosition, [], (err, result) => {
     if (err) {
       console.error('Error getting from waitlist: ', err.message);
-      res.status(500).json({ message: 'Error getting from waitlist', error: err.message, status: 500});
+      res.status(ERROR).json({ message: 'Error getting from waitlist', error: err.message, status: ERROR});
       return;
     }
 
-    let position = result ? result.position : 0;
+    let position = result ? result.position + 1 : 0;
     db.run(queryAddWaitlist, [net_id, class_id, position], function (err) {
       if (err) {
         console.error('Error adding to waitlist: ', err.message);
-        res.status(500).json({ message: 'Error adding to waitlist', error: err.message, status: 500});
+        res.status(ERROR).json({ message: 'Error adding to waitlist', error: err.message, status: ERROR});
         return;
       }
-      res.status(200).json({ message: 'Successfully added to waitlist', status: 200});
+      res.status(SUCCESS).json({ message: 'Successfully added to waitlist', status: SUCCESS});
     });
   });
   db.close();
@@ -1274,13 +836,335 @@ app.post('/removeWaitlist', async (req, res) => {
   db.run(queryRemove, [net_id, class_id], function (err) {
     if (err) {
       console.error('Error removing from waitlist: ', err.message);
-      res.status(500).json({ message: 'Error removing from waitlist', error: err.message, status: 500});
+      res.status(ERROR).json({ message: 'Error removing from waitlist', error: err.message, status: ERROR});
       return;
     }
-    res.status(200).json({ message: 'Successfully removed from waitlist', status: 200});
+    res.status(SUCCESS).json({ message: 'Successfully removed from waitlist', status: SUCCESS});
   });
   db.close();
 })
+
+/* ######################################
+*
+*           UTILITY FUNCTIONS
+*
+*  ###################################### */
+
+function dbGet(database, query, query_params) {
+  return new Promise((resolve, reject) => {
+    database.get(query, query_params, (err, result) => {
+      if (err) {
+        console.error('Error running database.get: ', err.message)
+        reject(err);
+        throw err;
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+function dbAll(database, query, query_params) {
+  return new Promise((resolve, reject) => {
+    database.all(query, query_params, (err, results) => {
+      if (err) {
+        console.error('Error running database.all: ', err.message);
+        reject(err);
+        throw err;
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
+function dbRun(database, query, query_params) {
+  return new Promise((resolve, reject) => {
+    database.run(query, query_params, function (err) {
+      if (err) {
+        console.error('Error running database.run: ', err.message);
+        reject(err);
+        throw err;
+      } else {
+        resolve(true);
+      }
+    });
+  })
+}
+
+function getClasses(db) {
+  let query = "SELECT * FROM classes;";
+  return dbAll(db, query, []);
+}
+
+function getProfessors(db) {
+  let query = "SELECT * FROM professors;";
+  return dbAll(db, query, []);
+}
+
+function getStudents(db) {
+  let query = "SELECT * FROM students;";
+  return dbAll(db, query, []);
+}
+
+function getAdvisers(db) {
+  let query = "SELECT * FROM advisers;";
+  return dbAll(db, query, []);
+}
+
+function getClass(db, class_id) {
+  let query = "SELECT * FROM classes WHERE class_id = ?;";
+  return dbGet(db, query, [class_id]);
+}
+
+function getProfessor(db, net_id) {
+  let query = "SELECT * FROM professors WHERE net_id = ?;";
+  return dbGet(db, query, [net_id]);
+}
+
+function getStudent(db, net_id) {
+  let query = "SELECT * FROM students WHERE net_id = ?;";
+  return dbGet(db, query, [net_id]);
+}
+
+function getAdviser(db, net_id) {
+  let query = "SELECT * FROM advisers WHERE net_id = ?;";
+  return dbGet(db, query, [net_id]);
+}
+
+function getSection(db, section_id) {
+  let query = "SELECT * FROM sections WHERE section_id = ?;";
+  return dbGet(db, query, [section_id]);
+}
+
+function addPerson(db, net_id, email, password, role) {
+  let query = "INSERT INTO people(net_id, email, hash_pass, salt, role) VALUES (?, ?, ?, ?, ?);";
+  let salt = generateSalt();
+  let hash_pass = hashStr(password + salt);
+  return dbRun(db, query, [net_id, email, hash_pass, salt, role]);
+}
+
+function addClass(db, class_id, credits, rating, average_gpa, professor, 
+  assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
+    let query = "INSERT INTO classes(class_id, credits, rating, " + 
+      "average_gpa, professor, assistant_professor, class_times, " + 
+      "quarter, class_name, sln, add_code_required) VALUES " + 
+      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor, 
+        assistant_professor, class_times, quarter, class_name, sln, add_code_required]);
+}
+
+function addStudent(db, net_id, email, password, student_name, major) {
+  addPerson(db, net_id, email, password, 'student');
+  let query = "INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);";
+  return dbRun(db, query, [net_id, student_name, major]);
+}
+
+function addProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
+  addPerson(db, net_id, email, password, 'professor');
+  let query = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
+  return dbRun(db, query, [net_id, professor_name, department, tenure, rating])
+}
+
+function addAdviser(db, net_id, email, password, adviser_name, department) {
+  addPerson(db, net_id, email, password, 'adviser');
+  let query = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
+  return dbRun(db, query, [net_id, adviser_name, department]);
+}
+
+function addSection(db, section_id, ta, co_ta, section_times, class_id) {
+  let query = "INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);";
+  return dbRun(db, query, [section_id, ta, co_ta, section_times, class_id]);
+}
+
+function updatePerson(db, net_id, email, password, role) {
+  let salt = generateSalt();
+  let hash_pass = hashStr(password + salt);
+  let query = "UPDATE people SET email = ?, hash_pass = ?, salt = ?, role = ? WHERE net_id = ?;";
+  return dbRun(db, query, [email, hash_pass, salt, role, net_id]);
+}
+
+async function updateClass(db, class_id, credits, rating, average_gpa, professor, 
+  assistant_professor, class_times, quarter, class_name, sln, add_code_required) {
+  let query = "SELECT * FROM classes WHERE class_id=?;";
+  let class_ = await dbGet(db, query, [class_id]);
+  if (!class_) {
+    return false;
+  }
+
+  let update_credits = credits ? credits : class_.credits;
+  let update_rating = rating ? rating : class_.rating;
+  let update_average_gpa = average_gpa ? average_gpa : class_.average_gpa;
+  let update_professor = professor ? professor : class_.professor;
+  let update_assistant_professor = assistant_professor ? assistant_professor : class_.assistant_professor;
+  let update_class_times = class_times ? class_times : class_.class_times;
+  let update_quarter = quarter ? quarter : class_.quarter;
+  let update_class_name = class_name ? class_name : class_.class_name;
+  let update_sln = sln ? sln : class_.sln;
+  let update_add_code_required = add_code_required ? add_code_required : class_.add_code_required;
+  query = "UPDATE classes SET credits = ?, rating = ?, average_gpa = ?, professor = ?, assistant_professor = ?, class_times = ?, quarter = ?, class_name = ?, sln = ?, add_code_required = ? WHERE class_id = ?;";
+  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor, update_assistant_professor, update_class_times, update_quarter, update_class_name, update_sln, update_add_code_required, class_id])
+}
+
+async function updateProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
+  updatePerson(db, net_id, email, password, 'professor');
+  let query = "SELECT * FROM professors WHERE net_id = ?;";
+  let professor = await dbGet(db, query, [net_id]);
+  if (!professor) {
+    return false;
+  }
+
+  let update_professor_name = professor_name ? professor_name : professor.professor_name;
+  let update_department = department ? department : professor.department;
+  let update_tenure = tenure ? tenure : professor.tenure;
+  let update_rating = rating ? rating : professor.rating;
+  query = "UPDATE professors SET professor_name = ?, department = ?, tenure = ?, rating = ? WHERE net_id = ?;";
+  return dbRun(db, query, [update_professor_name, update_department, update_tenure, update_rating, net_id]);
+}
+
+async function updateStudent(db, net_id, email, password, student_name, major) {
+  updatePerson(db, net_id, email, password, 'student');
+  let query = "SELECT * FROM students WHERE net_id = ?;";
+  let student = await dbGet(db, query, [net_id]);
+  if (!student) {
+    return false;
+  }
+
+  let update_student_name = student_name ? student_name : student.student_name;
+  let update_major = major ? major : student.major;
+  query = "UPDATE students SET student_name = ?, major = ? WHERE net_id = ?;";
+  return dbRun(db, query, [update_student_name, update_major, net_id]);
+}
+
+async function updateAdviser(db, net_id, email, password, adviser_name, department) {
+  updatePerson(db, net_id, email, password, 'adviser');
+  let query = "SELECT * FROM advisers WHERE net_id = ?;";
+  let adviser = await dbGet(db, query, [net_id]);
+  if (!adviser) {
+    return false;
+  }
+
+  let update_adviser_name = adviser_name ? adviser_name : adviser.adviser_name;
+  let update_department = department ? department : adviser.department;
+  query = "UPDATE advisers SET adviser_name = ?, department = ? WHERE net_id = ?;";
+  return dbRun(db, query, [update_adviser_name, update_department, net_id]);
+}
+
+async function updateSection(db, section_id, ta, co_ta, section_times, class_id) {
+  let query = "SELECT * FROM sections WHERE section_id = ?;";
+  let section = dbGet(db, query, [section_id]);
+  if (!section) {
+    return false;
+  }
+
+  let update_ta = ta ? ta : section.ta;
+  let update_co_ta = co_ta ? co_ta : section.co_ta;
+  let update_section_times = section_times ? section_times : section.section_times;
+  let update_class_id = class_id ? class_id : section.class_id;
+  query = "UPDATE sections SET ta = ?, co_ta = ?, section_times = ?, class_id = ? WHERE section_id = ?;";
+  return dbRun(db, query, [update_ta, update_co_ta, update_section_times, update_class_id, section_id]);
+}
+
+function removePerson(db, net_id) {
+  removeStudentFromWaitlist(db, net_id);
+  removeStudentFromRegistration(db, net_id);
+  let query = "DELETE FROM people WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeClass(db, class_id) {
+  let query = "DELETE FROM classes WHERE class_id = ?;";
+  return dbRun(db, query, [class_id]);
+}
+
+function removeProfessor(db, net_id) {
+  removePerson(db, net_id);
+  let query = "DELETE FROM professors WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeStudent(db, net_id) {
+  removePerson(db, net_id);
+  let query = "DELETE FROM students WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeAdviser(db, net_id) {
+  removePerson(db, net_id);
+  let query = "DELETE FROM advisers WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeSection(db, section_id) {
+  let query = "DELETE FROM sections WHERE section_id = ?;";
+  return dbRun(db, query, [section_id]);
+}
+
+async function login(db, net_id, password) {
+  let query = "SELECT hash_pass, salt FROM people WHERE net_id = ?;";
+  let person = await dbGet(db, query, [net_id]);
+  if (!person) {
+    return 404;
+  }
+  if (person.hash_pass != hashStr(password + person.salt)) {
+    return 403;
+  }
+
+  console.log('Signed in with net_id ' + net_id)
+  const timestamp = new Date().toLocaleString();
+  const logEntry = `${timestamp}: ${net_id} logged in\n`;
+  logStream.write(logEntry);
+  return 200;
+}
+
+function removeStudentFromRegistration(db, net_id) {
+  let query = "DELETE FROM registration WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeClassFromRegistration(db, class_id) {
+  let query = "DELETE FROM registration WHERE class_id = ?;";
+  return dbRun(db, query, [class_id]);
+}
+
+function removeStudentFromWaitlist(db, net_id) {
+  let query = "DELETE FROM waitlist WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
+}
+
+function removeClassFromWaitlist(db, class_id) {
+  let query = "DELETE FROM waitlist WHERE net_id = ?;";
+  return dbRun(db, query, [class_id]);
+}
+
+function setResDefaults(endpoint, status) {
+  let message;
+  if (Math.floor(status / 100) == ERROR / 100) {
+    message = ' error.'
+  } else if (Math.floor(status / 100) == FAILURE / 100) {
+    message = ' failure.'
+  } else if (Math.floor(status / 100) == SUCCESS / 100) {
+    message = ' success.';
+  } else {
+    throw new Error("status should be in the 200s, 400s, or 500s");
+  }
+  return { message: endpoint + message, status: status };
+}
+
+// Hashing function for strings.
+function hashStr(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+      let chr = str.charCodeAt(i);
+      hash = (hash * 31) + ((chr | 0) * 37); // bit-wise OR with 0 to convert to integer
+  }
+  return hash % MAX_HASH;
+}
+
+// Returns a random integer from 0 to MAX_SALT.
+function generateSalt() {
+  return Math.floor(Math.random() * MAX_SALT);
+}
 
 export default app
 

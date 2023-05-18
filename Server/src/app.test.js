@@ -33,7 +33,7 @@ describe("POST /users", () => {
       expect(found).toBe(true)
     }, TIMEOUT)
 
-    test("Test addClasses", async () => {
+    test("Test addClass", async () => {
 
       const req = {
         class_id: '8910',
@@ -48,7 +48,7 @@ describe("POST /users", () => {
         sln: '789',
         add_code_required: '1'
       };
-      const addResponse = await request(app).post("/addClasses").send(req);
+      const addResponse = await request(app).post("/addClass").send(req);
       const getResponse = await request(app).get("/getClasses").send();
       var classes = getResponse.body.class
       var found = false
@@ -60,7 +60,7 @@ describe("POST /users", () => {
       expect(found).toBe(true)
 
       // remove the class once we are done testing
-      var removeResponse = await request(app).post("/removeClasses").send({'class_id' : req.class_id});
+      var removeResponse = await request(app).post("/removeClass").send({'class_id' : req.class_id});
     }, TIMEOUT)
 
     test("Test updateClass", async () => {
@@ -79,7 +79,7 @@ describe("POST /users", () => {
     // These are the tests for the student endpoints
     test("Test getStudent", async () => {
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
-      var net_id = getStudent.body.Student.net_id
+      var net_id = getStudent.body.student.net_id
       console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon678')
     }, TIMEOUT)
@@ -96,7 +96,7 @@ describe("POST /users", () => {
       const addResponse = await request(app).post("/addStudent").send(req);
       console.log(addResponse.body.message)
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
-      var net_id = getStudent.body.Student.net_id
+      var net_id = getStudent.body.student.net_id
       console.log("This is the student net_id: " + net_id)
       expect(net_id).toBe('pokemon8910')
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
@@ -109,7 +109,7 @@ describe("POST /users", () => {
       console.log("This is the student:  " + updateResponse.body.Student);
 
       const addResponse = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
-      var major = addResponse.body.Student.major
+      var major = addResponse.body.student.major
       console.log(major)
 
       expect(major).toBe('computer engineering')
@@ -133,7 +133,7 @@ describe("POST /users", () => {
       const addResponse = await request(app).post("/addProfessor").send(req);
       console.log(addResponse.body.message)
       const getResponse = await request(app).post("/getProfessor").send({'net_id' : '678'});
-      var professors = getResponse.body.Professor.professor_name
+      var professors = getResponse.body.professor.professor_name
       console.log('This is the professors name: ' + professors)
       expect(professors).toBe('x')
 
@@ -145,9 +145,9 @@ describe("POST /users", () => {
 
     test("Test updateProfessor", async () => {
       const updateResponse = await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'cat'});
-      console.log(updateResponse.body.Professor);
+      console.log(updateResponse.body.professor);
       const addResponse = await request(app).post("/getProfessor").send({'net_id' : '123'});
-      var professor = addResponse.body.Professor.professor_name
+      var professor = addResponse.body.professor.professor_name
       console.log(professor)
 
       expect(professor).toBe('cat');
@@ -170,7 +170,7 @@ describe("POST /users", () => {
       console.log(addResponse.body.message)
 
       const getResponse = await request(app).post("/getAdviser").send({'net_id' : '345'});
-      var adviser = getResponse.body.Adviser.adviser_name
+      var adviser = getResponse.body.adviser.adviser_name
       console.log('This is the Adviser name: ' + adviser)
       expect(adviser).toBe('x')
 
@@ -180,9 +180,9 @@ describe("POST /users", () => {
 
     test("Test updateAdviser", async () => {
       const updateResponse = await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'cat'});
-      console.log(updateResponse.body.Adviser);
+      console.log(updateResponse.body.adviser);
       const addResponse = await request(app).post("/getAdviser").send({'net_id' : '456'});
-      var adviser = addResponse.body.Adviser.adviser_name
+      var adviser = addResponse.body.adviser.adviser_name
       console.log(adviser)
       expect(adviser).toBe('cat');
 
@@ -203,7 +203,7 @@ describe("POST /users", () => {
 
       const getResponse = await request(app).post("/getSection").send({'section_id' : '157'});
       console.log(getResponse.body.message)
-      var ta = getResponse.body.Section.ta
+      var ta = getResponse.body.section.ta
       console.log('This is the ta name: ' + ta)
       expect(ta).toBe('x')
 
@@ -213,9 +213,9 @@ describe("POST /users", () => {
 
     test("Test updateSection", async () => {
       const updateResponse = await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'cat'});
-      console.log(updateResponse.body.Section);
+      console.log(updateResponse.body.section);
       const addResponse = await request(app).post("/getSection").send({'section_id' : '331'});
-      var ta = addResponse.body.Section.ta
+      var ta = addResponse.body.section.ta
       console.log(ta)
       expect(ta).toBe('cat');
 
@@ -259,7 +259,7 @@ describe("POST /users", () => {
     test("Test login successful", async () => {
       const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : '123'});
       console.log(loginResponse.body.message);
-      expect(loginResponse.body.message).toBe('Logged in successfully')
+      expect(loginResponse.body.message).toBe('/login success.')
     }, TIMEOUT)
 
     test("Test login wrong password", async () => {
