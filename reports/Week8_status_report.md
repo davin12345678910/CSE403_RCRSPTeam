@@ -77,20 +77,23 @@ What I am stuck on:
 
 ### Foad Shariat
 what I did:
+I designed the add code capability to the front end. There are situation where the students are not able to register immediately and they have to have an add code
+When a student search for a course, if the course required the add code, the user can request the add code and if the add code is granted, the user can register.
+Also, the user can remove their add code request, by clicking on the Add code in progress 
 
 
 what I learned:
-
+I learned that React is very hard to work with when there are multiple async functions and I learned how to fix it.
 
 What I had trouble on:
-
+When there were multiple fetch, I had to manage the data that has to be shown on screen, so at first I had difficulity to sync the results
 
 What I am stuck on:
-
+Nothing specific I'm stuck on, but I think the security is the most important one.
 
 ### Sol Zamora
 what I did:
-I designed and implemented a waitlist system for courses. Students can add themselves to a course waitlist queue if the course is full. Once a spot opens up, the top queued student is automatically added to the course.
+I designed and implemented a waitlist system for courses. Students can add themselves to a course waitlist queue if it is full. Once a spot opens up, the top queued student is automatically added to the course.
 
 what I learned:
 I learned you can make PRIMARY KEYS of column tuples in SQL. This way, each individual column of a table can have repeats of the same entry, but no row can have the same pair of entries as another.
