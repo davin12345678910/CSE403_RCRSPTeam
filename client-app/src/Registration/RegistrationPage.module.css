@@ -165,6 +165,18 @@ h1 {
     margin-right: 10px;
 }
 
+.InProgressLabel {
+    color: black;
+    width: 9rem;
+    position: relative;
+    display: block;
+    padding: 0.3rem 0.2rem;
+    background-color: #e8e3d3;
+    opacity: 1;
+    background-image: repeating-radial-gradient( circle at 0 0, transparent 0, #e8e3d3 6px ), repeating-linear-gradient( #85754d55, #85754d );
+    cursor: pointer;
+}
+
 
 @media screen and (max-width: 600px) {
     .Modal {
