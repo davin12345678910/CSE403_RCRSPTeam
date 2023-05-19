@@ -92,6 +92,7 @@ const RegistrationPage = () => {
     }
 
     useEffect(() => {
+        Modal.setAppElement('#root');
         if (location.state && location.state.uwid) {
             const uwId = location.state.uwid;
             setUwId(uwId);
@@ -112,7 +113,7 @@ const RegistrationPage = () => {
         try {
             const data = await fetchData(getRegistrationEndpoint, getRegistrationOptions);
 
-            const registeredClasses = data.Registration;
+            const registeredClasses = data.registration;
             const classDataPromises = registeredClasses.map(async (registeredClass) => {
                 const getClassEndpoint = "/getClass";
                 const getClassOptions = {
@@ -229,8 +230,7 @@ const RegistrationPage = () => {
 
         try {
             const response = await fetchData(endpoint, options);
-
-            if (response.status === 201) {
+            if (response.status === 200) {
                 setRequestedAddCodes((prevRequestedAddCodes) => {
                     if (prevRequestedAddCodes.includes(course.sln)) {
                         return prevRequestedAddCodes.filter((sln) => sln !== course.sln);
