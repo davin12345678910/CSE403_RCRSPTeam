@@ -1,30 +1,40 @@
 import request from 'supertest'
 import app from './app.js'
-import { response } from 'express'
 
 const TIMEOUT = 5000;
 
-describe("POST /users", () => {
-  describe("given a username and password", () => {
 
+// This is going to be out testing automation for the backend
+describe("This is the registration automated testing", () => {
+
+  // This is going to be the intergration testing
+  describe("Intergration Testing", () => {
+
+    // This will be testing if our endpoints are able to give
+    // us 200 ok status code
     test("should respond with a 200 status code", async () => {
       const response = await request(app).post("/users").send()
       expect(response.statusCode).toBe(200)
     })
-    // test the endpoints for the classes
-    // We are always going to have 345 in the database, so we are going to check the get class endpoint
+
+    // **********These are the tests for the classes endpoints***************
+    // This check to see if the getClass endpoint properly works
     test("Test getClass", async () => {
+
+      // Here we will be getting a class that is already in the database
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
       var professor = addResponse.body.class.professor
       expect(professor).toBe('x')
     }, TIMEOUT)
 
-    // We are always going to have 345 in the database, so we are going to check
-    // if 345 is still in the database
+
+    // Here we will be getting all of the classes that are in the database
     test("Test getClasses", async () => {
       const addResponse = await request(app).get("/getClasses").send()
       var classes = addResponse.body.class
 
+      // Here we will check if a class that is already in the database is returned
+      // from getClasses
       var found = false
       classes.forEach(element => {
         if (element.class_id == '345') {
@@ -38,7 +48,7 @@ describe("POST /users", () => {
     creates a file with the following information:
     and adds the class to the database
     then see if the correct class is in the database
-    then delete the class from the database  
+    then delete the class from the database
     */
     test("Test addClass", async () => {
 
@@ -83,14 +93,16 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
 
-    // These are the tests for the student endpoints
+    // ********These are the tests for the student endpoints******
+    // This will check to see if we are able to get a student that we already
+    // added into the database
     test("Test getStudent", async () => {
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon678'});
       var net_id = getStudent.body.student.net_id
       expect(net_id).toBe('pokemon678')
     }, TIMEOUT)
 
-    // tests if correct student is in the database
+    // This will check to see if we are able to add a students into the database
     test("Test addStudent", async () => {
       const req = {
         net_id: 'pokemon8910',
@@ -103,11 +115,15 @@ describe("POST /users", () => {
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
       var net_id = getStudent.body.student.net_id
       expect(net_id).toBe('pokemon8910')
+
+      // Here we will remove, because if we tests again and don't have this
+      // we will get a unique key error since net_id is a primary key
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, TIMEOUT)
 
 
-    // tests if correct information is updated in the database
+    // This will update the fields of a student that we passed in, and will check
+    // to see if the fields properly updated or not
     test("Test updateStudent", async () => {
       await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
 
@@ -120,10 +136,8 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
 
-
-    // These are the tests for the professor endpoints
-    // follow the same format as the student endpoints
-
+    // **********These are the tests for the professor endpoints***************
+    // This is where we will be testing if we are able to properly add in a professor
     test("Test addProfessor", async () => {
       const req = {
         net_id: '678',
@@ -135,24 +149,26 @@ describe("POST /users", () => {
       };
 
       const addResponse = await request(app).post("/addProfessor").send(req);
-      console.log(addResponse.body.message)
+      //console.log(addResponse.body.message)
       const getResponse = await request(app).post("/getProfessor").send({'net_id' : '678'});
       var professors = getResponse.body.professor.professor_name
-      console.log('This is the professors name: ' + professors)
+      //console.log('This is the professors name: ' + professors)
       expect(professors).toBe('x')
 
-      var removeResponse = await request(app).post("/removeProfessor").send({'net_id' : '678'});
+      // We need to remove professor so that we can test add when we test again later
+      await request(app).post("/removeProfessor").send({'net_id' : '678'});
     }, TIMEOUT)
 
 
 
-
+    // Here we will be testing updateProfessor, to see if we are able to properly update the fields
+    // in which we pass into to this endpoint
     test("Test updateProfessor", async () => {
       const updateResponse = await request(app).post("/updateProfessor").send({'net_id' : '123', 'professor_name' : 'cat'});
-      console.log(updateResponse.body.professor);
+      //console.log(updateResponse.body.professor);
       const addResponse = await request(app).post("/getProfessor").send({'net_id' : '123'});
       var professor = addResponse.body.professor.professor_name
-      console.log(professor)
+      //console.log(professor)
 
       expect(professor).toBe('cat');
 
@@ -160,10 +176,8 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
 
-    /*
-    These are the endpoint tests for advisers
-    They follow the same format as the professor and student endpoints
-    */
+    // **********These are the tests for the adviser endpoints***************
+    // Here we will see if we are able to properly add in an adviser
     test("Test addAdviser", async () => {
       const req = {
         net_id: '345',
@@ -172,28 +186,32 @@ describe("POST /users", () => {
         email: 'z'
       };
       const addResponse = await request(app).post("/addAdviser").send(req);
-      console.log(addResponse.body.message)
+      //console.log(addResponse.body.message)
 
       const getResponse = await request(app).post("/getAdviser").send({'net_id' : '345'});
       var adviser = getResponse.body.adviser.adviser_name
-      console.log('This is the Adviser name: ' + adviser)
+      //console.log('This is the Adviser name: ' + adviser)
       expect(adviser).toBe('x')
 
-      var removeResponse = await request(app).post("/removeAdviser").send({'net_id' : '345'});
+      await request(app).post("/removeAdviser").send({'net_id' : '345'});
     }, TIMEOUT)
 
 
+    // Here we will test to see if we are able to properly update the fields of an adviser
+    // specfically the fields in which we pass to the endnpoint which we want to update
     test("Test updateAdviser", async () => {
       const updateResponse = await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'cat'});
-      console.log(updateResponse.body.adviser);
+      //console.log(updateResponse.body.adviser);
       const addResponse = await request(app).post("/getAdviser").send({'net_id' : '456'});
       var adviser = addResponse.body.adviser.adviser_name
-      console.log(adviser)
+      //console.log(adviser)
       expect(adviser).toBe('cat');
 
       await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x', 'email' : '456@uw.edu', 'password' : 'pass456', 'department' : 'math'});
     }, TIMEOUT)
 
+
+    // **********These are the tests for the section endpoints***************
     // these are the endpoint tests for the sections
     // they follow the same format as the professor and student and advisers endpoints
     test("Test addSection", async () => {
@@ -205,31 +223,34 @@ describe("POST /users", () => {
         class_id: 'w'
       };
       const addSection = await request(app).post("/addSection").send(req);
-      console.log(addSection.body.message)
+      //console.log(addSection.body.message)
 
       const getResponse = await request(app).post("/getSection").send({'section_id' : '157'});
-      console.log(getResponse.body.message)
+      //console.log(getResponse.body.message)
       var ta = getResponse.body.section.ta
-      console.log('This is the ta name: ' + ta)
+      //console.log('This is the ta name: ' + ta)
       expect(ta).toBe('x')
 
       var removeResponse = await request(app).post("/removeSection").send({'section_id' : '157'});
     }, TIMEOUT)
 
 
+    // Here we will test to see if we are able to update the fields in which we pass to the endpoint
+    // for the sections
     test("Test updateSection", async () => {
       const updateResponse = await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'cat'});
-      console.log(updateResponse.body.section);
+      //console.log(updateResponse.body.section);
       const addResponse = await request(app).post("/getSection").send({'section_id' : '331'});
       var ta = addResponse.body.section.ta
-      console.log(ta)
+      //console.log(ta)
       expect(ta).toBe('cat');
 
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
 
-    // these are the endpoint tests for the registration
-    // they follow the same format as the professor and student and advisers and section endpoints
+
+    // **********These are the tests for the registration endpoints***************
+    // Here we will test to see if we are able to add to the registration table
     test("Test addRegistration", async () => {
       const req = {
         net_id: 'pokemon678',
@@ -240,15 +261,15 @@ describe("POST /users", () => {
         class_id: 'cse312',
       }
       const addResponse = await request(app).post("/addRegistration").send(req);
-      console.log(addResponse.body.message);
+      //console.log(addResponse.body.message);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
       const getResponseClass = await request(app).post("/getClassRegistration").send({'class_id' : 'cse331'});
       await request(app).post('/removeRegistration').send({ net_id: 'pokemon678', class_id: 'cse331' });
-      console.log(getResponseStudent.body.message);
-      console.log(getResponseClass.body.message);
+      //console.log(getResponseStudent.body.message);
+      //console.log(getResponseClass.body.message);
       var classes = getResponseStudent.body.registration;
       var students = getResponseClass.body.registration;
-      console.log('This is the class: ' + classes);
+      //console.log('This is the class: ' + classes);
       var found = false
       classes.forEach(function(element) {
         if (element.class_id == 'cse331') {
@@ -257,7 +278,7 @@ describe("POST /users", () => {
       });
       expect(found).toBe(true)
 
-      console.log('This is the student: ' + students);
+      //console.log('This is the student: ' + students);
       found = false;
       students.forEach(function(element) {
         if (element.net_id == 'pokemon678') {
@@ -268,30 +289,35 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
 
+    // Here we will check to see if we are able to login successfully
     test("Test login successful", async () => {
       const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : '123'});
-      console.log(loginResponse.body.message);
+      //console.log(loginResponse.body.message);
       expect(loginResponse.body.message).toBe('/login success.')
     }, TIMEOUT)
 
+
+    // Here we will test to see if we are able to see if we get a invalid password message if we put in teh wrong password
     test("Test login wrong password", async () => {
       const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon678', 'password' : 'pass123'});
-      console.log(loginResponse.body.message);
+      //console.log(loginResponse.body.message);
       expect(loginResponse.body.message).toBe('Could not log in: Invalid password')
     }, TIMEOUT)
 
+    // Here we will test to see if we are going to get an error message if we put in the wrong net_id
     test("Test login wrong net_id", async () => {
       const loginResponse = await request(app).post("/login").send({'net_id' : 'pokemon789', 'password' : '123'});
-      console.log(loginResponse.body.message);
+      //console.log(loginResponse.body.message);
       expect(loginResponse.body.message).toBe('Could not log in: Invalid net_id')
     }, TIMEOUT)
 
 
+    // **********These are the tests for the addCode endpoints***************
 
-    // These are the tests for the student endpoints
+    // This will test to see if we are able to get the addCode for a class
     test("Test getAddCode", async () => {
       const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 403'});
-      console.log(getAddCode.body.AddCodes);
+      //console.log(getAddCode.body.AddCodes);
 
       // We should probably be testing a bit more than just the job type
       // it might be best to get something such as the addCode or the class for example,
@@ -301,7 +327,7 @@ describe("POST /users", () => {
       expect(add_code).toBe('Adviser');
     }, TIMEOUT)
 
-    // These are the tests for the student endpoints
+    // This will test to see if we are able to add an add code to the table properly
     test("Test addAddCode", async () => {
       const req = {
         add_id: '2',
@@ -311,9 +337,9 @@ describe("POST /users", () => {
         class: 'CSE 403',
         net_id: '123'
       };
-      console.log(req);
+      //console.log(req);
       const addAddCode = await request(app).post("/addAddCode").send(req);
-      console.log(addAddCode.body.message)
+      //console.log(addAddCode.body.message)
 
       const getAddCode = await request(app).post("/getAddCode").send({'class' : 'CSE 403'});
 
@@ -327,7 +353,8 @@ describe("POST /users", () => {
       await request(app).post("/removeAddCode").send({'add_id' : '2'});
     }, TIMEOUT)
 
-    // Here we will be adding test for the messaging servies in which users can use
+    // **********These are the tests for the message endpoints***************
+    // This will let you test to see if you are able to get a message that was added into the database
     test("Test getMessages", async () => {
       const req = {
         net_id_sender: 'sender',
@@ -336,12 +363,12 @@ describe("POST /users", () => {
         JobType_receiver: 'student',
         message: 'Add code is 12345'
       };
-      console.log(req);
+      //console.log(req);
       const addMessages = await request(app).post("/addMessages").send(req);
-      console.log(addMessages.body.message)
+      //console.log(addMessages.body.message)
 
       const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
-      console.log(getMessages.body.Messages);
+      //console.log(getMessages.body.Messages);
 
       await request(app).post('/removeMessages').send({ net_id_sender: 'sender', net_id_receiver: 'receiver' });
 
@@ -350,7 +377,7 @@ describe("POST /users", () => {
     }, TIMEOUT);
 
 
-    // Here we will be adding test for the messaging servies in which users can use
+    // Here we will test to see if we are able to add in a message into the message table
     test("Test addMessages", async () => {
       const req = {
         net_id_sender: 'sender',
@@ -359,12 +386,12 @@ describe("POST /users", () => {
         JobType_receiver: 'student',
         message: 'Add code is 12345'
       };
-      console.log(req);
+      //console.log(req);
       const addMessage = await request(app).post("/addMessages").send(req);
-      console.log(addMessage.body.message)
+      //console.log(addMessage.body.message)
 
       const getMessages = await request(app).post("/getMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
-      console.log(getMessages.body.Messages);
+      //console.log(getMessages.body.Messages);
 
       await request(app).post("/removeMessages").send({'net_id_sender' : 'sender', 'net_id_receiver': 'receiver'});
 

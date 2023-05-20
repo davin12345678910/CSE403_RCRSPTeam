@@ -5,13 +5,16 @@ import express, { query } from 'express';
 import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import cors from 'cors';
-import { get } from 'http';
 
 /*
 * GLOBAL VARIABLES
 */
+
+// These are for passwords
 const MAX_HASH = 10 ** 14;
 const MAX_SALT = 10 ** 6;
+
+// These are for network results
 const SUCCESS = 200;
 const FAILURE = 400;
 const ERROR   = 500;
@@ -65,6 +68,7 @@ async function makeTables(db) {
 
   // TODO: Table for addCodes, version 2, which will be the class, add code, and a list of people who have the add codes
 
+  // These will be runned in order to create the tables that we wrote above
   await dbRun(db, queryPeople, []);
   await dbRun(db, queryStudents, []);
   await dbRun(db, queryProfessors, []);
@@ -79,12 +83,15 @@ async function makeTables(db) {
   return true;
 }
 
+
+// This is where we will be making some starting data which we will be using for
+// tests as well as the website/demos
 async function addStartupData(db) {
   // Add default class
   let hasDefaultClass = await getClass(db, '345');
   if (!hasDefaultClass) {
-    await addClass(db, '345', null, null, null, 'x', 
-      null, null, null, null, null, null, 
+    await addClass(db, '345', null, null, null, 'x',
+      null, null, null, null, null, null,
       0, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
       1030, 1120, null, null, null, null);
   }
@@ -132,7 +139,6 @@ async function addStartupData(db) {
   }
 }
 
-app.use(express.json())
 
 /* ######################################
 *
@@ -154,12 +160,17 @@ init();
 *
 *  ###################################### */
 
-// This is a basic test for status checking
+// This is needed in order to be able to call the endpoints in which we make
+app.use(express.json())
+
+// This is the endpoint that we will later test to see if the status of the
+// endpoints give a ok message
 app.post('/users', async (req, res) => {
   let result = setResDefaults('/users', 200);
   res.send(result);
 })
 
+// This endpoint allows you to get all the classes
 app.get('/getClasses', async (req, res) => {
   let db = getDBConnection();
   let classes = await getClasses(db);
@@ -171,6 +182,7 @@ app.get('/getClasses', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get all professors
 app.get('/getProfessors', async (req, res) => {
   let db = getDBConnection();
   let professors = await getProfessors(db);
@@ -182,6 +194,7 @@ app.get('/getProfessors', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get all students
 app.get('/getStudents', async (req, res) => {
   let db = getDBConnection();
   let students = await getStudents(db);
@@ -193,6 +206,8 @@ app.get('/getStudents', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to get all advisers
 app.get('/getAdvisers', async (req, res) => {
   let db = getDBConnection();
   let advisers = await getAdvisers(db);
@@ -204,6 +219,8 @@ app.get('/getAdvisers', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to get a class
 app.post('/getClass', async (req, res) => {
   let db = getDBConnection();
   let class_id = req.body.class_id;
@@ -216,6 +233,7 @@ app.post('/getClass', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get a professor
 app.post('/getProfessor', async (req,res) => {
   let db = getDBConnection();
   let net_id = req.body.net_id;
@@ -228,6 +246,7 @@ app.post('/getProfessor', async (req,res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get a student
 app.post('/getStudent', async (req,res) => {
   let db = getDBConnection();
   let net_id = req.body.net_id;
@@ -240,6 +259,7 @@ app.post('/getStudent', async (req,res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get a adviser
 app.post('/getAdviser', async (req,res) => {
   let db = getDBConnection();
   let net_id = req.body.net_id;
@@ -252,6 +272,7 @@ app.post('/getAdviser', async (req,res) => {
   res.send(result);
 })
 
+// This endpoint allows you to get a section
 app.post('/getSection', async (req,res) => {
   let db = getDBConnection();
   let section_id = req.body.section_id;
@@ -264,8 +285,11 @@ app.post('/getSection', async (req,res) => {
   res.send(result);
 })
 
+// This endpoint allows you to add a class
 app.post('/addClass', async (req, res) => {
   let db = getDBConnection()
+
+  // These are variables in which we need for a class
   let class_id = req.body.class_id;
   let credits = req.body.credits;
   let rating = req.body.rating;
@@ -278,6 +302,9 @@ app.post('/addClass', async (req, res) => {
   let add_code_required = req.body.add_code_required;
   let enrolled = req.body.enrolled;
   let capacity = req.body.capacity;
+
+  // These variables are needed for a class and are also needed
+  // in order to check for scheduleing conflicts
   let startM = req.body.startM;
   let endM = req.body.endM;
   let startT = req.body.startT;
@@ -292,7 +319,7 @@ app.post('/addClass', async (req, res) => {
   let endSAT = req.body.endSAT;
   let startSUN = req.body.startSUN;
   let endSUN = req.body.endSUN;
-  let success = await addClass(db, class_id, credits, rating, average_gpa, professor, 
+  let success = await addClass(db, class_id, credits, rating, average_gpa, professor,
     assistant_professor, quarter, class_name, sln, add_code_required, enrolled, capacity,
     startM, endM, startT, endT, startW, endW, startTH, endTH, startF, endF, startSAT, endSAT,
     startSUN, endSUN);
@@ -303,8 +330,12 @@ app.post('/addClass', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to add a professor
 app.post('/addProfessor', async (req, res) => {
   let db = getDBConnection()
+
+  // These is the information that are needed for a professor
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -320,8 +351,12 @@ app.post('/addProfessor', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to add a student
 app.post('/addStudent', async (req, res) => {
   let db = getDBConnection()
+
+  // These is the information that are needed for a student
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -335,8 +370,12 @@ app.post('/addStudent', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to add a adviser
 app.post('/addAdviser', async (req, res) => {
   let db = getDBConnection()
+
+  // These is the information that are needed for an adviser
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -350,8 +389,12 @@ app.post('/addAdviser', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint allows you to add a section
 app.post('/addSection', async (req, res) => {
   let db = getDBConnection()
+
+  // These is the information that are needed for a section
   let section_id = req.body.section_id;
   let ta = req.body.ta;
   let co_ta = req.body.co_ta;
@@ -365,8 +408,13 @@ app.post('/addSection', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint update a class
 app.post('/updateClass', async (req, res) => {
   let db = getDBConnection()
+
+  // These are all the variables of a class, and all potential variables
+  // that you could update
   let class_id = req.body.class_id;
   let credits = req.body.credits;
   let rating = req.body.rating;
@@ -394,8 +442,8 @@ app.post('/updateClass', async (req, res) => {
   let endSAT = req.body.endSAT;
   let startSUN = req.body.startSUN;
   let endSUN = req.body.endSUN;
-  let success = await updateClass(db, class_id, credits, rating, average_gpa, professor, 
-    assistant_professor, quarter, class_name, sln, add_code_required, 
+  let success = await updateClass(db, class_id, credits, rating, average_gpa, professor,
+    assistant_professor, quarter, class_name, sln, add_code_required,
     enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
     startF, endF, startSAT, endSAT, startSUN, endSUN);
   db.close();
@@ -405,8 +453,11 @@ app.post('/updateClass', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint will allow you to update the information about a professor
 app.post('/updateProfessor', async (req, res) => {
   let db = getDBConnection()
+
+  // These are all of the potential variables that you could update for a professor
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -422,8 +473,12 @@ app.post('/updateProfessor', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to update the information about a student
 app.post('/updateStudent', async (req, res) => {
   let db = getDBConnection()
+
+  // These are all of the potential variables that you could update for a student
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -437,8 +492,12 @@ app.post('/updateStudent', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to update the information of the adviser
 app.post('/updateAdviser', async (req, res) => {
   let db = getDBConnection()
+
+  // these are all of the potential variables that you could update for an adviser
   let net_id = req.body.net_id;
   let email = req.body.email;
   let password = req.body.password;
@@ -452,8 +511,12 @@ app.post('/updateAdviser', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to update the information of the section
 app.post('/updateSection', async (req, res) => {
   let db = getDBConnection()
+
+  // These are all of the potential variables that you could update for a section
   let section_id = req.body.section_id;
   let ta = req.body.ta;
   let co_ta = req.body.co_ta;
@@ -467,6 +530,8 @@ app.post('/updateSection', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to remove a class
 app.post('/removeClass', async (req, res) => {
   let db = getDBConnection()
   let class_id = req.body.class_id;
@@ -478,6 +543,7 @@ app.post('/removeClass', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint will allow you to remove a professor
 app.post('/removeProfessor', async (req, res) => {
   let db = getDBConnection()
   let net_id = req.body.net_id;
@@ -489,6 +555,8 @@ app.post('/removeProfessor', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to remove a student
 app.post('/removeStudent', async (req, res) => {
   let db = getDBConnection()
   let net_id = req.body.net_id;
@@ -500,6 +568,7 @@ app.post('/removeStudent', async (req, res) => {
   res.send(result);
 })
 
+// This endpoint will allow you to remove an adviser
 app.post('/removeAdviser', async (req, res) => {
   let db = getDBConnection()
   let net_id = req.body.net_id;
@@ -511,6 +580,8 @@ app.post('/removeAdviser', async (req, res) => {
   res.send(result);
 })
 
+
+// This endpoint will allow you to remove a section
 app.post('/removeSection', async (req, res) => {
   let db = getDBConnection()
   let section_id = req.body.section_id;
@@ -522,6 +593,10 @@ app.post('/removeSection', async (req, res) => {
   res.send(result);
 })
 
+
+/*****
+ * These are the login endpoints
+ */
 const logStream = fs.createWriteStream("login.log", { flags: "a" });
 
 app.post("/log", (req, res) => {
@@ -788,6 +863,9 @@ app.post('/removeMessages', async (req, res) => {
 *
 *  ###################################### */
 
+
+// This function will allow the users to get the database that we are
+// going to use
 function dbGet(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.get(query, query_params, (err, result) => {
@@ -802,6 +880,7 @@ function dbGet(database, query, query_params) {
   });
 }
 
+// This will allow users to run database.all if needed
 function dbAll(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.all(query, query_params, (err, results) => {
@@ -816,6 +895,7 @@ function dbAll(database, query, query_params) {
   });
 }
 
+// This will allow users to run database.run() if needed
 function dbRun(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.run(query, query_params, function (err) {
@@ -830,6 +910,11 @@ function dbRun(database, query, query_params) {
   })
 }
 
+
+/******
+ * Below are methods that each have queries which will be able to get the
+ * information that they need for each of the endpoints
+ */
 function getClasses(db) {
   let query = "SELECT * FROM classes;";
   return dbAll(db, query, []);
@@ -892,17 +977,17 @@ function addPerson(db, net_id, email, password, role) {
   return dbRun(db, query, [net_id, email, hash_pass, salt, role]);
 }
 
-function addClass(db, class_id, credits, rating, average_gpa, professor, 
-  assistant_professor, quarter, class_name, sln, add_code_required, 
+function addClass(db, class_id, credits, rating, average_gpa, professor,
+  assistant_professor, quarter, class_name, sln, add_code_required,
   enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
   startF, endF, startSAT, endSAT, startSUN, endSUN) {
     let query = "INSERT INTO classes(class_id, credits, rating, average_gpa, professor, " +
       "assistant_professor, quarter, class_name, sln, add_code_required, " +
       "enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH, " +
-      "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " + 
+      "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " +
       "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor, 
-        assistant_professor, quarter, class_name, sln, add_code_required, 
+      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
+        assistant_professor, quarter, class_name, sln, add_code_required,
         enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
         startF, endF, startSAT, endSAT, startSUN, endSUN]);
 }
@@ -937,8 +1022,8 @@ function updatePerson(db, net_id, email, password, role) {
   return dbRun(db, query, [email, hash_pass, salt, role, net_id]);
 }
 
-async function updateClass(db, class_id, credits, rating, average_gpa, professor, 
-  assistant_professor, quarter, class_name, sln, add_code_required, 
+async function updateClass(db, class_id, credits, rating, average_gpa, professor,
+  assistant_professor, quarter, class_name, sln, add_code_required,
   enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
   startF, endF, startSAT, endSAT, startSUN, endSUN) {
   let query = "SELECT * FROM classes WHERE class_id = ?;";
@@ -973,8 +1058,8 @@ async function updateClass(db, class_id, credits, rating, average_gpa, professor
   let update_startSUN = startSUN ? startSUN : class_.startSUN;
   let update_endSUN = endSUN ? endSUN : class_.endSUN;
   query = "UPDATE classes SET credits = ?, rating = ?, average_gpa = ?, professor = ?, assistant_professor = ?, quarter = ?, class_name = ?, sln = ?, add_code_required = ?, enrolled = ?, capacity = ?, startM = ?, endM = ?, startT = ?, endT = ?, startW = ?, endW = ?, startTH = ?, endTH = ?, startF = ?, endF = ?, startSAT = ?, endSAT =?, startSUN = ?, endSUN = ? WHERE class_id = ?;";
-  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor, 
-    update_assistant_professor, update_quarter, update_class_name, update_sln, 
+  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor,
+    update_assistant_professor, update_quarter, update_class_name, update_sln,
     update_add_code_required, update_enrolled, update_capacity, update_startM, update_endM,
     update_startT, update_endT, update_startW, update_endW, update_startTH, update_endTH,
     update_startF, update_endF, update_startSAT, update_endSAT, update_startSUN, update_endSUN, class_id])
