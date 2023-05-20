@@ -11,7 +11,8 @@ describe("POST /users", () => {
       const response = await request(app).post("/users").send()
       expect(response.statusCode).toBe(200)
     })
-
+    // test the endpoints for the classes
+    // We are always going to have 345 in the database, so we are going to check the get class endpoint
     test("Test getClass", async () => {
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
       var professor = addResponse.body.class.professor
@@ -33,6 +34,12 @@ describe("POST /users", () => {
       expect(found).toBe(true)
     }, TIMEOUT)
 
+    /* test adding a class
+    creates a file with the following information:
+    and adds the class to the database
+    then see if the correct class is in the database
+    then delete the class from the database  
+    */
     test("Test addClass", async () => {
 
       const req = {
@@ -63,6 +70,7 @@ describe("POST /users", () => {
       await request(app).post("/removeClass").send({'class_id' : req.class_id});
     }, TIMEOUT)
 
+    /** tests updating a class where a field is updated and then test if the field is correctly updated */
     test("Test updateClass", async () => {
       await request(app).post("/updateClass").send({'class_id' : '345', 'professor' : 'cat'});
       const addResponse = await request(app).post("/getClass").send({'class_id' : '345'});
@@ -82,7 +90,7 @@ describe("POST /users", () => {
       expect(net_id).toBe('pokemon678')
     }, TIMEOUT)
 
-
+    // tests if correct student is in the database
     test("Test addStudent", async () => {
       const req = {
         net_id: 'pokemon8910',
@@ -99,7 +107,7 @@ describe("POST /users", () => {
     }, TIMEOUT)
 
 
-
+    // tests if correct information is updated in the database
     test("Test updateStudent", async () => {
       await request(app).post("/updateStudent").send({'net_id' : 'pokemon678', 'major' : 'computer engineering'});
 
@@ -113,7 +121,8 @@ describe("POST /users", () => {
 
 
 
-    //These are the tests for the professor endpoints
+    // These are the tests for the professor endpoints
+    // follow the same format as the student endpoints
 
     test("Test addProfessor", async () => {
       const req = {
@@ -153,6 +162,7 @@ describe("POST /users", () => {
 
     /*
     These are the endpoint tests for advisers
+    They follow the same format as the professor and student endpoints
     */
     test("Test addAdviser", async () => {
       const req = {
@@ -184,7 +194,8 @@ describe("POST /users", () => {
       await request(app).post("/updateAdviser").send({'net_id' : '456', 'adviser_name' : 'x', 'email' : '456@uw.edu', 'password' : 'pass456', 'department' : 'math'});
     }, TIMEOUT)
 
-
+    // these are the endpoint tests for the sections
+    // they follow the same format as the professor and student and advisers endpoints
     test("Test addSection", async () => {
       const req = {
         section_id: '157',
@@ -217,6 +228,8 @@ describe("POST /users", () => {
       await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
     }, TIMEOUT)
 
+    // these are the endpoint tests for the registration
+    // they follow the same format as the professor and student and advisers and section endpoints
     test("Test addRegistration", async () => {
       const req = {
         net_id: 'pokemon678',
@@ -365,6 +378,7 @@ describe("POST /users", () => {
     }, TIMEOUT);
   });
 
+  // These are the tests to see if the database is functioning properly
   describe("Unit Testing", () => {
     describe("Database works", () => {
       test('database works properly', async () => {
