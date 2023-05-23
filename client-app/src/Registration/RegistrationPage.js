@@ -10,20 +10,33 @@ import waitlistNotSelected from '../assets/waitlistnotselected.png';
 const RegistrationPage = () => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
     const location = useLocation();
+    // hook for modal state
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    // hook for uwid state
     const [uwId, setUwId] = useState('');
+    // hook for student info state
     const [studentInfo, setStudentInfo] = useState(null);
+    // hook for courses state
     const [courses, setCourses] = useState([]);
+    // hook for search term state
     const [searchTerm, setSearchTerm] = useState('');
+    // hook for selected courses state
     const [selectedCourses, setSelectedCourses] = useState([]);
+    // hook for checked courses state
     const [checkedCourses, setCheckedCourses] = useState([]);
+    // hook for requested add codes state
     const [requestedAddCodes, setRequestedAddCodes] = useState([]);
+    // hook for waitlisted state
     const [waitlisted, setWaitlisted] = useState(false);
 
+    // This function is responsible for the modal's checkbox change
     const handleCheckboxChange = (course) => {
+        // If no course is found, alert the user
         if (course === undefined) {
             window.alert("No courses found!");
         } else{
+            // Here we are checking if the course is already in the checkedCourses array
+            // If it is not, we add it to the array
             setCheckedCourses((prevCheckedCourses) => {
                 if (prevCheckedCourses.includes(course)) {
                     return prevCheckedCourses.filter((c) => c !== course);
@@ -34,11 +47,13 @@ const RegistrationPage = () => {
         }
     };
 
+    // This function is responsible for the modal close state
     const handleCloseModal = async () => {
+        // If no courses were added, alert the user
         if (courses.length === 0) {
             window.alert("No classes were added!");
         }
-
+        // Finding the selected courses that are not already in the selectedCourses array
         const newCourses = checkedCourses.filter(
             (course) => !selectedCourses.find((c) => c.sln === course.sln)
         );
@@ -48,12 +63,15 @@ const RegistrationPage = () => {
             await addCourse(course);
         }
 
+        // Update the selectedCourses array with the new courses
         setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, ...newCourses]);
         setCheckedCourses([]);
         setModalIsOpen(false);
     };
 
+    // This function is responsible for add course button
     const addCourse = async (course) => {
+        // Create the endpoint and options for the add course request
         const addRegistrationEndpoint = "/addRegistration";
         const addRegistrationOptions = {
             method: "POST",
@@ -63,6 +81,7 @@ const RegistrationPage = () => {
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
         try {
+            // Make the request
             const response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
             if (!response.ok) {
                 throw new Error('Error adding course');
@@ -72,7 +91,9 @@ const RegistrationPage = () => {
         }
     }
 
+    // This function is responsible for the remove course button
     const removeCourse = async (course) => {
+        // Create the endpoint and options for the remove course request
         const removeRegistrationEndpoint = "/removeRegistration";
         const removeRegistrationOptions = {
             method: "POST",
@@ -82,6 +103,7 @@ const RegistrationPage = () => {
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
         try {
+            // Make the request
             const response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
             if (!response.ok) {
                 throw new Error('Error removing course');
@@ -91,6 +113,7 @@ const RegistrationPage = () => {
         }
     }
 
+    // Hook startup function
     useEffect(() => {
         Modal.setAppElement('#root');
         if (location.state && location.state.uwid) {
@@ -101,7 +124,9 @@ const RegistrationPage = () => {
         }
     }, [location, location.state, requestedAddCodes, courses]);
 
+    // This function is responsible for getting the student registration data
     const getRegistrationData = async (uwId) => {
+        // Create the endpoint and options for the get registration request
         const getRegistrationEndpoint = "/getStudentRegistration";
         const getRegistrationOptions = {
             method: "POST",
@@ -111,9 +136,10 @@ const RegistrationPage = () => {
             body: JSON.stringify({'net_id': uwId})
         }
         try {
+            // Make the request
             const data = await fetchData(getRegistrationEndpoint, getRegistrationOptions);
-
             const registeredClasses = data.registration;
+            // Get the class data for each registered class
             const classDataPromises = registeredClasses.map(async (registeredClass) => {
                 const getClassEndpoint = "/getClass";
                 const getClassOptions = {
@@ -123,17 +149,22 @@ const RegistrationPage = () => {
                     },
                     body: JSON.stringify({'class_id': registeredClass.class_id})
                 };
+                // Make the request
                 const classData = await fetchData(getClassEndpoint, getClassOptions);
                 return classData.class;
             });
+            // Wait for all the requests to finish
             const classData = await Promise.all(classDataPromises);
+            // Update the selectedCourses array with the class data
             setSelectedCourses(classData);
         } catch (error) {
             console.error('Error fetching registration data:', error);
         }
     }
 
+    // This function is responsible for getting the student info
     const getStudentInfo = async (uwId) => {
+        // Create the endpoint and options for the get student request
         const getStudentEndpoint = "/getStudent";
         const getStudentOptions = {
             method: "POST",
@@ -143,6 +174,7 @@ const RegistrationPage = () => {
             body: JSON.stringify({'net_id': uwId})
         }
         try {
+            // Make the request
             const data = await fetchData(getStudentEndpoint, getStudentOptions);
             setStudentInfo(data);
             return data;
@@ -152,9 +184,11 @@ const RegistrationPage = () => {
         }
     }
 
+    // This function is responsible for searching for a course
     const searchCourse = async () => {
+        // Empty the courses array
         setCourses([]);
-
+        // Create the endpoint and options for the search course request
         const getClassEndpoint = "/getClass";
         const getClassOptions = {
             method: "POST",
@@ -164,13 +198,14 @@ const RegistrationPage = () => {
             body: JSON.stringify({'class_id': searchTerm})
         };
         try {
+            // Make the request
             const data = await fetchData(getClassEndpoint, getClassOptions);
 
             if (data.class === undefined) {
                 window.alert("No class found!");
                 return;
             }
-
+            // Get the add code status for the class
             const getAddCodeEndpoint = "/getAddCode";
             const getAddCodeOptions = {
                 method: "POST",
@@ -179,38 +214,51 @@ const RegistrationPage = () => {
                 },
                 body: JSON.stringify({'class': data.class.class_id})
             };
+            // Make the request
             const addCodeData = await fetchData(getAddCodeEndpoint, getAddCodeOptions);
-
+            // Update the course with the add code status
             const addCodeStatus = addCodeData.AddCodes.find((addCode) => addCode.net_id === uwId);
             const updatedCourse = {
                 ...data.class,
                 add_code_status: (addCodeStatus && addCodeStatus.add_code_status) ? addCodeStatus.add_code_status : "-1",
                 add_id: addCodeStatus ? addCodeStatus.add_id : null
             };
-
+            // Update the courses array
             setCourses(prevCourses => [...prevCourses, updatedCourse]);
         } catch (error) {
             console.error('Error fetching class data:', error);
         }
     }
 
+    // This function is responsible for opening the modal
     function openModal() {
+        // Reset the search term and courses array
         setSearchTerm('');
+        // Reset the courses array
         setCourses([]);
         setModalIsOpen(true);
     }
 
+    // This function is responsible for closing the modal
     function closeModal() {
         setModalIsOpen(false);
     }
 
+    // This function is responsible for handling removing a course
     const handleRemoveCourse = async (courseIndex) => {
+        // Get the course to remove
         const courseToRemove = selectedCourses[courseIndex];
+        // Remove the course
         await removeCourse(courseToRemove);
+        // Update the selected courses array
         setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
     };
-    
+
+    // This function is responsible for handling for add or remove add code requests
     const handleAddCodeRequest = async (course) => {
+        // Create the endpoint and options for the add or remove add code request
+        // If the add code status is 0, then we are removing the add code
+        // If the add code status is 1, then we are adding the add code
         const endpoint = course.add_code_status === "0" ? '/removeAddCode' : '/addAddCode';
         const add_id = course.add_code_status === "0" ? course.add_id : generateGUID();
         const options = {
@@ -229,8 +277,10 @@ const RegistrationPage = () => {
         };
 
         try {
+            // Make the request
             const response = await fetchData(endpoint, options);
             if (response.status === 200) {
+                // Update the requested add codes array
                 setRequestedAddCodes((prevRequestedAddCodes) => {
                     if (prevRequestedAddCodes.includes(course.sln)) {
                         return prevRequestedAddCodes.filter((sln) => sln !== course.sln);
@@ -259,7 +309,7 @@ const RegistrationPage = () => {
         }
     };
 
-
+    // This function is responsible for generating a GUID
     function generateGUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -267,9 +317,11 @@ const RegistrationPage = () => {
         });
     }
 
+    // This function is responsible for handling the waitlist click
     const handleWaitlistClick = async (course) => {
         // If the course is waitlisted, we want to remove it
         if (course.waitlisted) {
+            // Create the endpoint and options for the remove waitlist request
             const removeWaitlistEndpoint = "/removeStudentFromWaitlist";
             const removeWaitlistOptions = {
                 method: "POST",
@@ -280,11 +332,13 @@ const RegistrationPage = () => {
             };
 
             try {
+                // Make the request
                 const data = await fetchData(removeWaitlistEndpoint, removeWaitlistOptions);
 
                 if (data.status !== 200) {
                     window.alert("Could not remove from waitlist!");
                 } else {
+                    // Update the course
                     setCourses(courses.map(c =>
                         c.class_id === course.class_id
                             ? {...c, waitlisted: false}
@@ -298,6 +352,7 @@ const RegistrationPage = () => {
 
             // If the course is not waitlisted, we want to add it
         } else {
+            // Create the endpoint and options for the add waitlist request
             const addWaitlistEndpoint = "/addWaitlist";
             const addWaitlistOptions = {
                 method: "POST",
@@ -311,11 +366,13 @@ const RegistrationPage = () => {
             };
 
             try {
+                // Make the request
                 const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
                 console.log(data);
                 if (data.status !== 200) {
                     window.alert("Could not add to waitlist!");
                 } else {
+                    // Update the course
                     setCourses(courses.map(c =>
                         c.class_id === course.class_id
                             ? {...c, waitlisted: true}
@@ -328,8 +385,6 @@ const RegistrationPage = () => {
             }
         }
     };
-
-
 
     return (
         <div className={styles.RegistrationPage}>
@@ -353,6 +408,7 @@ const RegistrationPage = () => {
                 )}
 
                 <button onClick={openModal}>َAdd Courses</button>
+                {/*Modal for adding courses*/}
                 <Modal
                     isOpen={modalIsOpen}
                     onRequestClose={closeModal}
@@ -365,6 +421,7 @@ const RegistrationPage = () => {
                     <button onClick={searchCourse}>Search</button>
 
                     {courses.length > 0 && (
+                        // table for the modal
                         <table className={styles.ModalTable}>
                             <thead>
                             <tr>
@@ -453,6 +510,7 @@ const RegistrationPage = () => {
                 </div>
             )}
             {selectedCourses.length > 0 && (
+                // table for the selected courses
                 <table className={styles.RegistrationTable}>
                     <thead>
                     <tr>
