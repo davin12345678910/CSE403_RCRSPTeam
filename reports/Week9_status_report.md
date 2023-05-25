@@ -47,16 +47,20 @@ Just finalizing the project and seeing what we ant to add.
 
 ### Ahmed Helow
 what I did:
+I helped with hosting the website for the peer review assignment. 
 
 
 what I learned:
+I learned how to peer review other projects and comment on the structure of the repository. I also learned how to host a website. 
 
 
 What I had trouble on:
+We had trouble hosting the website publicly at the beginning. 
 
 
 
 What I am stuck on:
+We are now in the process of making the code be more readable by adding comments and helper functions. 
 
 
 
