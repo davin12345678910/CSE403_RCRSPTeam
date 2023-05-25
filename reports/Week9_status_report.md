@@ -87,15 +87,17 @@ What I am stuck on:
 
 
 ### Sol Zamora
-what I did:
+What I did:
+I began working on one of the final use cases: automating the waitlist system such that students are scheduled in a manner that doesn't allow scheduling conflicts. This means redesigning the 'classes' data table and modifying all affected functions.
 
-what I learned:
-
+What I learned:
+I learned how to implement a Queue-like data structure in SQL. I also learned that SQL data tables can store many more columns of data than I initially thought.
 
 What I had trouble on:
+I had trouble refactoring the code that was dependent on the 'classes' data table working as it did previously. Since the table was changed, every function and query that accessed that data table also had to be changed.
 
 What I am stuck on:
-
+I am stuck working on a method to disallow students from adding themselves to the waitlist for every class.
 
 
 ## Plans for next week:
