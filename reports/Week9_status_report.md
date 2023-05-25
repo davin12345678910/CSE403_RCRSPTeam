@@ -62,16 +62,16 @@ What I am stuck on:
 
 ### Chairnet Muche
 what I did:
-
+I helped with setting up the host and helped with the comments making sure that the required comments are done on the front-end side of the project.
 
 what I learned:
-
+I learned that hosting a project on a website takes time and effort when especially trying to host for both the back end and the front end at the same time.
 
 What I had trouble on:
-
+I had trouble hosting the site but with the help of group members, we were able to host it.
 
 What I am stuck on:
-
+I am still not sure what we need to add for our final project,  because we only have about one week to do it. And I think we need to choose which last cases to add to our project before finalizing it.
 
 
 ### Foad Shariat
