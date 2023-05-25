@@ -32,17 +32,17 @@ Getting a way to have changes in the code, but it not crashing or impacting the 
 
 ### Azaan Khalfe
 what I did:
-
+I helped hosting the project and adding comments to the backend portion.
 
 what I learned:
-
+I learned how to host a project and what is needed to host a project.
 
 
 What I had trouble on:
-
+I had trouble on trying to host get everything needed for hosting the project.
 
 What I am stuck on:
-
+Just finalizing the project and seeing what we ant to add.
 
 
 ### Ahmed Helow
