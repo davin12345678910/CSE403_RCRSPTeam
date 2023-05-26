@@ -2,6 +2,7 @@
 We are a team of computer science students working on a Resilient Course Registration System for CSE 403
 
 ## Develop manual
+https://docs.google.com/document/d/1DpmlfKxq3VFeilAVemMilKVNhCXm3DWoTRHX1fy9vwQ/edit?usp=sharing
 
 ## User Manual
 https://docs.google.com/document/d/13RvvEvJGE3wI7jSebsUUTVm4hDSWWP-2suIpz51K3Xc/edit?usp=sharing
