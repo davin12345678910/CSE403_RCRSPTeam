@@ -238,14 +238,14 @@ describe("This is the registration automated testing", () => {
     // Here we will test to see if we are able to update the fields in which we pass to the endpoint
     // for the sections
     test("Test updateSection", async () => {
-      const updateResponse = await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'cat'});
+      const updateResponse = await request(app).post("/updateSection").send({'section_id' : 'section0', 'ta' : 'cat'});
       //console.log(updateResponse.body.section);
-      const addResponse = await request(app).post("/getSection").send({'section_id' : '331'});
-      var ta = addResponse.body.section.ta
+      const getResponse = await request(app).post("/getSection").send({'section_id' : 'section0'});
+      var ta = getResponse.body.section.ta
       //console.log(ta)
       expect(ta).toBe('cat');
 
-      await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
+      await request(app).post("/updateSection").send({'section_id' : 'section0', 'ta' : 'x'});
     }, TIMEOUT)
 
 
@@ -256,10 +256,7 @@ describe("This is the registration automated testing", () => {
         net_id: 'pokemon678',
         class_id: 'cse331',
       }
-      const req2 = {
-        net_id: 'pokemon678',
-        class_id: 'cse312',
-      }
+      
       const addResponse = await request(app).post("/addRegistration").send(req);
       //console.log(addResponse.body.message);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
@@ -286,7 +283,26 @@ describe("This is the registration automated testing", () => {
         }
       });
       expect(found).toBe(true);
-    }, TIMEOUT)
+    }, TIMEOUT);
+
+    test("Test addRegistration full course", async () => {
+      const req = {
+        net_id: "pokemon678",
+        class_id: "cse332"
+      }
+      const addResponse = await request(app).post('/addRegistration').send(req);
+      expect(addResponse.body.status).toBe(500);
+    }, TIMEOUT);
+
+    test("Test addRegistration schedule conflict", async () => {
+      const req = {
+        net_id: "pokemon678",
+        class_id: "cse333"
+      }
+      const addResponse = await request(app).post('/addRegistration').send(req);
+      await request(app).post('/removeRegistration').send(req);
+      expect(addResponse.body.status).toBe(500);
+    }, TIMEOUT);
 
 
     // Here we will check to see if we are able to login successfully
