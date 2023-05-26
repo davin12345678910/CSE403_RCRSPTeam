@@ -136,7 +136,37 @@ async function addStartupClasses(db) {
 async function addStartupStudents(db) {
   let hasDefaultStudent = await getStudent(db, 'pokemon678');
   if (!hasDefaultStudent) {
-    await addStudent(db, 'pokemon678', 'pokemon678@uw.edu', '123', 'azaan', 'electrical engineering');
+    await addStudent(db, 'pokemon678', 'pokemon678@uw.edu', '123', 'pokemon', 'electrical engineering');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student0');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student0', 'student0@uw.edu', 'pass0', 'Ahmed', 'Computer Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student1');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student1', 'student1@uw.edu', 'pass1', 'Azaan', 'Computer Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student2');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student2', 'student2@uw.edu', 'pass2', 'Chairnet', 'Political Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student3');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student3', 'student3@uw.edu', 'pass3', 'Davin', 'Electrical Engineering');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student4');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student4', 'student4@uw.edu', 'pass4', 'Foad', 'Psychology');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student5');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student5', 'student5@uw.edu', 'pass5', 'Sol', 'Physics');
   }
 }
 

@@ -113,12 +113,16 @@ describe("This is the registration automated testing", () => {
       };
       await request(app).post("/addStudent").send(req);
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
+
+      // Here we will remove, because if we tests again and don't have this
+      // we will get a unique key error since net_id is a primary key
+      await request(app).post("/removeStudent").send({'net_id' : req.net_id});
+      
       var net_id = getStudent.body.student.net_id
       expect(net_id).toBe('pokemon8910')
 
       // Here we will remove, because if we tests again and don't have this
       // we will get a unique key error since net_id is a primary key
-      await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, TIMEOUT)
 
 
