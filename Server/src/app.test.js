@@ -117,7 +117,7 @@ describe("This is the registration automated testing", () => {
       // Here we will remove, because if we tests again and don't have this
       // we will get a unique key error since net_id is a primary key
       await request(app).post("/removeStudent").send({'net_id' : req.net_id});
-      
+
       var net_id = getStudent.body.student.net_id
       expect(net_id).toBe('pokemon8910')
 
@@ -307,6 +307,56 @@ describe("This is the registration automated testing", () => {
       await request(app).post('/removeRegistration').send(req);
       expect(addResponse.body.status).toBe(500);
     }, TIMEOUT);
+
+    test("Test addWaitlist", async () => {
+      const req = {
+        net_id: "student0",
+        class_id: "cse332"
+      }
+
+      const addResponse = await request(app).post('/addWaitlist').send(req);
+      const getResponse = await request(app).post('/getFullWaitlist').send();
+      await request(app).post('/removeWaitlist').send({ net_id: "student0" });
+
+      let found = false;
+      getResponse.body.waitlist.forEach((res) => {
+        if (res.net_id == "student0" && res.class_id == "cse332") {
+          found = true;
+        }
+      });
+
+      expect(addResponse.body.status).toBe(200);
+      expect(found).toBe(true);
+    }, TIMEOUT);
+
+    test("Test automatically register from waitlist when spot opens", async () => {
+      const req0 = {
+        net_id: "student0",
+        class_id: "cse344"
+      }
+      const req1 = {
+        net_id: "student1",
+        class_id: "cse344"
+      }
+
+      const addResponse0 = await request(app).post('/addRegistration').send(req0);
+      console.log(addResponse0.body.message);
+      const addResponse1 = await request(app).post('/addWaitlist').send(req1);
+      console.log(addResponse1.body.message);
+      const removeResponse0 = await request(app).post('/removeRegistration').send(req0);
+      console.log(removeResponse0.body.message);
+      const getResponse = await request(app).post('/getClassRegistration').send({ class_id: "cse344" });
+      console.log(getResponse.body.message);
+      await request(app).post('/removeRegistration').send(req1);
+
+      let found = false;
+      getResponse.body.registration.forEach((entry) => {
+        if (entry.net_id == "student1") {
+          found = true;
+        }
+      });
+      expect(found).toBe(true);
+    }, TIMEOUT)
 
 
     // Here we will check to see if we are able to login successfully

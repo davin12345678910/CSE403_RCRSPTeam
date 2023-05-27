@@ -58,7 +58,7 @@ async function makeTables(db) {
   let queryRegisterClass = 'CREATE TABLE IF NOT EXISTS registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), CONSTRAINT PK_Registration PRIMARY KEY (net_id,class_id));';
 
   // 8. Waitlist
-  let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
+  let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT PRIMARY KEY REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
 
   // 9. Addcode
   let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
@@ -199,9 +199,16 @@ async function addStartupRegistration(db) {
 }
 
 async function addStartupWaitlist(db) {
-  let hasDefaultWaitlist = await getWaitlist(db, 'pokemon678', '345');
+  let waitlist = await getFullWaitlist(db);
+  let hasDefaultWaitlist = false;
+  waitlist.forEach((entry) => {
+    if (entry.net_id == "pokemon678" && entry.class_id == "345") {
+      hasDefaultWaitlist = true;
+    }
+  });
+
   if (!hasDefaultWaitlist) {
-    await addWaitlist(db, 'pokemon678', '345')
+    await addWaitlist(db, "pokemon678", "345");
   }
 }
 
@@ -785,9 +792,8 @@ app.post('/removeClassFromRegistration', async (req, res) => {
 
 app.post('/getWaitlist', async (req, res) => {
   let db = getDBConnection();
-  let net_id = req.body.net_id;
   let class_id = req.body.class_id;
-  let waitlist = await getWaitlist(db, net_id, class_id);
+  let waitlist = await getWaitlist(db, class_id);
   db.close();
 
   let status = waitlist ? SUCCESS : ERROR;
@@ -816,6 +822,17 @@ app.post('/addWaitlist', async (req, res) => {
 
   let status = success ? SUCCESS : ERROR;
   let result = setResDefaults('/addWaitlist', status);
+  res.send(result);
+})
+
+app.post('/removeWaitlist', async (req, res) => {
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let success = await removeWaitlist(db, net_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeWaitlist', status);
   res.send(result);
 })
 
@@ -1248,7 +1265,7 @@ async function login(db, net_id, password) {
   const timestamp = new Date().toLocaleString();
   const logEntry = `${timestamp}: ${net_id} logged in\n`;
   logStream.write(logEntry);
-  return 200;
+  return SUCCESS;
 }
 
 function getRegistration(db, net_id, class_id) {
@@ -1307,9 +1324,9 @@ function removeClassFromRegistration(db, class_id) {
   return dbRun(db, query, [class_id]);
 }
 
-function getWaitlist(db, net_id, class_id) {
-  let query = "SELECT * FROM waitlist WHERE net_id = ? AND class_id = ?;";
-  return dbGet(db, query, [net_id, class_id]);
+function getWaitlist(db, class_id) {
+  let query = "SELECT * FROM waitlist WHERE class_id = ?;";
+  return dbGet(db, query, [class_id]);
 }
 
 function getFullWaitlist(db) {
@@ -1325,9 +1342,9 @@ async function addWaitlist(db, net_id, class_id) {
   return dbRun(db, query, [net_id, class_id, position]);
 }
 
-function removeWaitlist(db, net_id, class_id) {
-  let query = "DELETE FROM waitlist WHERE net_id = ? AND class_id = ?;";
-  return dbRun(db, query, [net_id, class_id]);
+function removeWaitlist(db, net_id) {
+  let query = "DELETE FROM waitlist WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
 }
 
 function removeStudentFromWaitlist(db, net_id) {
@@ -1342,15 +1359,15 @@ function removeClassFromWaitlist(db, class_id) {
 
 async function popWaitlist(db, class_id) {
   let query = "SELECT net_id FROM waitlist WHERE class_id = ? ORDER BY position ASC LIMIT 1;";
-  let net_id = await dbGet(db, query, [class_id]);
-  if (!net_id) {
+  let student = await dbGet(db, query, [class_id]);
+  if (!student) {
     return true;
   }
 
-  if (!addRegistration(db, net_id, class_id)) {
+  if (!(await addRegistration(db, student.net_id, class_id))) {
     return false;
   }
-  return removeWaitlist(db, net_id, class_id);
+  return removeWaitlist(db, student.net_id);
 }
 
 function getAddCodes(db, class_name) {
