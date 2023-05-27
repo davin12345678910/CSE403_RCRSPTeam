@@ -41,7 +41,6 @@ const LoginPage = () => {
 
         try {
             const data = await fetchData(loginEndpoint, loginOptions);
-            console.log(data);
             if (data['status'] === 200) {
                 navigate('/register', { state: { uwid } });
             } else {

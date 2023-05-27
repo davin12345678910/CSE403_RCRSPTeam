@@ -60,11 +60,13 @@ const RegistrationPage = () => {
 
         // Add each new course to the backend
         for (const course of newCourses) {
-            await addCourse(course);
+            const res = await addCourse(course);
+            // Only add the course to the selectedCourses array if the status is 200
+            if (res.status === 200) {
+                setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, course]);
+            }
         }
 
-        // Update the selectedCourses array with the new courses
-        setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, ...newCourses]);
         setCheckedCourses([]);
         setModalIsOpen(false);
     };
@@ -80,15 +82,17 @@ const RegistrationPage = () => {
             },
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
+        let response = null;
         try {
             // Make the request
-            const response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
-            if (!response.ok) {
+            response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
+            if (response.status !== 200) {
                 throw new Error('Error adding course');
             }
         } catch (error) {
             console.error('Error adding course:', error);
         }
+        return response;
     }
 
     // This function is responsible for the remove course button
@@ -102,15 +106,17 @@ const RegistrationPage = () => {
             },
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
+        let response = null;
         try {
             // Make the request
-            const response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
-            if (!response.ok) {
+            response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
+            if (response.status !== 200) {
                 throw new Error('Error removing course');
             }
         } catch (error) {
             console.error('Error removing course:', error);
         }
+        return response;
     }
 
     // Hook startup function
@@ -249,9 +255,11 @@ const RegistrationPage = () => {
         // Get the course to remove
         const courseToRemove = selectedCourses[courseIndex];
         // Remove the course
-        await removeCourse(courseToRemove);
+        const response = await removeCourse(courseToRemove);
         // Update the selected courses array
-        setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+        if (response.status === 200) {
+            setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+        }
     };
 
     // This function is responsible for handling for add or remove add code requests
@@ -368,7 +376,6 @@ const RegistrationPage = () => {
             try {
                 // Make the request
                 const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
-                console.log(data);
                 if (data.status !== 200) {
                     window.alert("Could not add to waitlist!");
                 } else {
@@ -384,6 +391,39 @@ const RegistrationPage = () => {
                 console.error('Error adding to waitlist:', error);
             }
         }
+    };
+
+    const formatDays = (course) => {
+        let days = '';
+        if (course.startM !== null) days += 'Mon-';
+        if (course.startT !== null) days += 'Tue-';
+        if (course.startW !== null) days += 'Wed-';
+        if (course.startTH !== null) days += 'Thu-';
+        if (course.startF !== null) days += 'Fri-';
+        if (course.startSAT !== null) days += 'Sat-';
+        if (course.startSUN !== null) days += 'Sun-';
+        // remove trailing '-' character
+        return days.slice(0, -1);
+    };
+
+    const formatTime = (course) => {
+        let time = '';
+        if (course.startM !== null) time = formatMilitaryTime(course.startM, course.endM);
+        else if (course.startT !== null) time = formatMilitaryTime(course.startT, course.endT);
+        else if (course.startW !== null) time = formatMilitaryTime(course.startW, course.endW);
+        else if (course.startTH !== null) time = formatMilitaryTime(course.startTH, course.endTH);
+        else if (course.startF !== null) time = formatMilitaryTime(course.startF, course.endF);
+        else if (course.startSAT !== null) time = formatMilitaryTime(course.startSAT, course.endSAT);
+        else if (course.startSUN !== null) time = formatMilitaryTime(course.startSUN, course.endSUN);
+        return time;
+    };
+
+    const formatMilitaryTime = (start, end) => {
+        const startHour = Math.floor(start / 100);
+        const startMinute = start % 100;
+        const endHour = Math.floor(end / 100);
+        const endMinute = end % 100;
+        return `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute} - ${endHour}:${endMinute < 10 ? '0' + endMinute : endMinute}`;
     };
 
     return (
@@ -431,6 +471,7 @@ const RegistrationPage = () => {
                                 <th>Credits</th>
                                 <th>Title</th>
                                 <th>Professor</th>
+                                <th>Class Day(s)</th>
                                 <th>Class Time</th>
                                 {courses.some(course => course.add_code_required === 1) && <th>Add Code Required</th>}
                             </tr>
@@ -440,7 +481,7 @@ const RegistrationPage = () => {
                                 <tr key={index}>
                                     <td>
                                      {
-                                        course.class_id === "333"
+                                         ((course.capacity - course.enrolled) === 0)
                                             ? <img
                                                 style={{cursor: 'pointer'}}
                                                 src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
@@ -463,7 +504,8 @@ const RegistrationPage = () => {
                                     <td>{course.credits}</td>
                                     <td>{course.class_name}</td>
                                     <td>{course.professor}</td>
-                                    <td>{course.class_times}</td>
+                                    <td>{formatDays(course)}</td>
+                                    <td>{formatTime(course)}</td>
                                     <td hidden={course.add_code_required !== 1}>
                                         {course.add_code_required === 1 && (
                                             <>
@@ -519,6 +561,7 @@ const RegistrationPage = () => {
                         <th>Credits</th>
                         <th>Title</th>
                         <th>Professor</th>
+                        <th>Class Day(s)</th>
                         <th>Class Time</th>
                         <th>Average GPA</th>
                         <th>Rating</th>
@@ -547,7 +590,8 @@ const RegistrationPage = () => {
                                 <td>{course.credits}</td>
                                 <td>{course.class_name}</td>
                                 <td>{course.professor}</td>
-                                <td>{course.class_times}</td>
+                                <td>{formatDays(course)}</td>
+                                <td>{formatTime(course)}</td>
                                 <td>{course.average_gpa}</td>
                                 <td>
                                     <ReactStars
