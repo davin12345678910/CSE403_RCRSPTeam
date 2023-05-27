@@ -29,11 +29,14 @@ const RegistrationPage = () => {
     // hook for waitlisted state
     const [waitlisted, setWaitlisted] = useState(false);
 
+
+    const [errorMessage, setErrorMessage] = useState('');
+
     // This function is responsible for the modal's checkbox change
     const handleCheckboxChange = (course) => {
         // If no course is found, alert the user
         if (course === undefined) {
-            window.alert("No courses found!");
+            setErrorMessage("No courses found!");
         } else{
             // Here we are checking if the course is already in the checkedCourses array
             // If it is not, we add it to the array
@@ -51,7 +54,7 @@ const RegistrationPage = () => {
     const handleCloseModal = async () => {
         // If no courses were added, alert the user
         if (courses.length === 0) {
-            window.alert("No classes were added!");
+            setErrorMessage("No classes were added!");
         }
         // Finding the selected courses that are not already in the selectedCourses array
         const newCourses = checkedCourses.filter(
@@ -87,10 +90,12 @@ const RegistrationPage = () => {
             // Make the request
             response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
             if (response.status !== 200) {
+                setErrorMessage('Error adding course');
                 throw new Error('Error adding course');
             }
         } catch (error) {
             console.error('Error adding course:', error);
+            setErrorMessage('Error adding course:', error);
         }
         return response;
     }
@@ -111,10 +116,12 @@ const RegistrationPage = () => {
             // Make the request
             response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
             if (response.status !== 200) {
+                setErrorMessage('Error removing course');
                 throw new Error('Error removing course');
             }
         } catch (error) {
             console.error('Error removing course:', error);
+            setErrorMessage('Error removing course:', error);
         }
         return response;
     }
@@ -165,6 +172,7 @@ const RegistrationPage = () => {
             setSelectedCourses(classData);
         } catch (error) {
             console.error('Error fetching registration data:', error);
+            setErrorMessage('Error fetching registration data:', error);
         }
     }
 
@@ -186,6 +194,7 @@ const RegistrationPage = () => {
             return data;
         } catch (error) {
             console.error('Error fetching data:', error);
+            setErrorMessage('Error fetching data:', error);
             return null;
         }
     }
@@ -208,7 +217,7 @@ const RegistrationPage = () => {
             const data = await fetchData(getClassEndpoint, getClassOptions);
 
             if (data.class === undefined) {
-                window.alert("No class found!");
+                setErrorMessage("No class found!");
                 return;
             }
             // Get the add code status for the class
@@ -233,6 +242,7 @@ const RegistrationPage = () => {
             setCourses(prevCourses => [...prevCourses, updatedCourse]);
         } catch (error) {
             console.error('Error fetching class data:', error);
+            setErrorMessage('Error fetching class data:', error);
         }
     }
 
@@ -314,6 +324,7 @@ const RegistrationPage = () => {
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('Error:', error);
         }
     };
 
@@ -344,7 +355,7 @@ const RegistrationPage = () => {
                 const data = await fetchData(removeWaitlistEndpoint, removeWaitlistOptions);
 
                 if (data.status !== 200) {
-                    window.alert("Could not remove from waitlist!");
+                    setErrorMessage("Could not remove from waitlist!");
                 } else {
                     // Update the course
                     setCourses(courses.map(c =>
@@ -356,6 +367,7 @@ const RegistrationPage = () => {
 
             } catch (error) {
                 console.error('Error removing from waitlist:', error);
+                setErrorMessage('Error removing from waitlist:', error);
             }
 
             // If the course is not waitlisted, we want to add it
@@ -377,7 +389,7 @@ const RegistrationPage = () => {
                 // Make the request
                 const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
                 if (data.status !== 200) {
-                    window.alert("Could not add to waitlist!");
+                    setErrorMessage("Could not add to waitlist!");
                 } else {
                     // Update the course
                     setCourses(courses.map(c =>
@@ -389,6 +401,7 @@ const RegistrationPage = () => {
 
             } catch (error) {
                 console.error('Error adding to waitlist:', error);
+                setErrorMessage('Error adding to waitlist:', error);
             }
         }
     };
@@ -616,6 +629,17 @@ const RegistrationPage = () => {
                     </tbody>
                 </table>
             )}
+            {errorMessage &&
+                <div className={styles.modalErr}>
+                    <div className={styles.modalContentErr}>
+                        <div className={styles.alertHeaderErr}>Alert</div>
+                        <p>{errorMessage}</p>
+                        <button className={styles.closeButtonErr} onClick={() => setErrorMessage('')}>
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
     )
 }

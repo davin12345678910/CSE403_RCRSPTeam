@@ -189,6 +189,47 @@ h1 {
     padding: 1rem;
     background-color: gold;
 }
+.modalErr {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modalContentErr {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 80%;
+    position: relative;
+    text-align: center;
+}
+
+.closeButtonErr{
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    border: none;
+    background: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    background-color: red;
+    border-radius: 1rem;
+    color: white;
+}
+.alertHeaderErr{
+    border-bottom: 1px solid black;
+    text-align: left;
+    padding: 0rem 0rem 1rem 0rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: red;
+}
+
 
 
 @media screen and (max-width: 600px) {
