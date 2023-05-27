@@ -269,7 +269,10 @@ const RegistrationPage = () => {
         // Update the selected courses array
         if (response.status === 200) {
             setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+        } else {
+            setErrorMessage("We cannot remove course");
         }
+
     };
 
     // This function is responsible for handling for add or remove add code requests
@@ -321,6 +324,9 @@ const RegistrationPage = () => {
                         }
                     });
                 });
+
+            } else {
+                setErrorMessage("we cannot add code or remove add code");
             }
         } catch (error) {
             console.error('Error:', error);
