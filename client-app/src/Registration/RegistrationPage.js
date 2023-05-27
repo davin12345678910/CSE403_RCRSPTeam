@@ -481,20 +481,22 @@ const RegistrationPage = () => {
                                 <tr key={index}>
                                     <td>
                                      {
-                                         ((course.capacity - course.enrolled) === 0)
-                                            ? <img
-                                                style={{cursor: 'pointer'}}
-                                                src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
-                                                alt="Waitlist Status"
-                                                width="50"
-                                                height="50"
-                                                onClick={() => handleWaitlistClick(course)}
-                                            />
-                                            : <>
-                                                <input type="checkbox"
-                                                onChange={() => handleCheckboxChange(course)}
-                                                disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
-                                               </>
+                                        selectedCourses.find(c => c.class_id === course.class_id)
+                                            ? <span style={{color: 'green'}}>Registered</span>
+                                            : ((course.capacity - course.enrolled) === 0)
+                                                ? <img
+                                                    style={{cursor: 'pointer'}}
+                                                    src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
+                                                    alt="Waitlist Status"
+                                                    width="50"
+                                                    height="50"
+                                                    onClick={() => handleWaitlistClick(course)}
+                                                />
+                                                : <>
+                                                    <input type="checkbox"
+                                                    onChange={() => handleCheckboxChange(course)}
+                                                    disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                                </>
 
                                      }   
                                         
