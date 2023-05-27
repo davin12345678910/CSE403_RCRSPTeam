@@ -80,14 +80,16 @@ I am still not sure what we need to add for our final project,  because we only 
 
 ### Foad Shariat
 what I did:
-
+I did some of the commenting for teh front end and also improved the add code and waitlist functionality
 
 what I learned:
+I learned how to use github functions and also working better with backend
 
 What I had trouble on:
-
+I had trouble on sending and recieving data with the backend in some point
 
 What I am stuck on:
+Nothing specific. I'm not stuck on anything.
 
 
 ### Sol Zamora
