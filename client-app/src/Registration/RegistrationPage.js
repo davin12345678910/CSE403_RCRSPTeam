@@ -32,6 +32,14 @@ const RegistrationPage = () => {
 
     const [errorMessage, setErrorMessage] = useState('');
 
+    // This function is responsible for the modal's enter key
+    const handleEnter = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchCourse();
+        }
+      }
+
     // This function is responsible for the modal's checkbox change
     const handleCheckboxChange = (course) => {
         // If no course is found, alert the user
@@ -476,7 +484,7 @@ const RegistrationPage = () => {
                     overlayClassName={styles.Overlay}
                 >
                     <h2 className={styles.AddCourseHeader}>Search and Add Course</h2>
-                    <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                    <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={handleEnter}/> 
                     <button onClick={searchCourse}>Search</button>
 
                     {courses.length > 0 && (
