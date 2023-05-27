@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'https://api-rcrsp.onrender.com';
 const fetchData = async (endpoint, options) => {
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
