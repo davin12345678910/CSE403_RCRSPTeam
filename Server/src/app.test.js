@@ -260,7 +260,7 @@ describe("This is the registration automated testing", () => {
         net_id: 'pokemon678',
         class_id: 'cse331',
       }
-      
+
       const addResponse = await request(app).post("/addRegistration").send(req);
       //console.log(addResponse.body.message);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
@@ -475,9 +475,51 @@ describe("This is the registration automated testing", () => {
     }, TIMEOUT);
 
 
-
+/*
     // Here we will be writing a test for addClasses
+    test("Test addClassesToRegistration", async () => {
+
+      const req = {
+        net_id: '123',
+        class_id: '91011'
+      };
+
+
+      const req2 = {
+        net_id : '123',
+        class_id: '101112'
+      };
+
+      classes = [req, req2];
+
+
+      const addResponse = await request(app).post("/addClasses").send({'classes': classes});
+      console.log("This is the result status: " + addResponse.body.status);
+      const getResponse = await request(app).get("/getStudentRegistration").send();
+      var classes = getResponse.body.class
+      var found = false;
+      var found2 = false;
+      classes.forEach(element => {
+        if (element.class_id == '91011') {
+          found = true
+        }
+
+        if (element.class_id == '101112') {
+          found2 = true
+        }
+      })
+
+      console.log("Did we find class 1: " + found);
+      console.log("Did we find class 2: "  + found2)
+
+      expect(found && found2).toBe(true)
+
+      // remove the class once we are done testing
+      await request(app).post("/removeClass").send({'class_id' : req.class_id});
+      await request(app).post("/removeClass").send({'class_id' : req2.class_id});
+    }, TIMEOUT)
   });
+*/
 
   // These are the tests to see if the database is functioning properly
   describe("Unit Testing", () => {
