@@ -331,6 +331,74 @@ app.post('/addClass', async (req, res) => {
 })
 
 
+app.post('/addClasses', async (req, res) => {
+  let db = getDBConnection();
+
+  // These are the classes that we will be adding in
+  let classes = req.get.classes;
+
+  classes.forEach(async (currentClass) => {
+    let class_id = currentClass.class_id;
+    let credits = currentClass.credits;
+    let rating = currentClass.rating;
+    let average_gpa = currentClass.average_gpa;
+    let professor = currentClass.professor;
+    let assistant_professor = currentClass.assistant_professor;
+    let quarter = currentClass.quarter;
+    let class_name = currentClass.class_name;
+    let sln = currentClass.sln;
+    let add_code_required = currentClass.add_code_required;
+    let enrolled = currentClass.enrolled;
+    let capacity = currentClass.capacity;
+
+    // These variables are needed for a class and are also needed
+    // in order to check for scheduleing conflicts
+    let startM = currentClass.startM;
+    let endM = currentClass.endM;
+    let startT = currentClass.startT;
+    let endT = currentClass.endT;
+    let startW = currentClass.startW;
+    let endW = currentClass.endW;
+    let startTH = currentClass.startTH;
+    let endTH = currentClass.endTH;
+    let startF = currentClass.startF;
+    let endF = currentClass.endF;
+    let startSAT = currentClass.startSAT;
+    let endSAT = currentClass.endSAT;
+    let startSUN = currentClass.startSUN;
+    let endSUN = currentClass.endSUN;
+
+    // Here we will need to check to see if the course if not already in the database
+    let queryContainsClass = 'SELECT * FROM classes WHERE class_id = ?;';
+
+    let foundClasses = await db.all(queryContainsClass, [currentClass.class_id]);
+
+    if (foundClasses.length == 0) {
+      let success = await addClass(db, class_id, credits, rating, average_gpa, professor,
+        assistant_professor, quarter, class_name, sln, add_code_required, enrolled, capacity,
+        startM, endM, startT, endT, startW, endW, startTH, endTH, startF, endF, startSAT, endSAT,
+        startSUN, endSUN)
+
+      let status = success ? SUCCESS : ERROR;
+
+      // This is the case if there is an added class that fails
+      if (status == ERROR) {
+        let result = setResDefaults('/addClasses', status);
+        res.send(result);
+        return
+      }
+    }
+  })
+
+  db.close();
+
+  // This is the case if all of the added classes pass
+  let result = setResDefaults('/addClasses', SUCCESS);
+  res.send(result);
+});
+
+
+
 // This endpoint allows you to add a professor
 app.post('/addProfessor', async (req, res) => {
   let db = getDBConnection()

@@ -403,6 +403,10 @@ describe("This is the registration automated testing", () => {
       })
       expect(found).toBe(true);
     }, TIMEOUT);
+
+
+
+    // Here we will be writing a test for addClasses
   });
 
   // These are the tests to see if the database is functioning properly
