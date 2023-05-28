@@ -29,11 +29,22 @@ const RegistrationPage = () => {
     // hook for waitlisted state
     const [waitlisted, setWaitlisted] = useState(false);
 
+
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // This function is responsible for the modal's enter key
+    const handleEnter = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchCourse();
+        }
+      }
+
     // This function is responsible for the modal's checkbox change
     const handleCheckboxChange = (course) => {
         // If no course is found, alert the user
         if (course === undefined) {
-            window.alert("No courses found!");
+            setErrorMessage("No courses found!");
         } else{
             // Here we are checking if the course is already in the checkedCourses array
             // If it is not, we add it to the array
@@ -51,7 +62,7 @@ const RegistrationPage = () => {
     const handleCloseModal = async () => {
         // If no courses were added, alert the user
         if (courses.length === 0) {
-            window.alert("No classes were added!");
+            setErrorMessage("No classes were added!");
         }
         // Finding the selected courses that are not already in the selectedCourses array
         const newCourses = checkedCourses.filter(
@@ -60,11 +71,13 @@ const RegistrationPage = () => {
 
         // Add each new course to the backend
         for (const course of newCourses) {
-            await addCourse(course);
+            const res = await addCourse(course);
+            // Only add the course to the selectedCourses array if the status is 200
+            if (res.status === 200) {
+                setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, course]);
+            }
         }
 
-        // Update the selectedCourses array with the new courses
-        setSelectedCourses((prevSelectedCourses) => [...prevSelectedCourses, ...newCourses]);
         setCheckedCourses([]);
         setModalIsOpen(false);
     };
@@ -80,15 +93,19 @@ const RegistrationPage = () => {
             },
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
+        let response = null;
         try {
             // Make the request
-            const response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
-            if (!response.ok) {
+            response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
+            if (response.status !== 200) {
+                setErrorMessage('Error adding course');
                 throw new Error('Error adding course');
             }
         } catch (error) {
             console.error('Error adding course:', error);
+            setErrorMessage('Error adding course:', error);
         }
+        return response;
     }
 
     // This function is responsible for the remove course button
@@ -102,15 +119,19 @@ const RegistrationPage = () => {
             },
             body: JSON.stringify({'net_id': uwId, 'class_id': course.class_id})
         }
+        let response = null;
         try {
             // Make the request
-            const response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
-            if (!response.ok) {
+            response = await fetchData(removeRegistrationEndpoint, removeRegistrationOptions);
+            if (response.status !== 200) {
+                setErrorMessage('Error removing course');
                 throw new Error('Error removing course');
             }
         } catch (error) {
             console.error('Error removing course:', error);
+            setErrorMessage('Error removing course:', error);
         }
+        return response;
     }
 
     // Hook startup function
@@ -159,6 +180,7 @@ const RegistrationPage = () => {
             setSelectedCourses(classData);
         } catch (error) {
             console.error('Error fetching registration data:', error);
+            setErrorMessage('Error fetching registration data:', error);
         }
     }
 
@@ -180,6 +202,7 @@ const RegistrationPage = () => {
             return data;
         } catch (error) {
             console.error('Error fetching data:', error);
+            setErrorMessage('Error fetching data:', error);
             return null;
         }
     }
@@ -202,7 +225,7 @@ const RegistrationPage = () => {
             const data = await fetchData(getClassEndpoint, getClassOptions);
 
             if (data.class === undefined) {
-                window.alert("No class found!");
+                setErrorMessage("No class found!");
                 return;
             }
             // Get the add code status for the class
@@ -227,6 +250,7 @@ const RegistrationPage = () => {
             setCourses(prevCourses => [...prevCourses, updatedCourse]);
         } catch (error) {
             console.error('Error fetching class data:', error);
+            setErrorMessage('Error fetching class data:', error);
         }
     }
 
@@ -249,9 +273,14 @@ const RegistrationPage = () => {
         // Get the course to remove
         const courseToRemove = selectedCourses[courseIndex];
         // Remove the course
-        await removeCourse(courseToRemove);
+        const response = await removeCourse(courseToRemove);
         // Update the selected courses array
-        setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+        if (response.status === 200) {
+            setSelectedCourses(selectedCourses.filter((_, index) => index !== courseIndex));
+        } else {
+            setErrorMessage("We cannot remove course");
+        }
+
     };
 
     // This function is responsible for handling for add or remove add code requests
@@ -303,9 +332,13 @@ const RegistrationPage = () => {
                         }
                     });
                 });
+
+            } else {
+                setErrorMessage("we cannot add code or remove add code");
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('Error:', error);
         }
     };
 
@@ -336,7 +369,7 @@ const RegistrationPage = () => {
                 const data = await fetchData(removeWaitlistEndpoint, removeWaitlistOptions);
 
                 if (data.status !== 200) {
-                    window.alert("Could not remove from waitlist!");
+                    setErrorMessage("Could not remove from waitlist!");
                 } else {
                     // Update the course
                     setCourses(courses.map(c =>
@@ -348,6 +381,7 @@ const RegistrationPage = () => {
 
             } catch (error) {
                 console.error('Error removing from waitlist:', error);
+                setErrorMessage('Error removing from waitlist:', error);
             }
 
             // If the course is not waitlisted, we want to add it
@@ -368,9 +402,8 @@ const RegistrationPage = () => {
             try {
                 // Make the request
                 const data = await fetchData(addWaitlistEndpoint, addWaitlistOptions);
-                console.log(data);
                 if (data.status !== 200) {
-                    window.alert("Could not add to waitlist!");
+                    setErrorMessage("Could not add to waitlist!");
                 } else {
                     // Update the course
                     setCourses(courses.map(c =>
@@ -382,8 +415,42 @@ const RegistrationPage = () => {
 
             } catch (error) {
                 console.error('Error adding to waitlist:', error);
+                setErrorMessage('Error adding to waitlist:', error);
             }
         }
+    };
+
+    const formatDays = (course) => {
+        let days = '';
+        if (course.startM !== null) days += 'Mon-';
+        if (course.startT !== null) days += 'Tue-';
+        if (course.startW !== null) days += 'Wed-';
+        if (course.startTH !== null) days += 'Thu-';
+        if (course.startF !== null) days += 'Fri-';
+        if (course.startSAT !== null) days += 'Sat-';
+        if (course.startSUN !== null) days += 'Sun-';
+        // remove trailing '-' character
+        return days.slice(0, -1);
+    };
+
+    const formatTime = (course) => {
+        let time = '';
+        if (course.startM !== null) time = formatMilitaryTime(course.startM, course.endM);
+        else if (course.startT !== null) time = formatMilitaryTime(course.startT, course.endT);
+        else if (course.startW !== null) time = formatMilitaryTime(course.startW, course.endW);
+        else if (course.startTH !== null) time = formatMilitaryTime(course.startTH, course.endTH);
+        else if (course.startF !== null) time = formatMilitaryTime(course.startF, course.endF);
+        else if (course.startSAT !== null) time = formatMilitaryTime(course.startSAT, course.endSAT);
+        else if (course.startSUN !== null) time = formatMilitaryTime(course.startSUN, course.endSUN);
+        return time;
+    };
+
+    const formatMilitaryTime = (start, end) => {
+        const startHour = Math.floor(start / 100);
+        const startMinute = start % 100;
+        const endHour = Math.floor(end / 100);
+        const endMinute = end % 100;
+        return `${startHour}:${startMinute < 10 ? '0' + startMinute : startMinute} - ${endHour}:${endMinute < 10 ? '0' + endMinute : endMinute}`;
     };
 
     return (
@@ -417,7 +484,7 @@ const RegistrationPage = () => {
                     overlayClassName={styles.Overlay}
                 >
                     <h2 className={styles.AddCourseHeader}>Search and Add Course</h2>
-                    <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                    <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} onKeyDown={handleEnter}/> 
                     <button onClick={searchCourse}>Search</button>
 
                     {courses.length > 0 && (
@@ -431,6 +498,7 @@ const RegistrationPage = () => {
                                 <th>Credits</th>
                                 <th>Title</th>
                                 <th>Professor</th>
+                                <th>Class Day(s)</th>
                                 <th>Class Time</th>
                                 {courses.some(course => course.add_code_required === 1) && <th>Add Code Required</th>}
                             </tr>
@@ -440,20 +508,22 @@ const RegistrationPage = () => {
                                 <tr key={index}>
                                     <td>
                                      {
-                                        course.class_id === "333"
-                                            ? <img
-                                                style={{cursor: 'pointer'}}
-                                                src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
-                                                alt="Waitlist Status"
-                                                width="50"
-                                                height="50"
-                                                onClick={() => handleWaitlistClick(course)}
-                                            />
-                                            : <>
-                                                <input type="checkbox"
-                                                onChange={() => handleCheckboxChange(course)}
-                                                disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
-                                               </>
+                                        selectedCourses.find(c => c.class_id === course.class_id)
+                                            ? <span style={{color: 'green'}}>Registered</span>
+                                            : ((course.capacity - course.enrolled) === 0)
+                                                ? <img
+                                                    style={{cursor: 'pointer'}}
+                                                    src={course.waitlisted ? waitlistSelected : waitlistNotSelected}
+                                                    alt="Waitlist Status"
+                                                    width="50"
+                                                    height="50"
+                                                    onClick={() => handleWaitlistClick(course)}
+                                                />
+                                                : <>
+                                                    <input type="checkbox"
+                                                    onChange={() => handleCheckboxChange(course)}
+                                                    disabled={course.add_code_required === 1 && course.add_code_status !== "1"} />
+                                                </>
 
                                      }   
                                         
@@ -463,7 +533,8 @@ const RegistrationPage = () => {
                                     <td>{course.credits}</td>
                                     <td>{course.class_name}</td>
                                     <td>{course.professor}</td>
-                                    <td>{course.class_times}</td>
+                                    <td>{formatDays(course)}</td>
+                                    <td>{formatTime(course)}</td>
                                     <td hidden={course.add_code_required !== 1}>
                                         {course.add_code_required === 1 && (
                                             <>
@@ -519,6 +590,7 @@ const RegistrationPage = () => {
                         <th>Credits</th>
                         <th>Title</th>
                         <th>Professor</th>
+                        <th>Class Day(s)</th>
                         <th>Class Time</th>
                         <th>Average GPA</th>
                         <th>Rating</th>
@@ -547,7 +619,8 @@ const RegistrationPage = () => {
                                 <td>{course.credits}</td>
                                 <td>{course.class_name}</td>
                                 <td>{course.professor}</td>
-                                <td>{course.class_times}</td>
+                                <td>{formatDays(course)}</td>
+                                <td>{formatTime(course)}</td>
                                 <td>{course.average_gpa}</td>
                                 <td>
                                     <ReactStars
@@ -570,6 +643,17 @@ const RegistrationPage = () => {
                     </tbody>
                 </table>
             )}
+            {errorMessage &&
+                <div className={styles.modalErr}>
+                    <div className={styles.modalContentErr}>
+                        <div className={styles.alertHeaderErr}>Alert</div>
+                        <p>{errorMessage}</p>
+                        <button className={styles.closeButtonErr} onClick={() => setErrorMessage('')}>
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
     )
 }

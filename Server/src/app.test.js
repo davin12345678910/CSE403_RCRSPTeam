@@ -113,12 +113,16 @@ describe("This is the registration automated testing", () => {
       };
       await request(app).post("/addStudent").send(req);
       const getStudent = await request(app).post("/getStudent").send({'net_id' : 'pokemon8910'});
+
+      // Here we will remove, because if we tests again and don't have this
+      // we will get a unique key error since net_id is a primary key
+      await request(app).post("/removeStudent").send({'net_id' : req.net_id});
+
       var net_id = getStudent.body.student.net_id
       expect(net_id).toBe('pokemon8910')
 
       // Here we will remove, because if we tests again and don't have this
       // we will get a unique key error since net_id is a primary key
-      await request(app).post("/removeStudent").send({'net_id' : req.net_id});
     }, TIMEOUT)
 
 
@@ -238,14 +242,14 @@ describe("This is the registration automated testing", () => {
     // Here we will test to see if we are able to update the fields in which we pass to the endpoint
     // for the sections
     test("Test updateSection", async () => {
-      const updateResponse = await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'cat'});
+      const updateResponse = await request(app).post("/updateSection").send({'section_id' : 'section0', 'ta' : 'cat'});
       //console.log(updateResponse.body.section);
-      const addResponse = await request(app).post("/getSection").send({'section_id' : '331'});
-      var ta = addResponse.body.section.ta
+      const getResponse = await request(app).post("/getSection").send({'section_id' : 'section0'});
+      var ta = getResponse.body.section.ta
       //console.log(ta)
       expect(ta).toBe('cat');
 
-      await request(app).post("/updateSection").send({'section_id' : '331', 'ta' : 'x'});
+      await request(app).post("/updateSection").send({'section_id' : 'section0', 'ta' : 'x'});
     }, TIMEOUT)
 
 
@@ -256,10 +260,7 @@ describe("This is the registration automated testing", () => {
         net_id: 'pokemon678',
         class_id: 'cse331',
       }
-      const req2 = {
-        net_id: 'pokemon678',
-        class_id: 'cse312',
-      }
+      
       const addResponse = await request(app).post("/addRegistration").send(req);
       //console.log(addResponse.body.message);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
@@ -283,6 +284,75 @@ describe("This is the registration automated testing", () => {
       students.forEach(function(element) {
         if (element.net_id == 'pokemon678') {
           found = true
+        }
+      });
+      expect(found).toBe(true);
+    }, TIMEOUT);
+
+    test("Test addRegistration full course", async () => {
+      const req = {
+        net_id: "pokemon678",
+        class_id: "cse332"
+      }
+      const addResponse = await request(app).post('/addRegistration').send(req);
+      expect(addResponse.body.status).toBe(500);
+    }, TIMEOUT);
+
+    test("Test addRegistration schedule conflict", async () => {
+      const req = {
+        net_id: "pokemon678",
+        class_id: "cse333"
+      }
+      const addResponse = await request(app).post('/addRegistration').send(req);
+      await request(app).post('/removeRegistration').send(req);
+      expect(addResponse.body.status).toBe(500);
+    }, TIMEOUT);
+
+    test("Test addWaitlist", async () => {
+      const req = {
+        net_id: "student0",
+        class_id: "cse332"
+      }
+
+      const addResponse = await request(app).post('/addWaitlist').send(req);
+      const getResponse = await request(app).post('/getFullWaitlist').send();
+      await request(app).post('/removeWaitlist').send({ net_id: "student0" });
+
+      let found = false;
+      getResponse.body.waitlist.forEach((res) => {
+        if (res.net_id == "student0" && res.class_id == "cse332") {
+          found = true;
+        }
+      });
+
+      expect(addResponse.body.status).toBe(200);
+      expect(found).toBe(true);
+    }, TIMEOUT);
+
+    test("Test automatically register from waitlist when spot opens", async () => {
+      const req0 = {
+        net_id: "student0",
+        class_id: "cse344"
+      }
+      const req1 = {
+        net_id: "student1",
+        class_id: "cse344"
+      }
+
+      const addResponse0 = await request(app).post('/addRegistration').send(req0);
+      console.log(addResponse0.body.message);
+      const addResponse1 = await request(app).post('/addWaitlist').send(req1);
+      console.log(addResponse1.body.message);
+      const removeResponse0 = await request(app).post('/removeRegistration').send(req0);
+      console.log(removeResponse0.body.message);
+      const getResponse = await request(app).post('/getClassRegistration').send({ class_id: "cse344" });
+      console.log(getResponse.body.message);
+      await request(app).post('/removeRegistration').send(req1);
+
+      let found = false;
+      getResponse.body.registration.forEach((entry) => {
+        if (entry.net_id == "student1") {
+          found = true;
         }
       });
       expect(found).toBe(true);

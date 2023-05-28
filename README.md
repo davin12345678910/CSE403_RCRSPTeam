@@ -1,6 +1,11 @@
 # CSE403_RCRSPTeam
 We are a team of computer science students working on a Resilient Course Registration System for CSE 403
 
+## Develop manual
+https://docs.google.com/document/d/1DpmlfKxq3VFeilAVemMilKVNhCXm3DWoTRHX1fy9vwQ/edit?usp=sharing
+
+## User Manual
+https://docs.google.com/document/d/13RvvEvJGE3wI7jSebsUUTVm4hDSWWP-2suIpz51K3Xc/edit?usp=sharing
 
 ## Idea of our project:
 We are making an app that is building on top of the current registration system of the UW that we hope will improve the experience of registrarting for classes for users. For example, we hope to make the add in code process more streamlined then the current process where you have to ask advisers, then later get the people who you can contact, then contact the person, then wait for a response where you might be asked to give more information, and possibly not end up with the code. As you can see this process is very time consuming and not that nice for the user. We hope to make a more streamlined process that is embedded into the current registration system where you can easily contact the needed people and get quicker responses as it is a one stop shop. As for those who give add codes, given that the request won't be in their emails, which may be hidden within the many thousands of other emails it makes it easier for everybody!

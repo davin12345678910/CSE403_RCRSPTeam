@@ -58,7 +58,7 @@ async function makeTables(db) {
   let queryRegisterClass = 'CREATE TABLE IF NOT EXISTS registration(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), CONSTRAINT PK_Registration PRIMARY KEY (net_id,class_id));';
 
   // 8. Waitlist
-  let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
+  let queryWaitlist = 'CREATE TABLE IF NOT EXISTS waitlist(net_id TEXT PRIMARY KEY REFERENCES people(net_id), class_id TEXT REFERENCES classes(class_id), position INTEGER);';
 
   // 9. Addcode
   let queryAddcode = 'CREATE TABLE IF NOT EXISTS addCode(add_id TEXT PRIMARY KEY, add_code_status TEXT, JobType TEXT, add_code INTEGER, class TEXT, net_id TEXT);';
@@ -83,60 +83,154 @@ async function makeTables(db) {
   return true;
 }
 
-
-// This is where we will be making some starting data which we will be using for
-// tests as well as the website/demos
-async function addStartupData(db) {
-  // Add default class
+async function addStartupClasses(db) {
   let hasDefaultClass = await getClass(db, '345');
   if (!hasDefaultClass) {
     await addClass(db, '345', null, null, null, 'x',
-      null, null, null, null, null, null,
+      null, null, null, null, null,
       0, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
       1030, 1120, null, null, null, null);
   }
 
-  // Add default student
-  let hasDefaultStudent = await getStudent(db, 'pokemon678');
-  if (!hasDefaultStudent) {
-    await addStudent(db, 'pokemon678', 'pokemon678@uw.edu', '123', 'azaan', 'electrical engineering');
+  hasDefaultClass = await getClass(db, 'cse331');
+  if (!hasDefaultClass) {
+    await addClass(db, 'cse331', null, null, null, 'Perkins',
+      null, null, null, null, null,
+      0, 100, 1130, 1220, null, null, 1130, 1220, null, null,
+      1130, 1220, null, null, null, null);
   }
 
-  // Add default professor
+  hasDefaultClass = await getClass(db, 'cse332');
+  if (!hasDefaultClass) {
+    await addClass(db, 'cse332', null, null, null, 'Anderson',
+      null, null, null, null, null,
+      100, 100, 830, 920, null, null, 830, 920, 930, 1020,
+      830, 920, null, null, null, null);
+  }
+
+  hasDefaultClass = await getClass(db, 'cse344');
+  if (!hasDefaultClass) {
+    await addClass(db, 'cse344', null, null, null, 'Tang',
+      null, null, null, null, null,
+      99, 100, 1130, 1320, null, null, 1330, 1520, null, null,
+      null, null, null, null, null, null);
+  }
+
+  hasDefaultClass = await getClass(db, 'cse333');
+  if (!hasDefaultClass) {
+    await addClass(db, 'cse333', null, null, null, 'Perkins',
+      null, null, null, null, null,
+      98, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
+      1030, 1120, null, null, null, null);
+  }
+
+  hasDefaultClass = await getClass(db, 'cse403');
+  if (!hasDefaultClass) {
+    await addClass(db, 'cse403', null, null, null, 'Nigini',
+      null, null, null, null, null,
+      277, 280, 1230, 1320, 1330, 1420, 1230, 1320, 1330, 1420,
+      1230, 1320, null, null, null, null);
+  }
+}
+
+async function addStartupStudents(db) {
+  let hasDefaultStudent = await getStudent(db, 'pokemon678');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'pokemon678', 'pokemon678@uw.edu', '123', 'pokemon', 'electrical engineering');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student0');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student0', 'student0@uw.edu', 'pass0', 'Ahmed', 'Computer Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student1');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student1', 'student1@uw.edu', 'pass1', 'Azaan', 'Computer Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student2');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student2', 'student2@uw.edu', 'pass2', 'Chairnet', 'Political Science');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student3');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student3', 'student3@uw.edu', 'pass3', 'Davin', 'Electrical Engineering');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student4');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student4', 'student4@uw.edu', 'pass4', 'Foad', 'Psychology');
+  }
+
+  hasDefaultStudent = await getStudent(db, 'student5');
+  if (!hasDefaultStudent) {
+    await addStudent(db, 'student5', 'student5@uw.edu', 'pass5', 'Sol', 'Physics');
+  }
+}
+
+async function addStartupProfessors(db) {
   let hasDefaultProfessor = await getProfessor(db, '123');
   if (!hasDefaultProfessor) {
     await addProfessor(db, '123', '123@uw.edu', 'pass123', 'x', 'math', '0', '4');
   }
+}
 
-  // Add default adviser
+async function addStartupAdvisers(db) {
   let hasDefaultAdviser = await getAdviser(db, '456');
   if (!hasDefaultAdviser) {
     await addAdviser(db, '456', '456@uw.edu', 'pass456', 'x', 'math');
   }
+}
 
-  // Add default section
-  let hasDefaultSection = await getSection(db, '331');
+async function addStartupSections(db) {
+  let hasDefaultSection = await getSection(db, 'section0');
   if (!hasDefaultSection) {
-    await addSection(db, '331', 'x', 'y', '11:30-12:20', '345');
+    await addSection(db, 'section0', 'x', 'y', '11:30-12:20', 'section0');
   }
+}
 
-  // Add default registration
-  let hasDefaultRegistration = await getRegistration(db, '123', '345');
+async function addStartupRegistration(db) {
+  let hasDefaultRegistration = await getRegistration(db, 'pokemon678', '345');
   if (!hasDefaultRegistration) {
-    await addRegistration(db, '123', '345');
+    await addRegistration(db, 'pokemon678', '345');
   }
+}
 
-  // Add default waitlist
-  let hasDefaultWaitlist = await getWaitlist(db, 'pokemon678', '345');
+async function addStartupWaitlist(db) {
+  let waitlist = await getFullWaitlist(db);
+  let hasDefaultWaitlist = false;
+  waitlist.forEach((entry) => {
+    if (entry.net_id == "pokemon678" && entry.class_id == "345") {
+      hasDefaultWaitlist = true;
+    }
+  });
+
   if (!hasDefaultWaitlist) {
-    await addWaitlist(db, 'pokemon678', '345')
+    await addWaitlist(db, "pokemon678", "345");
   }
+}
 
-  // Add default addcode
+async function addStartupAddCodes(db) {
   let hasDefaultAddcode = await getAddCodes(db, 'CSE 403');
   if (!hasDefaultAddcode[0]) {
     await addAddCode(db, '1', '0', 'Adviser', '123', 'CSE 403', 'pokemon678');
   }
+}
+
+
+// This is where we will be making some starting data which we will be using for
+// tests as well as the website/demos
+async function addStartupData(db) {
+  await addStartupClasses(db);
+  await addStartupStudents(db);
+  await addStartupProfessors(db);
+  await addStartupAdvisers(db);
+  await addStartupSections(db);
+  await addStartupRegistration(db);
+  await addStartupWaitlist(db);
+  await addStartupAddCodes(db);
 }
 
 
@@ -766,9 +860,8 @@ app.post('/removeClassFromRegistration', async (req, res) => {
 
 app.post('/getWaitlist', async (req, res) => {
   let db = getDBConnection();
-  let net_id = req.body.net_id;
   let class_id = req.body.class_id;
-  let waitlist = await getWaitlist(db, net_id, class_id);
+  let waitlist = await getWaitlist(db, class_id);
   db.close();
 
   let status = waitlist ? SUCCESS : ERROR;
@@ -797,6 +890,17 @@ app.post('/addWaitlist', async (req, res) => {
 
   let status = success ? SUCCESS : ERROR;
   let result = setResDefaults('/addWaitlist', status);
+  res.send(result);
+})
+
+app.post('/removeWaitlist', async (req, res) => {
+  let db = getDBConnection();
+  let net_id = req.body.net_id;
+  let success = await removeWaitlist(db, net_id);
+  db.close();
+
+  let status = success ? SUCCESS : ERROR;
+  let result = setResDefaults('/removeWaitlist', status);
   res.send(result);
 })
 
@@ -860,30 +964,6 @@ app.post('/removeAddCode', async (req, res) => {
   let result = setResDefaults('/removeAddCode', status);
   res.send(result);
 })
-
-// app.get('/updateAddCode', async (req, res) => {
-//   let db = await getDBConnection()
-//
-//   let add_id = req.query.add_id;
-//   let add_code_status = 1;
-//
-//   if(!add_id) {
-//     return res.status(400).json({ message: 'Missing parameter add_id.', 'status': 400});
-//   }
-//
-//   let updateClass = 'UPDATE addCode SET add_code_status = ? WHERE add_id = ?;';
-//
-//   db.run(updateClass, [add_code_status, add_id], function (err) {
-//     if (err) {
-//       console.error('Error updating AddCode:', err);
-//       res.status(500).json({ message: 'Error updating AddCode', error: err, 'status': 500});
-//     } else {
-//       res.status(200).json({ message: 'AddCode updated successfully', 'status': 200});
-//     }
-//   });
-//
-//   db.close();
-// })
 
 app.post('/getMessages', async (req, res) => {
   let db = getDBConnection();
@@ -1049,15 +1129,27 @@ function addClass(db, class_id, credits, rating, average_gpa, professor,
   assistant_professor, quarter, class_name, sln, add_code_required,
   enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
   startF, endF, startSAT, endSAT, startSUN, endSUN) {
-    let query = "INSERT INTO classes(class_id, credits, rating, average_gpa, professor, " +
-      "assistant_professor, quarter, class_name, sln, add_code_required, " +
-      "enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH, " +
-      "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " +
-      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-      return dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
-        assistant_professor, quarter, class_name, sln, add_code_required,
-        enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
-        startF, endF, startSAT, endSAT, startSUN, endSUN]);
+
+  if ((startM   && !endM)   || (!startM   && endM)   ||
+      (startT   && !endT)   || (!startT   && endT)   ||
+      (startW   && !endW)   || (!startW   && endW)   ||
+      (startTH  && !endTH)  || (!startTH  && endTH)  ||
+      (startF   && !endF)   || (!startF   && endF)   ||
+      (startSAT && !endSAT) || (!startSAT && endSAT) ||
+      (startSUN && !endSUN) || (!startSUN && endSUN)) {
+        return false;
+  }
+
+  let query = "INSERT INTO classes(class_id, credits, rating, average_gpa, professor, " +
+    "assistant_professor, quarter, class_name, sln, add_code_required, " +
+    "enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH, " +
+    "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " +
+    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+  return dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
+    assistant_professor, quarter, class_name, sln, add_code_required,
+    enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
+    startF, endF, startSAT, endSAT, startSUN, endSUN]);
 }
 
 function addStudent(db, net_id, email, password, student_name, major) {
@@ -1241,7 +1333,7 @@ async function login(db, net_id, password) {
   const timestamp = new Date().toLocaleString();
   const logEntry = `${timestamp}: ${net_id} logged in\n`;
   logStream.write(logEntry);
-  return 200;
+  return SUCCESS;
 }
 
 function getRegistration(db, net_id, class_id) {
@@ -1249,9 +1341,20 @@ function getRegistration(db, net_id, class_id) {
   return dbGet(db, query, [net_id, class_id]);
 }
 
-function addRegistration(db, net_id, class_id) {
+async function addRegistration(db, net_id, class_id) {
+  if (await hasClassConflict(db, net_id, class_id)) {
+    return false;
+  }
+  if (await classIsFull(db, class_id)) {
+    return false;
+  }
+  
   let query = "INSERT INTO registration(net_id, class_id) VALUES (?, ?);";
-  return dbRun(db, query, [net_id, class_id]);
+  if (!(await dbRun(db, query, [net_id, class_id]))) {
+    return false;
+  }
+  
+  return incrementClassEnrollment(db, class_id);
 }
 
 async function removeRegistration(db, net_id, class_id) {
@@ -1260,8 +1363,11 @@ async function removeRegistration(db, net_id, class_id) {
   if (!success) {
     return false;
   }
+  if (!(await decrementClassEnrollment(db, class_id))) {
+    return false;
+  }
 
-  return popWaitlist(db, [class_id]);
+  return popWaitlist(db, class_id);
 }
 
 async function removeStudentFromRegistration(db, net_id) {
@@ -1286,9 +1392,9 @@ function removeClassFromRegistration(db, class_id) {
   return dbRun(db, query, [class_id]);
 }
 
-function getWaitlist(db, net_id, class_id) {
-  let query = "SELECT * FROM waitlist WHERE net_id = ? AND class_id = ?;";
-  return dbGet(db, query, [net_id, class_id]);
+function getWaitlist(db, class_id) {
+  let query = "SELECT * FROM waitlist WHERE class_id = ?;";
+  return dbGet(db, query, [class_id]);
 }
 
 function getFullWaitlist(db) {
@@ -1304,9 +1410,9 @@ async function addWaitlist(db, net_id, class_id) {
   return dbRun(db, query, [net_id, class_id, position]);
 }
 
-function removeWaitlist(db, net_id, class_id) {
-  let query = "DELETE FROM waitlist WHERE net_id = ? AND class_id = ?;";
-  return dbRun(db, query, [net_id, class_id]);
+function removeWaitlist(db, net_id) {
+  let query = "DELETE FROM waitlist WHERE net_id = ?;";
+  return dbRun(db, query, [net_id]);
 }
 
 function removeStudentFromWaitlist(db, net_id) {
@@ -1321,15 +1427,15 @@ function removeClassFromWaitlist(db, class_id) {
 
 async function popWaitlist(db, class_id) {
   let query = "SELECT net_id FROM waitlist WHERE class_id = ? ORDER BY position ASC LIMIT 1;";
-  let net_id = await dbGet(db, query, [class_id]);
-  if (!net_id) {
-    return false;
+  let student = await dbGet(db, query, [class_id]);
+  if (!student) {
+    return true;
   }
 
-  if (!addRegistration(db, net_id, class_id)) {
+  if (!(await addRegistration(db, student.net_id, class_id))) {
     return false;
   }
-  return removeWaitlist(db, net_id, class_id);
+  return removeWaitlist(db, student.net_id);
 }
 
 function getAddCodes(db, class_name) {
@@ -1395,35 +1501,112 @@ function generateSalt() {
 
 // Returns true iff class1 and class2 have a scheduling conflict.
 function classesConflict(class1, class2) {
-  if ((class1.startM < class2.startM && class2.startM < class1.endM) ||
-      (class1.startM < class2.endM && class2.endM < class1.endM)) {
-        return true;
+  if (class1.startM != null && class2.startM != null) {
+    if ((class1.startM <= class2.startM && class2.startM <= class1.endM) ||
+        (class1.startM <= class2.endM && class2.endM <= class1.endM)) {
+          return true;
+    }
   }
-  if ((class1.startT < class2.startT && class2.startT < class1.endT) ||
-      (class1.startT < class2.endT && class2.endT < class1.endT)) {
-        return true;
+
+  if (class1.startT != null && class2.startT != null) {
+    if ((class1.startT <= class2.startT && class2.startT <= class1.endT) ||
+        (class1.startT <= class2.endT && class2.endT <= class1.endT)) {
+          return true;
+    }
   }
-  if ((class1.startW < class2.startW && class2.startW < class1.endW) ||
-      (class1.startW < class2.endW && class2.endW < class1.endW)) {
-        return true;
+
+  if (class1.startW != null && class2.startW != null) {
+    if ((class1.startW <= class2.startW && class2.startW <= class1.endW) ||
+        (class1.startW <= class2.endW && class2.endW <= class1.endW)) {
+          return true;
+    }
   }
-  if ((class1.startTH < class2.startTH && class2.startTH < class1.endTH) ||
-      (class1.startTH < class2.endTH && class2.endTH < class1.endTH)) {
-        return true;
+
+  if (class1.startTH != null && class2.startTH != null) {
+    if ((class1.startTH <= class2.startTH && class2.startTH <= class1.endTH) ||
+        (class1.startTH <= class2.endTH && class2.endTH <= class1.endTH)) {
+          return true;
+    }
   }
-  if ((class1.startF < class2.startF && class2.startF < class1.endF) ||
-      (class1.startF < class2.endF && class2.endF < class1.endF)) {
-        return true;
+
+  if (class1.startF != null && class2.startF != null) {
+    if ((class1.startF <= class2.startF && class2.startF <= class1.endF) ||
+        (class1.startF <= class2.endF && class2.endF <= class1.endF)) {
+          return true;
+    }
   }
-  if ((class1.startSAT < class2.startSAT && class2.startSAT < class1.endSAT) ||
-      (class1.startSAT < class2.endSAT && class2.endSAT < class1.endSAT)) {
-        return true;
+
+  if (class1.startSAT != null && class2.startSAT != null) {
+    if ((class1.startSAT <= class2.startSAT && class2.startSAT <= class1.endSAT) ||
+        (class1.startSAT <= class2.endSAT && class2.endSAT <= class1.endSAT)) {
+          return true;
+    }
   }
-  if ((class1.startSUN < class2.startSUN && class2.startSUN < class1.endSUN) ||
-      (class1.startSUN < class2.endSUN && class2.endSUN < class1.endSUN)) {
-        return true;
+
+  if (class1.startSUN != null && class2.startSUN != null) {
+    if ((class1.startSUN <= class2.startSUN && class2.startSUN <= class1.endSUN) ||
+        (class1.startSUN <= class2.endSUN && class2.endSUN <= class1.endSUN)) {
+          return true;
+    }
   }
+
   return false;
+}
+
+async function classIsFull(db, class_id) {
+  let query = "SELECT * FROM classes WHERE class_id = ?;";
+  let class_ = await dbGet(db, query, [class_id]);
+  if (!class_) {
+    return true;
+  }
+
+  return class_.enrolled == class_.capacity;
+}
+
+async function incrementClassEnrollment(db, class_id) {
+  let query = "SELECT * FROM classes WHERE class_id = ?;";
+  let class_ = await dbGet(db, query, [class_id]);
+  if (!class_) {
+    return false;
+  }
+
+  let enrolled = class_.enrolled;
+  query = "UPDATE classes SET enrolled = ? WHERE class_id = ?;";
+  return dbRun(db, query, [enrolled + 1, class_id]);
+}
+
+async function decrementClassEnrollment(db, class_id) {
+  let query = "SELECT * FROM classes WHERE class_id = ?;";
+  let class_ = await dbGet(db, query, [class_id]);
+  if (!class_) {
+    return false;
+  }
+
+  let enrolled = class_.enrolled;
+  query = "UPDATE classes SET enrolled = ? WHERE class_id = ?;";
+  return dbRun(db, query, [enrolled - 1, class_id]);
+}
+
+async function hasClassConflict(db, net_id, class_id) {
+  var class_to_check = await getClass(db, class_id);
+  if (!class_to_check) {
+    return true;
+  }
+
+  let query = "SELECT class_id FROM registration WHERE net_id = ?;";
+  let classes = await dbAll(db, query, [net_id]);
+  let hasClassConflict = false;
+
+  for (let c of classes) {
+    let id = c.class_id;
+    let class_ = await getClass(db, id);
+    if (classesConflict(class_to_check, class_)) {
+      hasClassConflict = true;
+      break;
+    }
+  }
+
+  return hasClassConflict;
 }
 
 export default app
