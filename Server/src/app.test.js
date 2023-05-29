@@ -332,7 +332,7 @@ describe("This is the registration automated testing", () => {
       expect(found).toBe(true);
     }, TIMEOUT);
 
-    /*
+
     test("Test automatically register from waitlist when spot opens", async () => {
       const req0 = {
         net_id: "student0",
@@ -361,7 +361,7 @@ describe("This is the registration automated testing", () => {
       });
       expect(found).toBe(true);
     }, TIMEOUT)
-    */
+
 
 
     // Here we will check to see if we are able to login successfully
@@ -428,7 +428,10 @@ describe("This is the registration automated testing", () => {
       await request(app).post("/removeAddCode").send({'add_id' : '2'});
     }, TIMEOUT)
 
-    // **********These are the tests for the message endpoints***************
+    // **********These are the tests for the message endpoints***************/
+
+    // not using message endpoints
+/*
     // This will let you test to see if you are able to get a message that was added into the database
     test("Test getMessages", async () => {
       const req = {
@@ -478,6 +481,7 @@ describe("This is the registration automated testing", () => {
       })
       expect(found).toBe(true);
     }, TIMEOUT);
+*/
 
 
 /*

@@ -763,13 +763,13 @@ app.post('/addRegistration', async (req, res) => {
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
   let addRegistrationResponse = await addRegistration(db, net_id, class_id)
-  // db.close();
 
   if (addRegistrationResponse != "Class successfully added!") {
     res.send({'status' : ERROR, 'error' : addRegistrationResponse});
   } else {
     res.send({'status' : SUCCESS, 'error' : 'N/A'});
   }
+  // db.close();
 })
 
 app.post('/getStudentRegistration', async (req, res) =>{
@@ -858,7 +858,7 @@ app.post('/addWaitlist', async (req, res) => {
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
   let success = await addWaitlist(db, net_id, class_id);
-  db.close();
+  // db.close();
 
   let status = success ? SUCCESS : ERROR;
   let result = setResDefaults('/addWaitlist', status);
@@ -1371,7 +1371,7 @@ function removeClassFromRegistration(db, class_id) {
 
 function getWaitlist(db, class_id) {
   let query = "SELECT * FROM waitlist WHERE class_id = ?;";
-  return dbGet(db, query, [class_id]);
+  return dbAll(db, query, [class_id]);
 }
 
 function getFullWaitlist(db) {
