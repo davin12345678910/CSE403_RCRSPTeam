@@ -245,7 +245,7 @@ const RegistrationPage = () => {
             const addCodeStatus = addCodeData.AddCodes.find((addCode) => addCode.net_id === uwId);
 
             // Get the waitlist for the class
-            const getWaitlistEndpoint = "/getWaitlist";
+            const getWaitlistEndpoint = "/getFullWaitlist";
             const getWaitlistOptions = {
                 method: "POST",
                 headers: {
@@ -256,12 +256,17 @@ const RegistrationPage = () => {
             // Make the request
             const waitlistData = await fetchData(getWaitlistEndpoint, getWaitlistOptions);
             // Check if the user is in the waitlist
-            const isWaitlisted = waitlistData.waitlist.find((waitlist) => waitlist.net_id === uwId);
+            let isWaitlisted = false;
+            const found = waitlistData.waitlist.find((waitlist) => waitlist.net_id === uwId && waitlist.class_id === data.class.class_id);
+            if (found) {
+                isWaitlisted = true;
+            }
             const updatedCourse = {
                 ...data.class,
                 add_code_status: (addCodeStatus && addCodeStatus.add_code_status) ? addCodeStatus.add_code_status : "-1",
                 add_id: addCodeStatus ? addCodeStatus.add_id : null,
-                waitlisted: isWaitlisted  // Set the waitlisted property based on the waitlist data
+                // Set the waitlisted property based on the waitlist data
+                waitlisted: isWaitlisted
             };
             // Update the courses array
             setCourses(prevCourses => [...prevCourses, updatedCourse]);
