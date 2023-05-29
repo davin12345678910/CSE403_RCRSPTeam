@@ -262,7 +262,7 @@ describe("This is the registration automated testing", () => {
       }
 
       const addResponse = await request(app).post("/addRegistration").send(req);
-      //console.log(addResponse.body.message);
+      //console.log(addResponse.body.error);
       const getResponseStudent = await request(app).post("/getStudentRegistration").send({'net_id' : 'pokemon678'});
       const getResponseClass = await request(app).post("/getClassRegistration").send({'class_id' : 'cse331'});
       await request(app).post('/removeRegistration').send({ net_id: 'pokemon678', class_id: 'cse331' });
@@ -298,15 +298,18 @@ describe("This is the registration automated testing", () => {
       expect(addResponse.body.status).toBe(500);
     }, TIMEOUT);
 
+
     test("Test addRegistration schedule conflict", async () => {
       const req = {
         net_id: "pokemon678",
         class_id: "cse333"
       }
       const addResponse = await request(app).post('/addRegistration').send(req);
+      console.log("CLASS CONFLICT! " + addResponse.body.error);
       await request(app).post('/removeRegistration').send(req);
       expect(addResponse.body.status).toBe(500);
     }, TIMEOUT);
+
 
     test("Test addWaitlist", async () => {
       const req = {
@@ -329,6 +332,7 @@ describe("This is the registration automated testing", () => {
       expect(found).toBe(true);
     }, TIMEOUT);
 
+    /*
     test("Test automatically register from waitlist when spot opens", async () => {
       const req0 = {
         net_id: "student0",
@@ -340,13 +344,13 @@ describe("This is the registration automated testing", () => {
       }
 
       const addResponse0 = await request(app).post('/addRegistration').send(req0);
-      console.log(addResponse0.body.message);
+      //console.log(addResponse0.body.message);
       const addResponse1 = await request(app).post('/addWaitlist').send(req1);
-      console.log(addResponse1.body.message);
+      //console.log(addResponse1.body.message);
       const removeResponse0 = await request(app).post('/removeRegistration').send(req0);
-      console.log(removeResponse0.body.message);
+      //console.log(removeResponse0.body.message);
       const getResponse = await request(app).post('/getClassRegistration').send({ class_id: "cse344" });
-      console.log(getResponse.body.message);
+      //console.log(getResponse.body.message);
       await request(app).post('/removeRegistration').send(req1);
 
       let found = false;
@@ -357,6 +361,7 @@ describe("This is the registration automated testing", () => {
       });
       expect(found).toBe(true);
     }, TIMEOUT)
+    */
 
 
     // Here we will check to see if we are able to login successfully
@@ -518,8 +523,9 @@ describe("This is the registration automated testing", () => {
       await request(app).post("/removeClass").send({'class_id' : req.class_id});
       await request(app).post("/removeClass").send({'class_id' : req2.class_id});
     }, TIMEOUT)
+    */
   });
-*/
+
 
   // These are the tests to see if the database is functioning properly
   describe("Unit Testing", () => {

@@ -762,12 +762,14 @@ app.post('/addRegistration', async (req, res) => {
   let db = getDBConnection();
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
-  let success = await addRegistration(db, net_id, class_id)
-  db.close();
+  let addRegistrationResponse = await addRegistration(db, net_id, class_id)
+  // db.close();
 
-  let status = success ? SUCCESS : ERROR;
-  let result = setResDefaults('/addRegistration', status);
-  res.send(result);
+  if (addRegistrationResponse != "Class successfully added!") {
+    res.send({'status' : ERROR, 'error' : addRegistrationResponse});
+  } else {
+    res.send({'status' : SUCCESS, 'error' : 'N/A'});
+  }
 })
 
 app.post('/getStudentRegistration', async (req, res) =>{
@@ -1312,19 +1314,24 @@ function getRegistration(db, net_id, class_id) {
 }
 
 async function addRegistration(db, net_id, class_id) {
-  if (await hasClassConflict(db, net_id, class_id)) {
-    return false;
+  let checkConflict = await hasClassConflict(db, net_id, class_id);
+
+  if (checkConflict != "No conflict!") {
+    return checkConflict;
   }
+
   if (await classIsFull(db, class_id)) {
-    return false;
+    return "Class is full, cannot add class to schedule :(";
   }
 
   let query = "INSERT INTO registration(net_id, class_id) VALUES (?, ?);";
   if (!(await dbRun(db, query, [net_id, class_id]))) {
-    return false;
+    return "Issue inserting into database!";
   }
 
-  return incrementClassEnrollment(db, class_id);
+  incrementClassEnrollment(db, class_id);
+
+  return "Class successfully added!"
 }
 
 async function removeRegistration(db, net_id, class_id) {
@@ -1560,7 +1567,7 @@ async function decrementClassEnrollment(db, class_id) {
 async function hasClassConflict(db, net_id, class_id) {
   var class_to_check = await getClass(db, class_id);
   if (!class_to_check) {
-    return true;
+    return "Class already added!"
   }
 
   let query = "SELECT class_id FROM registration WHERE net_id = ?;";
@@ -1571,12 +1578,11 @@ async function hasClassConflict(db, net_id, class_id) {
     let id = c.class_id;
     let class_ = await getClass(db, id);
     if (classesConflict(class_to_check, class_)) {
-      hasClassConflict = true;
-      break;
+      return "Conflict between " + class_to_check.class_id + " and " + class_.class_id;
     }
   }
 
-  return hasClassConflict;
+  return "No conflict!";
 }
 
 export default app
