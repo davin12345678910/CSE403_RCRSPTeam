@@ -560,7 +560,11 @@ const RegistrationPage = () => {
                             </tbody>
                         </table>
                     )}
-                    <button hidden={courses.length <= 0} onClick={handleCloseModal}>Add Course</button>
+                    {checkedCourses.length > 0 ? (
+                        <button onClick={handleCloseModal}>Add Course</button>
+                    ) : (
+                        <button hidden={courses.length <= 0} onClick={closeModal}>Close</button>
+                    )}
                 </Modal>
             </div>
             {selectedCourses.length > 0 && (
