@@ -226,9 +226,10 @@ const RegistrationPage = () => {
             const data = await fetchData(getClassEndpoint, getClassOptions);
 
             if (data.class === undefined) {
-                setErrorMessage("No class found!");
+                window.alert("No class found!");
                 return;
             }
+
             // Get the add code status for the class
             const getAddCodeEndpoint = "/getAddCode";
             const getAddCodeOptions = {
@@ -242,18 +243,34 @@ const RegistrationPage = () => {
             const addCodeData = await fetchData(getAddCodeEndpoint, getAddCodeOptions);
             // Update the course with the add code status
             const addCodeStatus = addCodeData.AddCodes.find((addCode) => addCode.net_id === uwId);
+
+            // Get the waitlist for the class
+            const getWaitlistEndpoint = "/getWaitlist";
+            const getWaitlistOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({'class_id': data.class.class_id})
+            };
+            // Make the request
+            const waitlistData = await fetchData(getWaitlistEndpoint, getWaitlistOptions);
+            // Check if the user is in the waitlist
+            const isWaitlisted = waitlistData.waitlist.find((waitlist) => waitlist.net_id === uwId);
             const updatedCourse = {
                 ...data.class,
                 add_code_status: (addCodeStatus && addCodeStatus.add_code_status) ? addCodeStatus.add_code_status : "-1",
-                add_id: addCodeStatus ? addCodeStatus.add_id : null
+                add_id: addCodeStatus ? addCodeStatus.add_id : null,
+                waitlisted: isWaitlisted  // Set the waitlisted property based on the waitlist data
             };
             // Update the courses array
             setCourses(prevCourses => [...prevCourses, updatedCourse]);
         } catch (error) {
             console.error('Error fetching class data:', error);
-            setErrorMessage('Error fetching class data:', error);
         }
     }
+
+
 
     // This function is responsible for opening the modal
     function openModal() {
