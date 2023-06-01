@@ -86,48 +86,48 @@ async function makeTables(db) {
 async function addStartupClasses(db) {
   let hasDefaultClass = await getClass(db, '345');
   if (!hasDefaultClass) {
-    await addClass(db, '345', null, null, null, 'x',
-      null, null, null, null, null,
+    await addClass(db, '345', 4, 5, 3.5, 'x',
+      'aa', 'Winter 2023', 'Introduction to CS I', 13111, 1,
       0, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
       1030, 1120, null, null, null, null);
   }
 
   hasDefaultClass = await getClass(db, 'cse331');
   if (!hasDefaultClass) {
-    await addClass(db, 'cse331', null, null, null, 'Perkins',
-      null, null, null, null, null,
+    await addClass(db, 'cse331', 4, 5, 2.6, 'Perkins',
+      'ss', 'Winter 2023', 'Introduction to CS II', 13222, 0,
       0, 100, 1130, 1220, null, null, 1130, 1220, null, null,
       1130, 1220, null, null, null, null);
   }
 
   hasDefaultClass = await getClass(db, 'cse332');
   if (!hasDefaultClass) {
-    await addClass(db, 'cse332', null, null, null, 'Anderson',
-      null, null, null, null, null,
+    await addClass(db, 'cse332', 5, 8, 3.6, 'Anderson',
+      'dd', 'Winter 2023', 'Introduction to CS III', 13333, 0,
       100, 100, 830, 920, null, null, 830, 920, 930, 1020,
       830, 920, null, null, null, null);
   }
 
   hasDefaultClass = await getClass(db, 'cse344');
   if (!hasDefaultClass) {
-    await addClass(db, 'cse344', null, null, null, 'Tang',
-      null, null, null, null, null,
+    await addClass(db, 'cse344', 4, 9, 3.8, 'Tang',
+      'ff', 'Winter 2023', 'Introduction to CS IV', 13444, 0,
       99, 100, 1130, 1320, null, null, 1330, 1520, null, null,
       null, null, null, null, null, null);
   }
 
   hasDefaultClass = await getClass(db, 'cse333');
   if (!hasDefaultClass) {
-    await addClass(db, 'cse333', null, null, null, 'Perkins',
-      null, null, null, null, null,
+    await addClass(db, 'cse333', 4, 7.5, 3.9, 'Perkins',
+      'gg', 'Winter 2023', 'Introduction to CS V', 13555, 0,
       98, 100, 1030, 1120, 1130, 1220, 1030, 1120, 1330, 1420,
       1030, 1120, null, null, null, null);
   }
 
   hasDefaultClass = await getClass(db, 'cse403');
   if (!hasDefaultClass) {
-    await addClass(db, 'cse403', null, null, null, 'Nigini',
-      null, null, null, null, null,
+    await addClass(db, 'cse403', 4, 10, 4, 'Nigini',
+      'hh', 'Winter 2023', 'Introduction to CS VI', 13666, 0,
       277, 280, 1230, 1320, 1330, 1420, 1230, 1320, 1330, 1420,
       1230, 1320, null, null, null, null);
   }
@@ -435,25 +435,18 @@ app.post('/addClassesToRegistration', async (req, res) => {
 
     let net_id = currentClass.net_id;
     let class_id = currentClass.class_id
+    let success = await addRegistration(db, net_id, class_id);
 
-    // Here we will need to check to see if the course if not already in the database
-    let hasConflict = hasClassConflict(db, net_id, class_id);
+    let status = success ? SUCCESS : ERROR;
 
-    if (!hasConflict) {
-      let success = await addRegistration(db, net_id, class_id);
-
-      let status = success ? SUCCESS : ERROR;
-
-      // This is the case if there is an added class that fails
-      if (status == ERROR) {
-        db.close()
-        let result = setResDefaults('/addClasses', status);
-        res.send(result);
-        return
-      }
+    // This is the case if there is an added class that fails
+    if (status == ERROR) {
+      db.close()
+      let result = setResDefaults('/addClasses', status);
+      res.send(result);
+      return
     }
-  })
-
+  });
   db.close();
 
   // This is the case if all of the added classes pass
@@ -553,7 +546,6 @@ app.post('/updateClass', async (req, res) => {
   let average_gpa = req.body.average_gpa;
   let professor = req.body.professor;
   let assistant_professor = req.body.assistant_professor;
-  let class_times = req.body.class_times;
   let quarter = req.body.quarter;
   let class_name = req.body.class_name;
   let sln = req.body.sln;
@@ -763,13 +755,13 @@ app.post('/addRegistration', async (req, res) => {
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
   let addRegistrationResponse = await addRegistration(db, net_id, class_id)
+  db.close();
 
   if (addRegistrationResponse != "Class successfully added!") {
     res.send({'status' : ERROR, 'error' : addRegistrationResponse});
   } else {
-    res.send({'status' : SUCCESS, 'error' : 'N/A'});
+    res.send({'status' : SUCCESS});
   }
-  // db.close();
 })
 
 app.post('/getStudentRegistration', async (req, res) =>{
@@ -858,7 +850,7 @@ app.post('/addWaitlist', async (req, res) => {
   let net_id = req.body.net_id;
   let class_id = req.body.class_id;
   let success = await addWaitlist(db, net_id, class_id);
-  // db.close();
+  db.close();
 
   let status = success ? SUCCESS : ERROR;
   let result = setResDefaults('/addWaitlist', status);
@@ -986,7 +978,7 @@ app.post('/removeMessages', async (req, res) => {
 
 // This function will allow the users to get the database that we are
 // going to use
-function dbGet(database, query, query_params) {
+async function dbGet(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.get(query, query_params, (err, result) => {
       if (err) {
@@ -1001,7 +993,7 @@ function dbGet(database, query, query_params) {
 }
 
 // This will allow users to run database.all if needed
-function dbAll(database, query, query_params) {
+async function dbAll(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.all(query, query_params, (err, results) => {
       if (err) {
@@ -1016,7 +1008,7 @@ function dbAll(database, query, query_params) {
 }
 
 // This will allow users to run database.run() if needed
-function dbRun(database, query, query_params) {
+async function dbRun(database, query, query_params) {
   return new Promise((resolve, reject) => {
     database.run(query, query_params, function (err) {
       if (err) {
@@ -1035,69 +1027,69 @@ function dbRun(database, query, query_params) {
  * Below are methods that each have queries which will be able to get the
  * information that they need for each of the endpoints
  */
-function getClasses(db) {
+async function getClasses(db) {
   let query = "SELECT * FROM classes;";
-  return dbAll(db, query, []);
+  return await dbAll(db, query, []);
 }
 
-function getProfessors(db) {
+async function getProfessors(db) {
   let query = "SELECT * FROM professors;";
-  return dbAll(db, query, []);
+  return await dbAll(db, query, []);
 }
 
-function getStudents(db) {
+async function getStudents(db) {
   let query = "SELECT * FROM students;";
-  return dbAll(db, query, []);
+  return await dbAll(db, query, []);
 }
 
-function getAdvisers(db) {
+async function getAdvisers(db) {
   let query = "SELECT * FROM advisers;";
-  return dbAll(db, query, []);
+  return await dbAll(db, query, []);
 }
 
-function getClass(db, class_id) {
+async function getClass(db, class_id) {
   let query = "SELECT * FROM classes WHERE class_id = ?;";
-  return dbGet(db, query, [class_id]);
+  return await dbGet(db, query, [class_id]);
 }
 
-function getProfessor(db, net_id) {
+async function getProfessor(db, net_id) {
   let query = "SELECT * FROM professors WHERE net_id = ?;";
-  return dbGet(db, query, [net_id]);
+  return await dbGet(db, query, [net_id]);
 }
 
-function getStudent(db, net_id) {
+async function getStudent(db, net_id) {
   let query = "SELECT * FROM students WHERE net_id = ?;";
-  return dbGet(db, query, [net_id]);
+  return await dbGet(db, query, [net_id]);
 }
 
-function getAdviser(db, net_id) {
+async function getAdviser(db, net_id) {
   let query = "SELECT * FROM advisers WHERE net_id = ?;";
-  return dbGet(db, query, [net_id]);
+  return await dbGet(db, query, [net_id]);
 }
 
-function getSection(db, section_id) {
+async function getSection(db, section_id) {
   let query = "SELECT * FROM sections WHERE section_id = ?;";
-  return dbGet(db, query, [section_id]);
+  return await dbGet(db, query, [section_id]);
 }
 
-function getStudentRegistration(db, net_id) {
+async function getStudentRegistration(db, net_id) {
   let query = "SELECT class_id FROM registration WHERE net_id = ?;";
-  return dbAll(db, query, [net_id]);
+  return await dbAll(db, query, [net_id]);
 }
 
-function getClassRegistration(db, class_id) {
+async function getClassRegistration(db, class_id) {
   let query = "SELECT net_id FROM registration WHERE class_id = ?;";
-  return dbAll(db, query, [class_id]);
+  return await dbAll(db, query, [class_id]);
 }
 
-function addPerson(db, net_id, email, password, role) {
+async function addPerson(db, net_id, email, password, role) {
   let query = "INSERT INTO people(net_id, email, hash_pass, salt, role) VALUES (?, ?, ?, ?, ?);";
   let salt = generateSalt();
   let hash_pass = hashStr(password + salt);
-  return dbRun(db, query, [net_id, email, hash_pass, salt, role]);
+  return await dbRun(db, query, [net_id, email, hash_pass, salt, role]);
 }
 
-function addClass(db, class_id, credits, rating, average_gpa, professor,
+async function addClass(db, class_id, credits, rating, average_gpa, professor,
   assistant_professor, quarter, class_name, sln, add_code_required,
   enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
   startF, endF, startSAT, endSAT, startSUN, endSUN) {
@@ -1118,40 +1110,40 @@ function addClass(db, class_id, credits, rating, average_gpa, professor,
     "startF, endF, startSAT, endSAT, startSUN, endSUN) VALUES " +
     "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-  return dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
+  return await dbRun(db, query, [class_id, credits, rating, average_gpa, professor,
     assistant_professor, quarter, class_name, sln, add_code_required,
     enrolled, capacity, startM, endM, startT, endT, startW, endW, startTH, endTH,
     startF, endF, startSAT, endSAT, startSUN, endSUN]);
 }
 
-function addStudent(db, net_id, email, password, student_name, major) {
-  addPerson(db, net_id, email, password, 'student');
+async function addStudent(db, net_id, email, password, student_name, major) {
+  await addPerson(db, net_id, email, password, 'student');
   let query = "INSERT INTO students(net_id, student_name, major) VALUES (?, ?, ?);";
-  return dbRun(db, query, [net_id, student_name, major]);
+  return await dbRun(db, query, [net_id, student_name, major]);
 }
 
-function addProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
-  addPerson(db, net_id, email, password, 'professor');
+async function addProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
+  await addPerson(db, net_id, email, password, 'professor');
   let query = "INSERT INTO professors(net_id, professor_name, department, tenure, rating) VALUES (?, ?, ?, ?, ?);";
-  return dbRun(db, query, [net_id, professor_name, department, tenure, rating])
+  return await dbRun(db, query, [net_id, professor_name, department, tenure, rating])
 }
 
-function addAdviser(db, net_id, email, password, adviser_name, department) {
-  addPerson(db, net_id, email, password, 'adviser');
+async function addAdviser(db, net_id, email, password, adviser_name, department) {
+  await addPerson(db, net_id, email, password, 'adviser');
   let query = "INSERT INTO advisers(net_id, adviser_name, department) VALUES (?, ?, ?);";
-  return dbRun(db, query, [net_id, adviser_name, department]);
+  return await dbRun(db, query, [net_id, adviser_name, department]);
 }
 
-function addSection(db, section_id, ta, co_ta, section_times, class_id) {
+async function addSection(db, section_id, ta, co_ta, section_times, class_id) {
   let query = "INSERT INTO sections(section_id, ta, co_ta, section_times, class_id) VALUES (?, ?, ?, ?, ?);";
-  return dbRun(db, query, [section_id, ta, co_ta, section_times, class_id]);
+  return await dbRun(db, query, [section_id, ta, co_ta, section_times, class_id]);
 }
 
-function updatePerson(db, net_id, email, password, role) {
+async function updatePerson(db, net_id, email, password, role) {
   let salt = generateSalt();
   let hash_pass = hashStr(password + salt);
   let query = "UPDATE people SET email = ?, hash_pass = ?, salt = ?, role = ? WHERE net_id = ?;";
-  return dbRun(db, query, [email, hash_pass, salt, role, net_id]);
+  return await dbRun(db, query, [email, hash_pass, salt, role, net_id]);
 }
 
 async function updateClass(db, class_id, credits, rating, average_gpa, professor,
@@ -1190,7 +1182,7 @@ async function updateClass(db, class_id, credits, rating, average_gpa, professor
   let update_startSUN = startSUN ? startSUN : class_.startSUN;
   let update_endSUN = endSUN ? endSUN : class_.endSUN;
   query = "UPDATE classes SET credits = ?, rating = ?, average_gpa = ?, professor = ?, assistant_professor = ?, quarter = ?, class_name = ?, sln = ?, add_code_required = ?, enrolled = ?, capacity = ?, startM = ?, endM = ?, startT = ?, endT = ?, startW = ?, endW = ?, startTH = ?, endTH = ?, startF = ?, endF = ?, startSAT = ?, endSAT =?, startSUN = ?, endSUN = ? WHERE class_id = ?;";
-  return dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor,
+  return await dbRun(db, query, [update_credits, update_rating, update_average_gpa, update_professor,
     update_assistant_professor, update_quarter, update_class_name, update_sln,
     update_add_code_required, update_enrolled, update_capacity, update_startM, update_endM,
     update_startT, update_endT, update_startW, update_endW, update_startTH, update_endTH,
@@ -1198,7 +1190,7 @@ async function updateClass(db, class_id, credits, rating, average_gpa, professor
 }
 
 async function updateProfessor(db, net_id, email, password, professor_name, department, tenure, rating) {
-  updatePerson(db, net_id, email, password, 'professor');
+  await updatePerson(db, net_id, email, password, 'professor');
   let query = "SELECT * FROM professors WHERE net_id = ?;";
   let professor = await dbGet(db, query, [net_id]);
   if (!professor) {
@@ -1210,11 +1202,11 @@ async function updateProfessor(db, net_id, email, password, professor_name, depa
   let update_tenure = tenure ? tenure : professor.tenure;
   let update_rating = rating ? rating : professor.rating;
   query = "UPDATE professors SET professor_name = ?, department = ?, tenure = ?, rating = ? WHERE net_id = ?;";
-  return dbRun(db, query, [update_professor_name, update_department, update_tenure, update_rating, net_id]);
+  return await dbRun(db, query, [update_professor_name, update_department, update_tenure, update_rating, net_id]);
 }
 
 async function updateStudent(db, net_id, email, password, student_name, major) {
-  updatePerson(db, net_id, email, password, 'student');
+  await updatePerson(db, net_id, email, password, 'student');
   let query = "SELECT * FROM students WHERE net_id = ?;";
   let student = await dbGet(db, query, [net_id]);
   if (!student) {
@@ -1224,11 +1216,11 @@ async function updateStudent(db, net_id, email, password, student_name, major) {
   let update_student_name = student_name ? student_name : student.student_name;
   let update_major = major ? major : student.major;
   query = "UPDATE students SET student_name = ?, major = ? WHERE net_id = ?;";
-  return dbRun(db, query, [update_student_name, update_major, net_id]);
+  return await dbRun(db, query, [update_student_name, update_major, net_id]);
 }
 
 async function updateAdviser(db, net_id, email, password, adviser_name, department) {
-  updatePerson(db, net_id, email, password, 'adviser');
+  await updatePerson(db, net_id, email, password, 'adviser');
   let query = "SELECT * FROM advisers WHERE net_id = ?;";
   let adviser = await dbGet(db, query, [net_id]);
   if (!adviser) {
@@ -1243,7 +1235,7 @@ async function updateAdviser(db, net_id, email, password, adviser_name, departme
 
 async function updateSection(db, section_id, ta, co_ta, section_times, class_id) {
   let query = "SELECT * FROM sections WHERE section_id = ?;";
-  let section = dbGet(db, query, [section_id]);
+  let section = await dbGet(db, query, [section_id]);
   if (!section) {
     return false;
   }
@@ -1253,42 +1245,42 @@ async function updateSection(db, section_id, ta, co_ta, section_times, class_id)
   let update_section_times = section_times ? section_times : section.section_times;
   let update_class_id = class_id ? class_id : section.class_id;
   query = "UPDATE sections SET ta = ?, co_ta = ?, section_times = ?, class_id = ? WHERE section_id = ?;";
-  return dbRun(db, query, [update_ta, update_co_ta, update_section_times, update_class_id, section_id]);
+  return await dbRun(db, query, [update_ta, update_co_ta, update_section_times, update_class_id, section_id]);
 }
 
-function removePerson(db, net_id) {
-  removeStudentFromWaitlist(db, net_id);
-  removeStudentFromRegistration(db, net_id);
+async function removePerson(db, net_id) {
+  await removeStudentFromWaitlist(db, net_id);
+  await removeStudentFromRegistration(db, net_id);
   let query = "DELETE FROM people WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeClass(db, class_id) {
+async function removeClass(db, class_id) {
   let query = "DELETE FROM classes WHERE class_id = ?;";
-  return dbRun(db, query, [class_id]);
+  return await dbRun(db, query, [class_id]);
 }
 
-function removeProfessor(db, net_id) {
-  removePerson(db, net_id);
+async function removeProfessor(db, net_id) {
+  await removePerson(db, net_id);
   let query = "DELETE FROM professors WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeStudent(db, net_id) {
-  removePerson(db, net_id);
+async function removeStudent(db, net_id) {
+  await removePerson(db, net_id);
   let query = "DELETE FROM students WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeAdviser(db, net_id) {
-  removePerson(db, net_id);
+async function removeAdviser(db, net_id) {
+  await removePerson(db, net_id);
   let query = "DELETE FROM advisers WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeSection(db, section_id) {
+async function removeSection(db, section_id) {
   let query = "DELETE FROM sections WHERE section_id = ?;";
-  return dbRun(db, query, [section_id]);
+  return await dbRun(db, query, [section_id]);
 }
 
 async function login(db, net_id, password) {
@@ -1308,9 +1300,9 @@ async function login(db, net_id, password) {
   return SUCCESS;
 }
 
-function getRegistration(db, net_id, class_id) {
+async function getRegistration(db, net_id, class_id) {
   let query = "SELECT * FROM registration WHERE net_id = ? AND class_id = ?;";
-  return dbGet(db, query, [net_id, class_id]);
+  return await dbGet(db, query, [net_id, class_id]);
 }
 
 async function addRegistration(db, net_id, class_id) {
@@ -1329,7 +1321,9 @@ async function addRegistration(db, net_id, class_id) {
     return "Issue inserting into database!";
   }
 
-  incrementClassEnrollment(db, class_id);
+  if (!(await incrementClassEnrollment(db, class_id))) {
+    return false;
+  }
 
   return "Class successfully added!"
 }
@@ -1344,7 +1338,7 @@ async function removeRegistration(db, net_id, class_id) {
     return false;
   }
 
-  return popWaitlist(db, class_id);
+  return await popWaitlist(db, class_id);
 }
 
 async function removeStudentFromRegistration(db, net_id) {
@@ -1358,25 +1352,25 @@ async function removeStudentFromRegistration(db, net_id) {
   }
 
   success = true;
-  classes.forEach((class_id) => {
-    success = success && popWaitlist(class_id);
+  await classes.forEach(async (class_id) => {
+    success = success && (await popWaitlist(class_id));
   })
   return success;
 }
 
-function removeClassFromRegistration(db, class_id) {
+async function removeClassFromRegistration(db, class_id) {
   let query = "DELETE FROM registration WHERE class_id = ?;";
-  return dbRun(db, query, [class_id]);
+  return await dbRun(db, query, [class_id]);
 }
 
-function getWaitlist(db, class_id) {
+async function getWaitlist(db, class_id) {
   let query = "SELECT * FROM waitlist WHERE class_id = ?;";
-  return dbAll(db, query, [class_id]);
+  return await dbAll(db, query, [class_id]);
 }
 
-function getFullWaitlist(db) {
+async function getFullWaitlist(db) {
   let query = "SELECT * FROM waitlist;";
-  return dbAll(db, query, []);
+  return await dbAll(db, query, []);
 }
 
 async function addWaitlist(db, net_id, class_id) {
@@ -1384,22 +1378,22 @@ async function addWaitlist(db, net_id, class_id) {
   let result = await dbGet(db, query, []);
   let position = result ? result.position + 1 : 0;
   query = "INSERT INTO waitlist(net_id, class_id, position) VALUES (?, ?, ?);";
-  return dbRun(db, query, [net_id, class_id, position]);
+  return await dbRun(db, query, [net_id, class_id, position]);
 }
 
-function removeWaitlist(db, net_id) {
+async function removeWaitlist(db, net_id) {
   let query = "DELETE FROM waitlist WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeStudentFromWaitlist(db, net_id) {
+async function removeStudentFromWaitlist(db, net_id) {
   let query = "DELETE FROM waitlist WHERE net_id = ?;";
-  return dbRun(db, query, [net_id]);
+  return await dbRun(db, query, [net_id]);
 }
 
-function removeClassFromWaitlist(db, class_id) {
+async function removeClassFromWaitlist(db, class_id) {
   let query = "DELETE FROM waitlist WHERE net_id = ?;";
-  return dbRun(db, query, [class_id]);
+  return await dbRun(db, query, [class_id]);
 }
 
 async function popWaitlist(db, class_id) {
@@ -1412,37 +1406,37 @@ async function popWaitlist(db, class_id) {
   if (!(await addRegistration(db, student.net_id, class_id))) {
     return false;
   }
-  return removeWaitlist(db, student.net_id);
+  return await removeWaitlist(db, student.net_id);
 }
 
-function getAddCodes(db, class_name) {
+async function getAddCodes(db, class_name) {
   let query = "SELECT * FROM addCode WHERE class = ?;";
-  return dbAll(db, query, [class_name]);
+  return await dbAll(db, query, [class_name]);
 }
 
-function addAddCode(db, add_id, add_code_status, JobType, add_code, class_name, net_id) {
+async function addAddCode(db, add_id, add_code_status, JobType, add_code, class_name, net_id) {
   let query = "INSERT INTO addCode(add_id, add_code_status, JobType, add_code, class, net_id) VALUES (?, ?, ?, ?, ?, ?);";
-  return dbRun(db, query, [add_id, add_code_status, JobType, add_code, class_name, net_id]);
+  return await dbRun(db, query, [add_id, add_code_status, JobType, add_code, class_name, net_id]);
 }
 
-function removeAddCode(db, add_id) {
+async function removeAddCode(db, add_id) {
   let query = "DELETE FROM addCode WHERE add_id = ?;";
-  return dbRun(db, query, [add_id]);
+  return await dbRun(db, query, [add_id]);
 }
 
-function getMessages(db, net_id_receiver, net_id_sender) {
+async function getMessages(db, net_id_receiver, net_id_sender) {
   let query = "SELECT * FROM messages WHERE net_id_receiver = ? AND net_id_sender = ?;"
-  return dbAll(db, query, [net_id_receiver, net_id_sender]);
+  return await dbAll(db, query, [net_id_receiver, net_id_sender]);
 }
 
-function addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) {
+async function addMessage(db, net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) {
   let query = "INSERT INTO messages(net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message) VALUES (?, ?, ?, ?, ?);";
-  return dbRun(db, query, [net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message]);
+  return await dbRun(db, query, [net_id_sender, JobType_sender, net_id_receiver, JobType_receiver, message]);
 }
 
-function removeMessages(db, sender, receiver) {
+async function removeMessages(db, sender, receiver) {
   let query = "DELETE FROM messages WHERE net_id_sender = ? AND net_id_receiver = ?;";
-  return dbRun(db, query, [sender, receiver]);
+  return await dbRun(db, query, [sender, receiver]);
 }
 
 // Constructs a basic object to be passed into res.send()
@@ -1549,7 +1543,7 @@ async function incrementClassEnrollment(db, class_id) {
 
   let enrolled = class_.enrolled;
   query = "UPDATE classes SET enrolled = ? WHERE class_id = ?;";
-  return dbRun(db, query, [enrolled + 1, class_id]);
+  return await dbRun(db, query, [enrolled + 1, class_id]);
 }
 
 async function decrementClassEnrollment(db, class_id) {
@@ -1561,7 +1555,7 @@ async function decrementClassEnrollment(db, class_id) {
 
   let enrolled = class_.enrolled;
   query = "UPDATE classes SET enrolled = ? WHERE class_id = ?;";
-  return dbRun(db, query, [enrolled - 1, class_id]);
+  return await dbRun(db, query, [enrolled - 1, class_id]);
 }
 
 async function hasClassConflict(db, net_id, class_id) {
