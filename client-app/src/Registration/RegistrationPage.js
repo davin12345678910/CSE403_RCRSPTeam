@@ -97,7 +97,7 @@ const RegistrationPage = () => {
         try {
             // Make the request
             response = await fetchData(addRegistrationEndpoint, addRegistrationOptions);
-            if (response.error.includes("Conflict")) {
+            if (response.error && response.error.includes("Conflict")) {
                 setErrorMessage(response.error);
             } else if (response.status !== 200) {
                 setErrorMessage('Error adding course');
